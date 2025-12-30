@@ -2,80 +2,104 @@ import { auth, db } from "./firebase.js";
 import {
   collection,
   addDoc,
+  deleteDoc,
+  doc,
   query,
   where,
   onSnapshot
 } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-firestore.js";
-
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-auth.js";
+
+let books = [];
+let currentUser = null;
 
 const titleInput = document.getElementById("title");
 const authorInput = document.getElementById("author");
+const categoryInput = document.getElementById("category");
 const dateInput = document.getElementById("date");
 const bookList = document.getElementById("bookList");
-const form = document.getElementById("bookForm");
-const toggleBtn = document.getElementById("toggleForm");
+const searchInput = document.getElementById("search");
 
-let currentUser = null;
-
-// Toggle form
-toggleBtn.onclick = () => {
-  form.classList.toggle("hidden");
+document.getElementById("toggleForm").onclick = () => {
+  document.getElementById("bookForm").classList.toggle("hidden");
 };
 
-// Auth check
 onAuthStateChanged(auth, user => {
-  if (!user) {
-    location.href = "index.html";
-    return;
-  }
+  if (!user) return location.href = "index.html";
   currentUser = user;
   loadBooks();
 });
 
-// Add book
-window.addBook = async () => {
-  const title = titleInput.value.trim();
-  const author = authorInput.value.trim();
-  const date = dateInput.value;
+async function loadBooks() {
+  const q = query(collection(db, "books"), where("uid", "==", currentUser.uid));
+  onSnapshot(q, snap => {
+    books = [];
+    snap.forEach(d => books.push({ id: d.id, ...d.data() }));
+    renderBooks(books);
+  });
+}
 
-  if (!title || !author || !date) {
-    alert("Fill all fields");
-    return;
-  }
+window.addBook = async () => {
+  if (!titleInput.value || !authorInput.value || !categoryInput.value || !dateInput.value)
+    return alert("Fill all fields");
 
   await addDoc(collection(db, "books"), {
     uid: currentUser.uid,
-    title,
-    author,
-    date
+    title: titleInput.value,
+    author: authorInput.value,
+    category: categoryInput.value,
+    date: dateInput.value
   });
 
   titleInput.value = "";
   authorInput.value = "";
+  categoryInput.value = "";
   dateInput.value = "";
 };
 
-// Load books
-function loadBooks() {
-  const q = query(
-    collection(db, "books"),
-    where("uid", "==", currentUser.uid)
-  );
+function renderBooks(data) {
+  bookList.innerHTML = "";
+  data.forEach(b => {
+    bookList.innerHTML += `
+      <div class="book">
+        <h3>${b.title}</h3>
+        <small>✍ ${b.author} | 📁 ${b.category}</small>
+        <p>📅 ${b.date}</p>
 
-  onSnapshot(q, snapshot => {
-    bookList.innerHTML = "";
-
-    snapshot.forEach(doc => {
-      const b = doc.data();
-
-      bookList.innerHTML += `
-        <div class="book">
-          <h3>${b.title}</h3>
-          <p>✍ ${b.author}</p>
-          <p>📅 ${b.date}</p>
+        <div class="book-actions">
+          <button class="edit" onclick="editBook('${b.id}')">Edit</button>
+          <button onclick="deleteBook('${b.id}')">Delete</button>
         </div>
-      `;
-    });
+      </div>
+    `;
   });
 }
+
+window.deleteBook = async (id) => {
+  await deleteDoc(doc(db, "books", id));
+};
+
+window.editBook = (id) => {
+  const book = books.find(b => b.id === id);
+  titleInput.value = book.title;
+  authorInput.value = book.author;
+  categoryInput.value = book.category;
+  dateInput.value = book.date;
+
+  deleteBook(id);
+};
+
+// SEARCH
+searchInput.oninput = () => {
+  const value = searchInput.value.toLowerCase();
+  renderBooks(books.filter(b => b.title.toLowerCase().includes(value)));
+};
+
+// SORT
+window.sortByName = () => {
+  renderBooks([...books].sort((a, b) => a.title.localeCompare(b.title)));
+};
+
+window.sortByDate = () => {
+  renderBooks([...books].sort((a, b) => new Date(b.date) - new Date(a.date)));
+};
