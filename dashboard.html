@@ -2,11 +2,10 @@
 <html>
 <head>
   <title>Dashboard</title>
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="dashboard.css">
 </head>
 <body>
 
-<!-- SIDEBAR -->
 <div class="sidebar">
   <button class="nav-btn">Books</button>
   <button class="nav-btn">Quotes</button>
@@ -17,17 +16,13 @@
   <button id="logoutBtn" class="logout">Logout</button>
 </div>
 
-<!-- MAIN CONTENT -->
 <div class="content">
-  <h1>Dashboard</h1>
-  <p>Select a section from the left</p>
+  <h2>Dashboard</h2>
 
-  <!-- Image Upload Section -->
-  <div class="section">
-    <input type="file" id="imgFile">
-    <button onclick="uploadImage()">Upload Image</button>
-    <div id="imageGallery"></div>
-  </div>
+  <input type="file" id="imgFile">
+  <button onclick="uploadImage()">Upload Image</button>
+
+  <div id="imageGallery"></div>
 </div>
 
 <script type="module" src="dashboard.js"></script>
