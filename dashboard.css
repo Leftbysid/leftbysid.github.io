@@ -51,12 +51,22 @@ body {
 
 /* LOGOUT */
 .logout {
-  margin-top: 30px;
-  background: red;
-  color: white;
+  width: 180px;
+  padding: 14px;
+  font-size: 16px;
+  border-radius: 10px;
+  border: none;
+  background: black;
+  color: red;
+  font-weight: bold;
+  cursor: pointer;
   box-shadow: 0 0 12px red;
+  transition: 0.25s;
+  margin-top: 30px;
 }
 
 .logout:hover {
-  background: darkred;
+  background: red;
+  color: black;
+  transform: scale(1.05);
 }
