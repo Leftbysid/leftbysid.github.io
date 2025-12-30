@@ -1,25 +1,32 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="UTF-8">
-  <title>My Cozy Dashboard</title>
+  <title>Dashboard</title>
   <link rel="stylesheet" href="dashboard.css">
 </head>
 <body>
 
-<div class="scene">
+<div class="dashboard">
 
-  <!-- CLICKABLE AREAS -->
-  <div class="hotspot books" onclick="go('books.html')"></div>
-  <div class="hotspot links" onclick="go('links.html')"></div>
-  <div class="hotspot stuff" onclick="go('stuff.html')"></div>
-  <div class="hotspot quotes" onclick="go('quotes.html')"></div>
+  <h1>Dashboard</h1>
+
+  <div class="menu">
+    <button onclick="go('books.html')">📚 Books</button>
+    <button onclick="go('quotes.html')">💬 Quotes</button>
+    <button onclick="go('links.html')">🔗 Links</button>
+    <button onclick="go('stuff.html')">📦 Stuff</button>
+    <button class="logout" onclick="logout()">Logout</button>
+  </div>
 
 </div>
 
 <script>
   function go(page) {
     window.location.href = page;
+  }
+
+  function logout() {
+    window.location.href = "index.html";
   }
 </script>
 
