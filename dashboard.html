@@ -6,16 +6,29 @@
 </head>
 <body>
 
-<h2>My Dashboard</h2>
+<!-- SIDEBAR -->
+<div class="sidebar">
+  <button class="nav-btn">Books</button>
+  <button class="nav-btn">Quotes</button>
+  <button class="nav-btn">Links</button>
+  <button class="nav-btn">Images</button>
+  <button class="nav-btn">Stuffs</button>
 
-<button id="logoutBtn">Logout</button>
+  <button id="logoutBtn" class="logout">Logout</button>
+</div>
 
-<hr>
+<!-- MAIN CONTENT -->
+<div class="content">
+  <h1>Dashboard</h1>
+  <p>Select a section from the left</p>
 
-<input type="file" id="imgFile">
-<button onclick="uploadImage()">Upload Image</button>
-
-<div id="imageGallery"></div>
+  <!-- Image Upload Section -->
+  <div class="section">
+    <input type="file" id="imgFile">
+    <button onclick="uploadImage()">Upload Image</button>
+    <div id="imageGallery"></div>
+  </div>
+</div>
 
 <script type="module" src="dashboard.js"></script>
 </body>
