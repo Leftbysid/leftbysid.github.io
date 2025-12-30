@@ -7,39 +7,36 @@ import {
   onSnapshot
 } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-firestore.js";
 
-import {
-  onAuthStateChanged
-} from "https://www.gstatic.com/firebasejs/12.7.0/firebase-auth.js";
+import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-auth.js";
 
 const titleInput = document.getElementById("title");
 const authorInput = document.getElementById("author");
-const coverInput = document.getElementById("cover");
 const dateInput = document.getElementById("date");
 const bookList = document.getElementById("bookList");
+const form = document.getElementById("bookForm");
+const toggleBtn = document.getElementById("toggleForm");
 
 let currentUser = null;
 
-// 🔐 WAIT FOR LOGIN
+// Toggle form
+toggleBtn.onclick = () => {
+  form.classList.toggle("hidden");
+};
+
+// Auth check
 onAuthStateChanged(auth, user => {
   if (!user) {
-    window.location.href = "index.html";
+    location.href = "index.html";
     return;
   }
-
   currentUser = user;
   loadBooks();
 });
 
-// ➕ ADD BOOK
+// Add book
 window.addBook = async () => {
-  if (!currentUser) {
-    alert("Not logged in");
-    return;
-  }
-
   const title = titleInput.value.trim();
   const author = authorInput.value.trim();
-  const cover = coverInput.value.trim();
   const date = dateInput.value;
 
   if (!title || !author || !date) {
@@ -51,17 +48,15 @@ window.addBook = async () => {
     uid: currentUser.uid,
     title,
     author,
-    cover,
     date
   });
 
   titleInput.value = "";
   authorInput.value = "";
-  coverInput.value = "";
   dateInput.value = "";
 };
 
-// 📚 LOAD BOOKS
+// Load books
 function loadBooks() {
   const q = query(
     collection(db, "books"),
@@ -76,12 +71,9 @@ function loadBooks() {
 
       bookList.innerHTML += `
         <div class="book">
-          <img src="${b.cover || 'https://via.placeholder.com/80x110'}">
-          <div class="book-info">
-            <h3>${b.title}</h3>
-            <p>✍ ${b.author}</p>
-            <p>📅 ${b.date}</p>
-          </div>
+          <h3>${b.title}</h3>
+          <p>✍ ${b.author}</p>
+          <p>📅 ${b.date}</p>
         </div>
       `;
     });
