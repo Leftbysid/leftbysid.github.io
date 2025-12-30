@@ -7,15 +7,12 @@
 </head>
 <body>
 
-<!-- Background Music -->
 <audio id="bgMusic" loop>
   <source src="bg-music.mp3" type="audio/mpeg">
 </audio>
 
-<!-- Music Toggle -->
 <button class="music-btn" onclick="toggleMusic()">▶</button>
 
-<!-- Dashboard -->
 <div class="center-menu">
   <button onclick="go('books.html')">📚 Books</button>
   <button onclick="go('quotes.html')">💬 Quotes</button>
@@ -24,23 +21,11 @@
   <button class="logout" onclick="logout()">🚪 Logout</button>
 </div>
 
-<script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-app.js";
-  import { getAuth, signOut } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-auth.js";
-
-  const firebaseConfig = {
-    apiKey: "YOUR_API_KEY",
-    authDomain: "YOUR_PROJECT.firebaseapp.com",
-    projectId: "YOUR_PROJECT_ID",
-  };
-
-  const app = initializeApp(firebaseConfig);
-  const auth = getAuth(app);
-
+<script>
   const music = document.getElementById("bgMusic");
   let playing = false;
 
-  window.toggleMusic = () => {
+  function toggleMusic() {
     if (!playing) {
       music.play();
       playing = true;
@@ -50,17 +35,15 @@
       playing = false;
       document.querySelector(".music-btn").innerText = "▶";
     }
-  };
+  }
 
-  window.go = (page) => {
+  function go(page) {
     window.location.href = page;
-  };
+  }
 
-  window.logout = () => {
-    signOut(auth).then(() => {
-      window.location.href = "index.html";
-    });
-  };
+  function logout() {
+    window.location.href = "index.html";
+  }
 </script>
 
 </body>
