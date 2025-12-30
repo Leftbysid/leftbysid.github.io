@@ -1,40 +1,18 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="UTF-8">
-  <title>Access Portal</title>
+  <title>Access Terminal</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body class="cyber-body">
 
 <div class="cyber-box">
   <h1 class="glow">ACCESS TERMINAL</h1>
-  <p class="sub">Authenticate to continue</p>
-
   <input id="email" type="email" placeholder="Email">
   <input id="password" type="password" placeholder="Password">
-
-  <button id="loginBtn">ENTER SYSTEM</button>
-
-  <p class="footer-text">⚡ Secured • Encrypted • Private</p>
+  <button id="loginBtn">ENTER</button>
 </div>
 
-<script type="module">
-  import { auth } from "./firebase.js";
-  import {
-    signInWithEmailAndPassword,
-    onAuthStateChanged
-  } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-auth.js";
-
-  onAuthStateChanged(auth, user => {
-    if (user) window.location = "dashboard.html";
-  });
-
-  loginBtn.onclick = () => {
-    signInWithEmailAndPassword(auth, email.value, password.value)
-      .catch(err => alert(err.message));
-  };
-</script>
-
+<script type="module" src="auth.js"></script>
 </body>
 </html>
