@@ -1,23 +1,21 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+  <meta charset="UTF-8">
   <title>Dashboard</title>
   <link rel="stylesheet" href="dashboard.css">
 </head>
 <body>
 
-<div class="dashboard">
+<div class="game-menu">
+  <h1 class="title">🎮 DASHBOARD</h1>
 
-  <h1>Dashboard</h1>
+  <button onclick="go('books.html')">📚 Books</button>
+  <button onclick="go('quotes.html')">💬 Quotes</button>
+  <button onclick="go('links.html')">🔗 Links</button>
+  <button onclick="go('stuff.html')">📦 Stuff</button>
 
-  <div class="menu">
-    <button onclick="go('books.html')">📚 Books</button>
-    <button onclick="go('quotes.html')">💬 Quotes</button>
-    <button onclick="go('links.html')">🔗 Links</button>
-    <button onclick="go('stuff.html')">📦 Stuff</button>
-    <button class="logout" onclick="logout()">Logout</button>
-  </div>
-
+  <button class="logout" onclick="logout()">🚪 Logout</button>
 </div>
 
 <script>
