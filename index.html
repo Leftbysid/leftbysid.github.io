@@ -1,43 +1,37 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Login</title>
+  <meta charset="UTF-8">
+  <title>Access Portal</title>
   <link rel="stylesheet" href="style.css">
 </head>
-<body>
+<body class="cyber-body">
 
-<h2>My Personal Space</h2>
+<div class="cyber-box">
+  <h1 class="glow">ACCESS TERMINAL</h1>
+  <p class="sub">Authenticate to continue</p>
 
-<input id="email" type="email" placeholder="Email">
-<input id="password" type="password" placeholder="Password">
+  <input id="email" type="email" placeholder="Email">
+  <input id="password" type="password" placeholder="Password">
 
-<button id="loginBtn">Login</button>
-<button id="signupBtn">Sign Up</button>
+  <button id="loginBtn">ENTER SYSTEM</button>
+
+  <p class="footer-text">⚡ Secured • Encrypted • Private</p>
+</div>
 
 <script type="module">
   import { auth } from "./firebase.js";
   import {
     signInWithEmailAndPassword,
-    createUserWithEmailAndPassword,
     onAuthStateChanged
   } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-auth.js";
 
-  // Auto-redirect if already logged in
   onAuthStateChanged(auth, user => {
-    if (user) {
-      window.location = "dashboard.html";
-    }
+    if (user) window.location = "dashboard.html";
   });
 
-  // Login
-  document.getElementById("loginBtn").onclick = () => {
+  loginBtn.onclick = () => {
     signInWithEmailAndPassword(auth, email.value, password.value)
-      .catch(err => alert(err.message));
-  };
-
-  // Signup
-  document.getElementById("signupBtn").onclick = () => {
-    createUserWithEmailAndPassword(auth, email.value, password.value)
       .catch(err => alert(err.message));
   };
 </script>
