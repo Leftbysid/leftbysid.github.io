@@ -1,76 +1,40 @@
-/* CYBERPUNK LOGIN */
-
-body.cyber-body {
-  margin: 0;
-  height: 100vh;
-  background: radial-gradient(circle at top, #0f2027, #000);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  font-family: 'Segoe UI', sans-serif;
+body {
+  background: #000;
   color: #00f2ff;
-}
-
-.cyber-box {
-  background: rgba(0, 0, 0, 0.75);
-  padding: 35px;
-  width: 320px;
-  border-radius: 15px;
-  box-shadow:
-    0 0 10px #00f2ff,
-    0 0 30px rgba(0, 255, 255, 0.4);
+  font-family: Arial;
   text-align: center;
 }
 
-.glow {
-  font-size: 22px;
-  text-shadow:
-    0 0 5px #00f2ff,
-    0 0 15px #00f2ff;
+.cyber-body {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
 }
 
-.sub {
-  font-size: 13px;
-  color: #aaa;
-  margin-bottom: 20px;
-}
-
-input {
-  width: 100%;
-  padding: 12px;
-  margin: 8px 0;
-  border-radius: 6px;
-  border: none;
+.cyber-box {
   background: #050505;
-  color: #00f2ff;
-  outline: none;
-  box-shadow: inset 0 0 5px #00f2ff;
+  padding: 30px;
+  border-radius: 10px;
+  box-shadow: 0 0 20px #00f2ff;
 }
 
-input::placeholder {
-  color: #666;
-}
-
-button {
+input, button {
   width: 100%;
-  padding: 12px;
-  margin-top: 12px;
-  background: #00f2ff;
-  border: none;
-  border-radius: 6px;
-  font-weight: bold;
-  cursor: pointer;
-  color: black;
-  transition: 0.2s;
+  padding: 10px;
+  margin: 10px 0;
+  background: black;
+  color: #00f2ff;
+  border: 1px solid #00f2ff;
 }
 
 button:hover {
-  background: #00c4cc;
-  box-shadow: 0 0 10px #00f2ff;
+  background: #00f2ff;
+  color: black;
 }
 
-.footer-text {
-  margin-top: 15px;
-  font-size: 11px;
-  color: #666;
+img {
+  width: 200px;
+  margin: 10px;
+  border-radius: 10px;
 }
