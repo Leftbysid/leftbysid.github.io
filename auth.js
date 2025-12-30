@@ -1,15 +1,7 @@
 import { auth } from "./firebase.js";
 import {
-  signInWithEmailAndPassword,
-  onAuthStateChanged
+  signInWithEmailAndPassword
 } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-auth.js";
-
-// Auto-login if already logged in
-onAuthStateChanged(auth, user => {
-  if (user) {
-    window.location.href = "dashboard.html";
-  }
-});
 
 // Login button
 document.getElementById("loginBtn").addEventListener("click", () => {
@@ -22,5 +14,8 @@ document.getElementById("loginBtn").addEventListener("click", () => {
   }
 
   signInWithEmailAndPassword(auth, email, password)
+    .then(() => {
+      window.location.href = "dashboard.html";
+    })
     .catch(err => alert(err.message));
 });
