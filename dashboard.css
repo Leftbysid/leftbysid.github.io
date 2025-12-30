@@ -8,65 +8,43 @@ body {
   font-family: Arial, sans-serif;
 }
 
-/* MENU */
 .center-menu {
   display: flex;
   flex-direction: column;
   gap: 18px;
 }
 
-/* BUTTON BASE */
 button {
   width: 240px;
   padding: 14px;
   font-size: 16px;
   border-radius: 12px;
-  background: #000;
-  color: #00f2ff;
   border: 2px solid rgba(0, 255, 255, 0.6);
+  background: black;
+  color: #00f2ff;
   cursor: pointer;
-  transition: all 0.25s ease;
-  box-shadow:
-    0 0 8px rgba(0, 255, 255, 0.4),
-    inset 0 0 6px rgba(0, 255, 255, 0.3);
+  transition: 0.25s;
+  box-shadow: 0 0 10px rgba(0, 255, 255, 0.4);
 }
 
-/* HOVER EFFECT */
 button:hover {
   background: #00f2ff;
-  color: #000;
-  box-shadow:
-    0 0 20px #00f2ff,
-    0 0 40px rgba(0, 255, 255, 0.6);
-  transform: scale(1.07);
+  color: black;
+  box-shadow: 0 0 25px #00f2ff;
+  transform: scale(1.06);
 }
 
-/* CLICK EFFECT */
-button:active {
-  transform: scale(1.03);
-  box-shadow:
-    0 0 25px #00f2ff,
-    inset 0 0 12px rgba(0, 0, 0, 0.5);
-}
-
-/* LOGOUT BUTTON */
 .logout {
+  border-color: red;
   color: #ff4d4d;
-  border-color: rgba(255, 0, 0, 0.7);
-  box-shadow:
-    0 0 8px rgba(255, 0, 0, 0.5),
-    inset 0 0 6px rgba(255, 0, 0, 0.4);
 }
 
 .logout:hover {
   background: red;
   color: white;
-  box-shadow:
-    0 0 25px red,
-    0 0 45px rgba(255, 0, 0, 0.7);
+  box-shadow: 0 0 25px red;
 }
 
-/* MUSIC BUTTON */
 .music-btn {
   position: fixed;
   top: 20px;
@@ -76,16 +54,7 @@ button:active {
   border-radius: 50%;
   background: black;
   color: #00f2ff;
-  border: 2px solid rgba(0, 255, 255, 0.7);
-  font-size: 20px;
+  border: 2px solid #00f2ff;
   cursor: pointer;
-  box-shadow:
-    0 0 12px rgba(0, 255, 255, 0.6),
-    inset 0 0 6px rgba(0, 255, 255, 0.3);
-}
-
-.music-btn:hover {
-  background: #00f2ff;
-  color: black;
-  box-shadow: 0 0 25px #00f2ff;
+  box-shadow: 0 0 12px #00f2ff;
 }
