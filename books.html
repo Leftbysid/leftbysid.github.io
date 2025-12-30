@@ -9,11 +9,19 @@
 <div class="container">
   <h1>📚 My Books</h1>
 
+  <input id="search" placeholder="Search books...">
+
+  <div class="controls">
+    <button onclick="sortByName()">Sort A–Z</button>
+    <button onclick="sortByDate()">Sort by Date</button>
+  </div>
+
   <button id="toggleForm" class="add-btn">➕ Add Book</button>
 
   <div id="bookForm" class="form hidden">
     <input id="title" placeholder="Book Title">
     <input id="author" placeholder="Author">
+    <input id="category" placeholder="Category">
     <input id="date" type="date">
     <button onclick="addBook()">Save Book</button>
   </div>
