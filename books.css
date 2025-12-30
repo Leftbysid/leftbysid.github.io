@@ -10,32 +10,28 @@ body {
   margin: auto;
 }
 
-h1 {
-  text-align: center;
-}
-
 input {
   width: 100%;
   padding: 10px;
-  margin: 8px 0;
+  margin: 6px 0;
   background: black;
   border: 1px solid #00f2ff;
   color: #00f2ff;
   border-radius: 6px;
 }
 
+button {
+  padding: 10px;
+  border: none;
+  background: #00f2ff;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
 .controls {
   display: flex;
   gap: 10px;
-  margin-bottom: 10px;
-}
-
-button {
-  padding: 10px;
-  background: #00f2ff;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
+  margin: 10px 0;
 }
 
 .add-btn {
@@ -54,24 +50,50 @@ button {
   border-radius: 8px;
 }
 
-.book h3 {
-  margin: 0;
-}
-
-.book small {
-  color: #aaa;
-}
-
 .book-actions {
   margin-top: 8px;
 }
 
 .book-actions button {
-  margin-right: 5px;
+  margin-right: 6px;
   background: red;
   color: white;
 }
 
-.book-actions button.edit {
+.book-actions .edit {
   background: orange;
+}
+
+/* MODAL */
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.6);
+  backdrop-filter: blur(6px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.overlay.hidden {
+  display: none;
+}
+
+.edit-modal {
+  background: black;
+  padding: 25px;
+  border-radius: 10px;
+  width: 300px;
+  box-shadow: 0 0 20px #00f2ff;
+}
+
+.modal-buttons {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 10px;
+}
+
+.modal-buttons .cancel {
+  background: red;
+  color: white;
 }
