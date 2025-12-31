@@ -31,13 +31,8 @@ body {
   margin: 15px auto;
 }
 
-.hidden {
-  display: none;
-}
-
-/* BOOK CARD */
 .book-card {
-  border: 2px solid rgba(0, 255, 255, 0.5);
+  border: 2px solid rgba(0,255,255,.5);
   padding: 16px;
   border-radius: 12px;
   margin: 15px auto;
@@ -73,7 +68,6 @@ body {
   border: none;
   font-size: 22px;
   cursor: pointer;
-  transition: 0.2s;
 }
 
 .book-actions button:hover {
