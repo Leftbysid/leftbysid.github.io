@@ -3,25 +3,41 @@
 <head>
   <meta charset="UTF-8">
   <title>Dashboard</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600&family=Pacifico&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="dashboard.css">
 </head>
 <body>
 
+<!-- Background Music -->
 <audio id="bgMusic" loop>
   <source src="bg-music.mp3" type="audio/mpeg">
 </audio>
 
 <button class="music-btn" onclick="toggleMusic()">▶</button>
 
-<div class="center-menu">
-  <button onclick="go('books.html')">Books</button>
-  <button onclick="go('quotes.html')">Quotes</button>
-  <button onclick="go('links.html')">Links</button>
-  <button onclick="go('stuff.html')">Stuff</button>
-  <button class="logout" onclick="logout()">Logout</button>
+<div class="container">
+  <h1 class="title">All My Shit</h1>
+  <h2 class="subtitle">Go Fuck Yourself</h2>
+
+  <div class="menu">
+    <button onclick="go('books.html')">Books</button>
+    <button onclick="go('quotes.html')">Quotes</button>
+    <button onclick="go('links.html')">Links</button>
+    <button onclick="go('stuff.html')">Stuff</button>
+    <button class="logout" onclick="logout()">Logout</button>
+  </div>
 </div>
 
 <script>
+  function go(page) {
+    window.location.href = page;
+  }
+
+  function logout() {
+    window.location.href = "index.html";
+  }
+
   const music = document.getElementById("bgMusic");
   let playing = false;
 
@@ -35,14 +51,6 @@
       playing = false;
       document.querySelector(".music-btn").innerText = "▶";
     }
-  }
-
-  function go(page) {
-    window.location.href = page;
-  }
-
-  function logout() {
-    window.location.href = "index.html";
   }
 </script>
 
