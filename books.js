@@ -13,6 +13,7 @@ import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.7.0/fi
 
 let books = [];
 let editingId = null;
+let deleteId = null;
 let currentUser = null;
 
 const titleInput = document.getElementById("title");
@@ -21,12 +22,6 @@ const categoryInput = document.getElementById("category");
 const dateInput = document.getElementById("date");
 const bookList = document.getElementById("bookList");
 const searchInput = document.getElementById("search");
-
-const overlay = document.getElementById("editOverlay");
-const editTitle = document.getElementById("editTitle");
-const editAuthor = document.getElementById("editAuthor");
-const editCategory = document.getElementById("editCategory");
-const editDate = document.getElementById("editDate");
 
 document.getElementById("toggleForm").onclick = () => {
   document.getElementById("bookForm").classList.toggle("hidden");
@@ -40,8 +35,7 @@ onAuthStateChanged(auth, user => {
 
 // ADD / UPDATE
 window.addBook = async () => {
-  if (!titleInput.value || !authorInput.value || !categoryInput.value || !dateInput.value)
-    return alert("Fill all fields");
+  if (!titleInput.value || !authorInput.value) return;
 
   if (editingId) {
     await updateDoc(doc(db, "books", editingId), {
@@ -83,14 +77,19 @@ function renderBooks(list) {
   bookList.innerHTML = "";
   list.forEach(b => {
     bookList.innerHTML += `
-      <div class="book">
-        <h3>${b.title}</h3>
-        <p>✍ ${b.author}</p>
-        <p>📁 ${b.category}</p>
-        <p>📅 ${b.date}</p>
+      <div class="book-card">
+        <div class="book-header">
+          ${b.title}
+          <span class="book-author">– ${b.author}</span>
+        </div>
+
+        <div class="book-meta">
+          📂 ${b.category} &nbsp; | &nbsp; 📅 ${b.date}
+        </div>
+
         <div class="book-actions">
-          <button class="edit" onclick="editBook('${b.id}')">Edit</button>
-          <button onclick="deleteBook('${b.id}')">Delete</button>
+          <button onclick="editBook('${b.id}')">✏️</button>
+          <button onclick="askDelete('${b.id}')">🗑️</button>
         </div>
       </div>
     `;
@@ -104,46 +103,34 @@ searchInput.oninput = () => {
 };
 
 // SORT
-window.sortByName = () => {
+window.sortByName = () =>
   renderBooks([...books].sort((a, b) => a.title.localeCompare(b.title)));
-};
 
-window.sortByDate = () => {
-  renderBooks([...books].sort((a, b) => new Date(b.date) - new Date(a.date)));
-};
+window.sortByDate = () =>
+  renderBooks([...books].sort((a, b) => new Date(a.date) - new Date(b.date)));
 
 // EDIT
-window.editBook = (id) => {
-  const book = books.find(b => b.id === id);
-
-  editTitle.value = book.title;
-  editAuthor.value = book.author;
-  editCategory.value = book.category;
-  editDate.value = book.date;
-
+window.editBook = id => {
+  const b = books.find(x => x.id === id);
+  titleInput.value = b.title;
+  authorInput.value = b.author;
+  categoryInput.value = b.category;
+  dateInput.value = b.date;
   editingId = id;
-  overlay.classList.remove("hidden");
-};
-
-window.saveEdit = async () => {
-  await updateDoc(doc(db, "books", editingId), {
-    title: editTitle.value,
-    author: editAuthor.value,
-    category: editCategory.value,
-    date: editDate.value
-  });
-
-  editingId = null;
-  overlay.classList.add("hidden");
-};
-
-window.closeEdit = () => {
-  overlay.classList.add("hidden");
 };
 
 // DELETE
-window.deleteBook = async (id) => {
-  if (confirm("Delete this book?")) {
-    await deleteDoc(doc(db, "books", id));
-  }
+window.askDelete = id => {
+  deleteId = id;
+  document.getElementById("confirmBox").classList.remove("hidden");
+};
+
+window.confirmDelete = async () => {
+  await deleteDoc(doc(db, "books", deleteId));
+  closeConfirm();
+};
+
+window.closeConfirm = () => {
+  deleteId = null;
+  document.getElementById("confirmBox").classList.add("hidden");
 };
