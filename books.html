@@ -39,5 +39,21 @@
 </div>
 
 <script type="module" src="books.js"></script>
+  <!-- EDIT POPUP -->
+<div id="editOverlay" class="edit-overlay hidden">
+  <div class="edit-box">
+    <h3>Edit Book</h3>
+
+    <input id="editTitle" placeholder="Book Title">
+    <input id="editAuthor" placeholder="Author">
+    <input id="editCategory" placeholder="Category">
+    <input id="editDate" type="date">
+
+    <div class="edit-actions">
+      <button onclick="saveEdit()">💾 Save</button>
+      <button class="cancel" onclick="closeEdit()">✖ Cancel</button>
+    </div>
+  </div>
+</div>
 </body>
 </html>
