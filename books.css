@@ -1,99 +1,105 @@
 body {
   background: radial-gradient(circle, #0f2027, #000);
+  font-family: Arial;
   color: #00f2ff;
-  font-family: Arial, sans-serif;
-  padding: 30px;
+  padding: 20px;
 }
 
-.container {
-  max-width: 800px;
-  margin: auto;
-}
-
-input {
-  width: 100%;
-  padding: 10px;
-  margin: 6px 0;
-  background: black;
-  border: 1px solid #00f2ff;
-  color: #00f2ff;
-  border-radius: 6px;
-}
-
-button {
-  padding: 10px;
-  border: none;
-  background: #00f2ff;
-  border-radius: 6px;
-  cursor: pointer;
+.title {
+  text-align: center;
 }
 
 .controls {
   display: flex;
   gap: 10px;
-  margin: 10px 0;
+  justify-content: center;
 }
 
-.add-btn {
-  width: 100%;
-  margin: 10px 0;
+.controls input,
+.controls button,
+#bookForm input,
+#bookForm button {
+  padding: 10px;
+  border-radius: 8px;
+  border: 2px solid #00f2ff;
+  background: black;
+  color: #00f2ff;
 }
 
-.form.hidden {
+#toggleForm {
+  display: block;
+  margin: 15px auto;
+}
+
+.hidden {
   display: none;
 }
 
-.book {
-  border: 1px solid #00f2ff;
-  padding: 12px;
-  margin-top: 10px;
-  border-radius: 8px;
+/* BOOK CARD */
+.book-card {
+  border: 2px solid rgba(0, 255, 255, 0.5);
+  padding: 16px;
+  border-radius: 12px;
+  margin: 15px auto;
+  max-width: 520px;
+  box-shadow: 0 0 12px rgba(0,255,255,.4);
+}
+
+.book-header {
+  font-size: 20px;
+  font-weight: bold;
+  display: flex;
+  gap: 8px;
+}
+
+.book-author {
+  color: #ccc;
+}
+
+.book-meta {
+  margin-top: 6px;
+  font-size: 14px;
+  color: #aaa;
 }
 
 .book-actions {
-  margin-top: 8px;
+  margin-top: 10px;
+  display: flex;
+  gap: 15px;
 }
 
 .book-actions button {
-  margin-right: 6px;
-  background: red;
-  color: white;
+  background: none;
+  border: none;
+  font-size: 22px;
+  cursor: pointer;
+  transition: 0.2s;
 }
 
-.book-actions .edit {
-  background: orange;
+.book-actions button:hover {
+  transform: scale(1.2);
 }
 
-/* MODAL */
-.overlay {
+.confirm {
   position: fixed;
   inset: 0;
-  background: rgba(0,0,0,0.6);
-  backdrop-filter: blur(6px);
+  background: rgba(0,0,0,0.7);
   display: flex;
   justify-content: center;
   align-items: center;
 }
 
-.overlay.hidden {
-  display: none;
-}
-
-.edit-modal {
+.confirm-box {
   background: black;
-  padding: 25px;
-  border-radius: 10px;
-  width: 300px;
-  box-shadow: 0 0 20px #00f2ff;
+  padding: 20px;
+  border-radius: 12px;
+  border: 2px solid red;
+  text-align: center;
 }
 
-.modal-buttons {
-  display: flex;
-  justify-content: space-between;
+.confirm-actions {
   margin-top: 10px;
-}
-
-.modal-buttons .cancel {
-  background: red;
-  color: white;
+  display: flex;
+  gap: 15px;
+  justify-content: center;
 }
