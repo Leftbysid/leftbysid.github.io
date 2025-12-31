@@ -16,129 +16,159 @@ let editingId = null;
 let deleteId = null;
 let currentUser = null;
 
-const titleInput = document.getElementById("title");
-const authorInput = document.getElementById("author");
-const categoryInput = document.getElementById("category");
-const dateInput = document.getElementById("date");
-const bookList = document.getElementById("bookList");
-const searchInput = document.getElementById("search");
-const bookForm = document.getElementById("bookForm");
+document.addEventListener("DOMContentLoaded", () => {
 
-document.getElementById("confirmBox").style.display = "none";
-bookForm.style.display = "none";
+  const titleInput = document.getElementById("title");
+  const authorInput = document.getElementById("author");
+  const categoryInput = document.getElementById("category");
+  const dateInput = document.getElementById("date");
+  const bookList = document.getElementById("bookList");
+  const searchInput = document.getElementById("search");
+  const bookForm = document.getElementById("bookForm");
 
-// Toggle Add Form
-document.getElementById("toggleForm").onclick = () => {
-  bookForm.style.display =
-    bookForm.style.display === "none" ? "block" : "none";
-};
+  const editOverlay = document.getElementById("editOverlay");
+  const editTitle = document.getElementById("editTitle");
+  const editAuthor = document.getElementById("editAuthor");
+  const editCategory = document.getElementById("editCategory");
+  const editDate = document.getElementById("editDate");
 
-// Auth
-onAuthStateChanged(auth, user => {
-  if (!user) location.href = "index.html";
-  currentUser = user;
-  loadBooks();
-});
+  document.getElementById("confirmBox").style.display = "none";
+  bookForm.style.display = "none";
 
-// Add / Update Book
-window.addBook = async () => {
-  if (!titleInput.value || !authorInput.value) return;
+  // Toggle Add Book Form
+  document.getElementById("toggleForm").onclick = () => {
+    bookForm.style.display =
+      bookForm.style.display === "none" ? "block" : "none";
+  };
 
-  if (editingId) {
-    await updateDoc(doc(db, "books", editingId), {
-      title: titleInput.value,
-      author: authorInput.value,
-      category: categoryInput.value,
-      date: dateInput.value
-    });
-    editingId = null;
-  } else {
-    await addDoc(collection(db, "books"), {
-      uid: currentUser.uid,
-      title: titleInput.value,
-      author: authorInput.value,
-      category: categoryInput.value,
-      date: dateInput.value
+  // Auth
+  onAuthStateChanged(auth, user => {
+    if (!user) {
+      window.location.href = "index.html";
+      return;
+    }
+    currentUser = user;
+    loadBooks();
+  });
+
+  // ADD BOOK
+  window.addBook = async () => {
+    if (!titleInput.value || !authorInput.value) return;
+
+    if (editingId) {
+      await updateDoc(doc(db, "books", editingId), {
+        title: titleInput.value,
+        author: authorInput.value,
+        category: categoryInput.value,
+        date: dateInput.value
+      });
+      editingId = null;
+    } else {
+      await addDoc(collection(db, "books"), {
+        uid: currentUser.uid,
+        title: titleInput.value,
+        author: authorInput.value,
+        category: categoryInput.value,
+        date: dateInput.value
+      });
+    }
+
+    bookForm.style.display = "none";
+    titleInput.value = "";
+    authorInput.value = "";
+    categoryInput.value = "";
+    dateInput.value = "";
+  };
+
+  // LOAD BOOKS
+  function loadBooks() {
+    const q = query(collection(db, "books"), where("uid", "==", currentUser.uid));
+    onSnapshot(q, snap => {
+      books = [];
+      snap.forEach(d => books.push({ id: d.id, ...d.data() }));
+      renderBooks(books);
     });
   }
 
-  bookForm.style.display = "none";
-  titleInput.value = "";
-  authorInput.value = "";
-  categoryInput.value = "";
-  dateInput.value = "";
-};
+  // RENDER
+  function renderBooks(list) {
+    bookList.innerHTML = "";
+    list.forEach(b => {
+      bookList.innerHTML += `
+        <div class="book-card">
+          <div class="book-header">
+            ${b.title} <span>– ${b.author}</span>
+          </div>
 
-// Load Books
-function loadBooks() {
-  const q = query(collection(db, "books"), where("uid", "==", currentUser.uid));
-  onSnapshot(q, snap => {
-    books = [];
-    snap.forEach(d => books.push({ id: d.id, ...d.data() }));
-    renderBooks(books);
-  });
-}
+          <div class="book-meta">
+            📁 ${b.category} | 📅 ${b.date}
+          </div>
 
-// Render
-function renderBooks(list) {
-  bookList.innerHTML = "";
-  list.forEach(b => {
-    bookList.innerHTML += `
-      <div class="book-card">
-        <div class="book-header">
-          ${b.title} <span>– ${b.author}</span>
+          <div class="book-actions">
+            <button onclick="editBook('${b.id}')">✏️</button>
+            <button onclick="askDelete('${b.id}')">🗑️</button>
+          </div>
         </div>
+      `;
+    });
+  }
 
-        <div class="book-meta">
-          📁 ${b.category} | 📅 ${b.date}
-        </div>
+  // SEARCH
+  searchInput.oninput = () => {
+    const q = searchInput.value.toLowerCase();
+    renderBooks(books.filter(b => b.title.toLowerCase().includes(q)));
+  };
 
-        <div class="book-actions">
-          <button onclick="editBook('${b.id}')">✏️</button>
-          <button onclick="askDelete('${b.id}')">🗑️</button>
-        </div>
-      </div>
-    `;
-  });
-}
+  // SORT
+  window.sortByName = () =>
+    renderBooks([...books].sort((a, b) => a.title.localeCompare(b.title)));
 
-// Search
-searchInput.oninput = () => {
-  const q = searchInput.value.toLowerCase();
-  renderBooks(books.filter(b => b.title.toLowerCase().includes(q)));
-};
+  window.sortByDate = () =>
+    renderBooks([...books].sort((a, b) => new Date(a.date) - new Date(b.date)));
 
-// Sorting
-window.sortByName = () =>
-  renderBooks([...books].sort((a, b) => a.title.localeCompare(b.title)));
+  // EDIT
+  window.editBook = (id) => {
+    const b = books.find(x => x.id === id);
 
-window.sortByDate = () =>
-  renderBooks([...books].sort((a, b) => new Date(a.date) - new Date(b.date)));
+    editTitle.value = b.title;
+    editAuthor.value = b.author;
+    editCategory.value = b.category;
+    editDate.value = b.date;
 
-// Edit
-window.editBook = id => {
-  const b = books.find(x => x.id === id);
-  titleInput.value = b.title;
-  authorInput.value = b.author;
-  categoryInput.value = b.category;
-  dateInput.value = b.date;
+    editingId = id;
+    editOverlay.classList.remove("hidden");
+  };
 
-  editingId = id;
-  bookForm.style.display = "block";
-};
+  window.saveEdit = async () => {
+    await updateDoc(doc(db, "books", editingId), {
+      title: editTitle.value,
+      author: editAuthor.value,
+      category: editCategory.value,
+      date: editDate.value
+    });
 
-// Delete
-window.askDelete = id => {
-  deleteId = id;
-  document.getElementById("confirmBox").style.display = "flex";
-};
+    editingId = null;
+    editOverlay.classList.add("hidden");
+  };
 
-window.confirmDelete = async () => {
-  await deleteDoc(doc(db, "books", deleteId));
-  closeConfirm();
-};
+  window.closeEdit = () => {
+    editOverlay.classList.add("hidden");
+  };
 
-window.closeConfirm = () => {
-  deleteId = null;
-  document.getElementById("confirmBox").style.display = "none";
-};
+  // DELETE
+  window.askDelete = id => {
+    deleteId = id;
+    document.getElementById("confirmBox").style.display = "flex";
+  };
+
+  window.confirmDelete = async () => {
+    await deleteDoc(doc(db, "books", deleteId));
+    closeConfirm();
+  };
+
+  window.closeConfirm = () => {
+    deleteId = null;
+    document.getElementById("confirmBox").style.display = "none";
+  };
+
+});
