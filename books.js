@@ -35,7 +35,7 @@ document.addEventListener("DOMContentLoaded", () => {
   document.getElementById("confirmBox").style.display = "none";
   bookForm.style.display = "none";
 
-  // Toggle Add Book Form
+  // Toggle add form
   document.getElementById("toggleForm").onclick = () => {
     bookForm.style.display =
       bookForm.style.display === "none" ? "block" : "none";
@@ -51,7 +51,7 @@ document.addEventListener("DOMContentLoaded", () => {
     loadBooks();
   });
 
-  // ADD BOOK
+  // Add / Update
   window.addBook = async () => {
     if (!titleInput.value || !authorInput.value) return;
 
@@ -80,7 +80,7 @@ document.addEventListener("DOMContentLoaded", () => {
     dateInput.value = "";
   };
 
-  // LOAD BOOKS
+  // Load books
   function loadBooks() {
     const q = query(collection(db, "books"), where("uid", "==", currentUser.uid));
     onSnapshot(q, snap => {
@@ -90,51 +90,53 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // RENDER
+  // ✅ UPDATED RENDER
   function renderBooks(list) {
     bookList.innerHTML = "";
+
     list.forEach(b => {
       bookList.innerHTML += `
         <div class="book-card">
-          <div class="book-header">
-            ${b.title} <span>– ${b.author}</span>
+          <div class="book-top">
+            <div>
+              <div class="book-title">${b.title}</div>
+              <div class="book-author">by ${b.author}</div>
+            </div>
+
+            <div class="book-actions">
+              <button onclick="editBook('${b.id}')">✏️</button>
+              <button onclick="askDelete('${b.id}')">🗑️</button>
+            </div>
           </div>
 
           <div class="book-meta">
-            📁 ${b.category} | 📅 ${b.date}
-          </div>
-
-          <div class="book-actions">
-            <button onclick="editBook('${b.id}')">✏️</button>
-            <button onclick="askDelete('${b.id}')">🗑️</button>
+            📁 ${b.category} &nbsp; | &nbsp; 📅 ${b.date}
           </div>
         </div>
       `;
     });
   }
 
-  // SEARCH
+  // Search
   searchInput.oninput = () => {
     const q = searchInput.value.toLowerCase();
     renderBooks(books.filter(b => b.title.toLowerCase().includes(q)));
   };
 
-  // SORT
+  // Sort
   window.sortByName = () =>
     renderBooks([...books].sort((a, b) => a.title.localeCompare(b.title)));
 
   window.sortByDate = () =>
     renderBooks([...books].sort((a, b) => new Date(a.date) - new Date(b.date)));
 
-  // EDIT
+  // Edit popup
   window.editBook = (id) => {
     const b = books.find(x => x.id === id);
-
     editTitle.value = b.title;
     editAuthor.value = b.author;
     editCategory.value = b.category;
     editDate.value = b.date;
-
     editingId = id;
     editOverlay.classList.remove("hidden");
   };
@@ -146,7 +148,6 @@ document.addEventListener("DOMContentLoaded", () => {
       category: editCategory.value,
       date: editDate.value
     });
-
     editingId = null;
     editOverlay.classList.add("hidden");
   };
@@ -155,7 +156,7 @@ document.addEventListener("DOMContentLoaded", () => {
     editOverlay.classList.add("hidden");
   };
 
-  // DELETE
+  // Delete
   window.askDelete = id => {
     deleteId = id;
     document.getElementById("confirmBox").style.display = "flex";
@@ -170,5 +171,4 @@ document.addEventListener("DOMContentLoaded", () => {
     deleteId = null;
     document.getElementById("confirmBox").style.display = "none";
   };
-
 });
