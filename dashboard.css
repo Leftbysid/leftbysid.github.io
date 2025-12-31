@@ -56,15 +56,16 @@ body {
 
 /* LOGOUT BUTTON */
 .logout {
-  border: 2px solid red;
-  color: #eb4437;
-  box-shadow: 0 0 12px red;
+  border: 2px solid #ff2b2b;
+  color: #ff2b2b;
+  background: black;
+  box-shadow: 0 0 15px rgba(255, 43, 43, 0.7);
 }
 
 .logout:hover {
-  background: red;
+  background: #ff2b2b;
   color: black;
-  box-shadow: 0 0 25px red;
+  box-shadow: 0 0 30px rgba(255, 43, 43, 1);
 }
 
 /* MUSIC BUTTON */
