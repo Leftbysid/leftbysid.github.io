@@ -97,3 +97,35 @@ body {
   gap: 15px;
   justify-content: center;
 }
+#toggleForm {
+  display: block;
+  margin: 15px auto;
+  padding: 10px 20px;
+  background: black;
+  border: 2px solid #00f2ff;
+  color: #00f2ff;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+#toggleForm:hover {
+  background: #00f2ff;
+  color: black;
+}
+
+.book-header {
+  font-size: 20px;
+  font-weight: bold;
+}
+
+.book-header span {
+  font-size: 16px;
+  color: #aaa;
+}
+
+.book-actions button {
+  font-size: 22px;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
