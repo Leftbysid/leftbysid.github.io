@@ -62,3 +62,30 @@ function animate() {
 }
 
 animate();
+<script type="module">
+import { auth } from "./firebase.js";
+import { signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+
+window.login = async function () {
+  const email = document.querySelector("input[type=email]").value;
+  const password = document.querySelector("input[type=password]").value;
+
+  if (!email || !password) {
+    alert("Enter email & password");
+    return;
+  }
+
+  try {
+    await signInWithEmailAndPassword(auth, email, password);
+
+    // Smooth transition
+    document.body.style.opacity = "0";
+    setTimeout(() => {
+      window.location.href = "dashboard.html";
+    }, 600);
+
+  } catch (err) {
+    alert("Login failed: " + err.message);
+  }
+};
+</script>
