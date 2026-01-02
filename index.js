@@ -16,8 +16,8 @@ for (let i = 0; i < NODE_COUNT; i++) {
   nodes.push({
     x: Math.random() * canvas.width,
     y: Math.random() * canvas.height,
-    vx: (Math.random() - 0.5) * 0.25,
-    vy: (Math.random() - 0.5) * 0.25,
+   vx: (Math.random() - 0.5) * 0.8,
+   vy: (Math.random() - 0.5) * 0.8,
     r: Math.random() * 1.5 + 0.5
   });
 }
@@ -30,35 +30,3 @@ function animate() {
 
     n.x += n.vx;
     n.y += n.vy;
-
-    if (n.x < 0 || n.x > canvas.width) n.vx *= -1;
-    if (n.y < 0 || n.y > canvas.height) n.vy *= -1;
-
-    // Draw node
-    ctx.beginPath();
-    ctx.arc(n.x, n.y, n.r, 0, Math.PI * 2);
-    ctx.fillStyle = "#00ff9c";
-    ctx.shadowColor = "#00ff9c";
-    ctx.shadowBlur = 8;
-    ctx.fill();
-
-    // Connections
-    for (let j = i + 1; j < nodes.length; j++) {
-      const m = nodes[j];
-      const dist = Math.hypot(n.x - m.x, n.y - m.y);
-
-      if (dist < LINK_DIST) {
-        ctx.strokeStyle = `rgba(0,255,156,${1 - dist / LINK_DIST})`;
-        ctx.lineWidth = 0.8;
-        ctx.beginPath();
-        ctx.moveTo(n.x, n.y);
-        ctx.lineTo(m.x, m.y);
-        ctx.stroke();
-      }
-    }
-  }
-
-  requestAnimationFrame(animate);
-}
-
-animate();
