@@ -151,3 +151,7 @@ window.confirmDelete = async () => {
 
 window.closeConfirm = () =>
   document.getElementById("confirmBox").classList.add("hidden");
+// Close add form after auth load (safety)
+window.addEventListener("DOMContentLoaded", () => {
+  bookForm.classList.add("hidden");
+});
