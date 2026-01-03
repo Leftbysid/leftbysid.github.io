@@ -1,0 +1,95 @@
+body {
+  background: black;
+  color: #00ff9c;
+  font-family: 'Share Tech Mono', monospace;
+  padding: 20px;
+}
+
+.title {
+  text-align: center;
+  text-shadow: 0 0 15px #00ff9c;
+}
+
+.controls {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.controls input,
+.controls button {
+  padding: 10px;
+  background: black;
+  border: 2px solid #00ff9c;
+  color: #00ff9c;
+}
+
+#toggleForm {
+  display: block;
+  margin: 15px auto;
+  padding: 10px 20px;
+  border: 2px solid #00ff9c;
+  background: transparent;
+  color: #00ff9c;
+}
+
+#quoteForm {
+  max-width: 600px;
+  margin: 15px auto;
+  border: 2px solid #00ff9c;
+  padding: 15px;
+}
+
+#quoteForm textarea,
+#quoteForm input {
+  width: 100%;
+  margin: 6px 0;
+  padding: 10px;
+  background: black;
+  border: 1px solid #00ff9c;
+  color: #00ff9c;
+}
+
+.quote-card {
+  position: relative;
+  max-width: 600px;
+  margin: 15px auto;
+  padding: 18px;
+  border: 2px solid #00ff9c;
+  box-shadow: 0 0 15px rgba(0,255,156,.5);
+  background: rgba(0,0,0,.75);
+}
+
+.quote-actions {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+}
+
+.quote-actions button {
+  background: none;
+  border: none;
+  color: #00ff9c;
+  font-size: 18px;
+  cursor: pointer;
+}
+
+.quote-text {
+  font-size: 18px;
+  margin-bottom: 10px;
+}
+
+.quote-author {
+  font-size: 14px;
+  opacity: .85;
+}
+
+.quote-date {
+  font-size: 12px;
+  opacity: .6;
+}
+
+.hidden {
+  display: none;
+}
