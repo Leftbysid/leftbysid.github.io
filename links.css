@@ -1,0 +1,90 @@
+body {
+  background: black;
+  font-family: 'Share Tech Mono', monospace;
+  color: #00ff9c;
+  padding: 20px;
+}
+
+/* TITLE */
+.title {
+  text-align: center;
+  margin-bottom: 10px;
+}
+
+/* CONTROLS */
+.controls {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+}
+
+.controls input,
+.controls button,
+#linkForm input,
+#linkForm button {
+  padding: 8px;
+  border: 2px solid #00ff9c;
+  background: black;
+  color: #00ff9c;
+  border-radius: 6px;
+}
+
+/* ADD BUTTON */
+#toggleForm {
+  display: block;
+  margin: 10px auto;
+}
+
+/* LIST ROW */
+.link-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border: 2px solid #00ff9c;
+  padding: 10px 14px;
+  margin: 8px auto;
+  max-width: 900px;
+  box-shadow: 0 0 12px rgba(0,255,156,.4);
+}
+
+/* TEXT */
+.link-text {
+  display: flex;
+  gap: 20px;
+  font-size: 14px;
+}
+
+/* ACTIONS */
+.link-actions {
+  display: flex;
+  gap: 12px;
+}
+
+.link-actions button {
+  background: none;
+  border: none;
+  font-size: 18px;
+  color: #00ff9c;
+  cursor: pointer;
+}
+
+/* POPUPS */
+.hidden { display: none; }
+
+.confirm,
+.edit-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.75);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.confirm-box,
+.edit-box {
+  border: 2px solid #00ff9c;
+  padding: 20px;
+  background: black;
+  box-shadow: 0 0 15px #00ff9c;
+}
