@@ -16,8 +16,8 @@ for (let i = 0; i < NODE_COUNT; i++) {
   nodes.push({
     x: Math.random() * canvas.width,
     y: Math.random() * canvas.height,
-   vx: (Math.random() - 0.5) * 0.8,
-   vy: (Math.random() - 0.5) * 0.8,
+    vx: (Math.random() - 0.5) * (0.2 + Math.random() * 0.6),
+    vy: (Math.random() - 0.5) * (0.2 + Math.random() * 0.6),
     r: Math.random() * 1.5 + 0.5
   });
 }
