@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>My Books</title>
+  <link rel="stylesheet" href="books.css">
+</head>
+<body>
+
+<h1 class="title">📚 BOOK ARCHIVE</h1>
+
+<!-- STATS HEADER -->
+<div class="stats">
+  <span>Total: <b id="totalCount">0</b></span>
+  <span>Read: <b id="readCount">0</b></span>
+  <span>Unread: <b id="unreadCount">0</b></span>
+</div>
+
+<div class="controls">
+  <input id="search" placeholder="Search books...">
+  <button onclick="sortByName()">Sort A–Z</button>
+  <button onclick="sortByDate()">Sort by Date</button>
+</div>
+
+<button id="toggleForm">➕ Add Book</button>
+
+<!-- INPUT BAR -->
+<div id="bookForm" class="book-form hidden">
+  <input id="title" placeholder="Title">
+  <input id="author" placeholder="Author">
+  <input id="category" placeholder="Category">
+  <input id="date" type="date">
+  <button onclick="addBook()">Save</button>
+</div>
+
+<div id="bookList"></div>
+
+<!-- DELETE CONFIRM -->
+<div id="confirmBox" class="confirm hidden">
+  <div class="confirm-box">
+    <p>Delete this book?</p>
+    <div class="confirm-actions">
+      <button onclick="confirmDelete()">Yes</button>
+      <button onclick="closeConfirm()">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- EDIT POPUP -->
+<div id="editOverlay" class="edit-overlay hidden">
+  <div class="edit-box">
+    <h3>Edit Book</h3>
+    <input id="editTitle">
+    <input id="editAuthor">
+    <input id="editCategory">
+    <input id="editDate" type="date">
+    <div class="edit-actions">
+      <button onclick="saveEdit()">💾 Save</button>
+      <button class="cancel" onclick="closeEdit()">✖ Cancel</button>
+    </div>
+  </div>
+</div>
+
+<script type="module" src="books.js"></script>
+</body>
+</html>
