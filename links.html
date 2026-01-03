@@ -17,17 +17,17 @@
 
 <button id="toggleForm">➕ Add Link</button>
 
-<!-- ADD FORM -->
+<!-- ADD LINK FORM -->
 <div id="linkForm" class="hidden">
-  <input id="type" placeholder="Type (Article / Video / Tool)">
-  <input id="name" placeholder="Name">
-  <input id="desc" placeholder="Description">
+  <input id="type" placeholder="Link Type (Article / Tool / Video)">
+  <input id="name" placeholder="Link Name">
+  <input id="desc" placeholder="Short Description">
   <button onclick="addLink()">Save</button>
 </div>
 
 <div id="linkList"></div>
 
-<!-- DELETE CONFIRM -->
+<!-- DELETE CONFIRM POPUP -->
 <div id="confirmBox" class="confirm hidden">
   <div class="confirm-box">
     <p>Delete this link?</p>
@@ -42,9 +42,11 @@
 <div id="editOverlay" class="edit-overlay hidden">
   <div class="edit-box">
     <h3>Edit Link</h3>
-    <input id="editType">
-    <input id="editName">
-    <input id="editDesc">
+
+    <input id="editType" placeholder="Link Type">
+    <input id="editName" placeholder="Link Name">
+    <input id="editDesc" placeholder="Description">
+
     <div class="edit-actions">
       <button onclick="saveEdit()">💾 Save</button>
       <button class="cancel" onclick="closeEdit()">✖ Cancel</button>
