@@ -1,13 +1,22 @@
+/* ===============================
+   ROUTE GUARD + LIBRARY TYPE
+================================ */
 const params = new URLSearchParams(window.location.search);
 const libraryType = params.get("type"); // fiction | nonfiction
 
-const body = document.body;
+const pageContent = document.getElementById("pageContent");
 
 if (!libraryType) {
   location.replace("fnf.html");
 } else {
-  body.classList.remove("hidden");
+  pageContent.classList.remove("hidden");
 }
+
+/* FIRESTORE COLLECTION */
+const COLLECTION_NAME =
+  libraryType === "fiction"
+    ? "books_fiction"
+    : "books_nonfiction";
 
 /* ===============================
    IMPORTS
@@ -218,5 +227,3 @@ window.confirmDelete = async () => {
 
 window.closeConfirm = () =>
   document.getElementById("confirmBox").classList.add("hidden");
-
-
