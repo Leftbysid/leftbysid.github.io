@@ -24,11 +24,12 @@ function draw() {
       drops[i] = 0;
     }
 
-    drops[i] += 0.4; // try 0.2 – 0.6
+    drops[i] += 0.2; // try 0.2 – 0.6
   }
 }
 
-setInterval(draw, 50);
+setInterval(draw, 33);
+
 
 
 
