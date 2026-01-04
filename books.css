@@ -194,4 +194,9 @@ body {
   box-shadow: 0 0 45px rgba(0,255,156,.9);
 }
 
+/* PREVENT BOOK PAGE FLASH ONLY */
+.books-page.hidden {
+  display: none;
+}
+
 
