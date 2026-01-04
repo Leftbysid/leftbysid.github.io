@@ -9,20 +9,19 @@ const img = document.getElementById("matrixImage");
 const fontSize = 16;
 const chars = "0123456789";
 
-const cols = Math.floor(canvas.width / fontSize);
-const rows = Math.floor(canvas.height / fontSize);
+let cols = Math.floor(canvas.width / fontSize);
+let rows = Math.floor(canvas.height / fontSize);
 
-let drops = new Array(cols).fill(0);
-let mask = []; // image mask grid
+let rain = new Array(cols).fill(0);
+let mask = new Array(cols * rows).fill(false);
 
 img.onload = () => {
-  // draw image into grid-sized offscreen canvas
   const off = document.createElement("canvas");
   off.width = cols;
   off.height = rows;
   const offCtx = off.getContext("2d");
 
-  // center image into grid
+  // scale & center image into grid
   const scale = Math.min(cols / img.width, rows / img.height);
   const w = img.width * scale;
   const h = img.height * scale;
@@ -33,42 +32,47 @@ img.onload = () => {
 
   const data = offCtx.getImageData(0, 0, cols, rows).data;
 
-  // build boolean mask
-  mask = [];
   for (let i = 0; i < data.length; i += 4) {
-    mask.push(data[i + 3] > 20); // alpha check
+    mask[i / 4] = data[i + 3] > 40;
   }
 
-  // randomize drops
-  drops = drops.map(() => Math.floor(Math.random() * rows));
+  rain = rain.map(() => Math.floor(Math.random() * rows));
 };
 
 function draw() {
-  ctx.fillStyle = "rgba(0,0,0,0.1)";
+  ctx.fillStyle = "rgba(0,0,0,0.12)";
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-  ctx.fillStyle = "#00ff9c";
   ctx.font = fontSize + "px monospace";
 
   for (let c = 0; c < cols; c++) {
-    const r = drops[c];
-    const index = r * cols + c;
+    const r = rain[c];
+    const idx = r * cols + c;
 
-    if (mask[index]) {
-      const char = chars[Math.floor(Math.random() * chars.length)];
-      ctx.fillText(char, c * fontSize, r * fontSize);
+    // background rain
+    ctx.fillStyle = "#00aa66";
+    ctx.fillText(
+      chars[Math.floor(Math.random() * chars.length)],
+      c * fontSize,
+      r * fontSize
+    );
+
+    // image mask highlight
+    if (mask[idx]) {
+      ctx.fillStyle = "#00ff9c";
+      ctx.fillText(
+        chars[Math.floor(Math.random() * chars.length)],
+        c * fontSize,
+        r * fontSize
+      );
     }
 
-    drops[c]++;
+    rain[c]++;
 
-    if (drops[c] > rows) {
-      drops[c] = Math.floor(Math.random() * -20);
+    if (rain[c] > rows) {
+      rain[c] = Math.floor(Math.random() * -20);
     }
   }
 }
 
 setInterval(draw, 70);
-
-window.addEventListener("resize", () => {
-  location.reload(); // simple + safe
-});
