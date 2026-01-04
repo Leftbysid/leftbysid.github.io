@@ -83,12 +83,15 @@ body {
   padding: 12px;
   border: 1px solid rgba(0,255,156,.4);
   background: rgba(0,0,0,.6);
+  transition: transform .15s ease, box-shadow .15s ease; /* ✅ ADDED */
 }
+
 /* 🔥 HOVER GLOW */
 .book-row:hover {
   transform: translateY(-2px);
   box-shadow: 0 0 20px rgba(0,255,156,.75);
 }
+
 
 .book-row.read {
   opacity: .75;
@@ -159,4 +162,5 @@ body {
   color: #00ff9c;
   text-decoration: none;
 }
+
 
