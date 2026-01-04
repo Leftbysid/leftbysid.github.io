@@ -30,8 +30,9 @@ function draw() {
       drops[i] = 0;
     }
 
-    drops[i] += 0.2; // slow rain, no overlap
+    drops[i] += 1; // slow rain, no overlap
   }
 }
 
-setInterval(draw, 33);
+setInterval(draw, 60);
+
