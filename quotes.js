@@ -29,8 +29,8 @@ const editQuote = document.getElementById("editQuote");
 const editAuthor = document.getElementById("editAuthor");
 const editDate = document.getElementById("editDate");
 
-document.getElementById("toggleForm").onclick = () =>
-  quoteForm.classList.toggle("hidden");
+document.getElementById("toggleForm").onclick =
+  () => quoteForm.classList.toggle("hidden");
 
 onAuthStateChanged(auth, user => {
   if (!user) location.href = "index.html";
@@ -55,8 +55,7 @@ window.addQuote = async () => {
 function loadQuotes() {
   const q = query(collection(db, "quotes"), where("uid", "==", currentUser.uid));
   onSnapshot(q, snap => {
-    quotes = [];
-    snap.forEach(d => quotes.push({ id: d.id, ...d.data() }));
+    quotes = snap.docs.map(d => ({ id: d.id, ...d.data() }));
     renderQuotes(quotes);
   });
 }
@@ -65,7 +64,7 @@ function renderQuotes(list) {
   quoteList.innerHTML = "";
   list.forEach(q => {
     quoteList.innerHTML += `
-      <div class="quote-card">
+      <div class="quote-row">
         <div class="quote-actions">
           <button onclick="editQuoteFn('${q.id}')">✏️</button>
           <button onclick="askDelete('${q.id}')">🗑️</button>
@@ -73,7 +72,7 @@ function renderQuotes(list) {
 
         <p class="quote-text">“${q.text}”</p>
         <p class="quote-author">— ${q.author}</p>
-        <p class="quote-date">${q.date || ""}</p>
+        ${q.date ? `<p class="quote-date">${q.date}</p>` : ""}
       </div>
     `;
   });
@@ -81,10 +80,12 @@ function renderQuotes(list) {
 
 searchInput.oninput = () => {
   const q = searchInput.value.toLowerCase();
-  renderQuotes(quotes.filter(x =>
-    x.text.toLowerCase().includes(q) ||
-    x.author.toLowerCase().includes(q)
-  ));
+  renderQuotes(
+    quotes.filter(x =>
+      x.text.toLowerCase().includes(q) ||
+      x.author.toLowerCase().includes(q)
+    )
+  );
 };
 
 window.sortByAuthor = () =>
