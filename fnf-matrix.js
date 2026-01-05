@@ -118,3 +118,21 @@ if (nonFictionBtn) {
     rainColor = "#00ff9c";
   });
 }
+/* =========================
+   BACKGROUND MUSIC (CHOOSER ONLY)
+========================= */
+const music = document.getElementById("bgMusic");
+let musicStarted = false;
+
+function startMusic() {
+  if (musicStarted) return;
+  musicStarted = true;
+
+  music.volume = 0.5; // adjust (0.0 – 1.0)
+  music.play().catch(() => {});
+}
+
+/* Start music on first interaction */
+["click", "touchstart", "keydown"].forEach(evt => {
+  document.addEventListener(evt, startMusic, { once: true });
+});
