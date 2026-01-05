@@ -32,7 +32,7 @@ function drawMatrix(time) {
   lastTime = time;
 
   mctx.globalCompositeOperation = "destination-out";
-  mctx.fillStyle = "rgba(0,0,0,0.15)";
+  mctx.fillStyle = "rgba(0,0,0,0.03)";
   mctx.fillRect(0, 0, matrix.width, matrix.height);
   mctx.globalCompositeOperation = "source-over";
   mctx.fillStyle = rainColor;
