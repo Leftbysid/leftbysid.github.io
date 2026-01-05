@@ -3,8 +3,8 @@ import {
   collection, addDoc, deleteDoc, updateDoc,
   doc, query, where, onSnapshot
 } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-firestore.js";
-import { onAuthStateChanged } from
-  "https://www.gstatic.com/firebasejs/12.7.0/firebase-auth.js";
+import { onAuthStateChanged }
+  from "https://www.gstatic.com/firebasejs/12.7.0/firebase-auth.js";
 
 let links = [];
 let editId = null;
@@ -22,6 +22,7 @@ const saveLinkBtn = document.getElementById("saveLink");
 
 const sortNameBtn = document.getElementById("sortName");
 const sortTypeBtn = document.getElementById("sortType");
+const searchInput = document.getElementById("search");
 
 const confirmDeleteBtn = document.getElementById("confirmDeleteBtn");
 const cancelDeleteBtn = document.getElementById("cancelDeleteBtn");
@@ -29,7 +30,21 @@ const cancelDeleteBtn = document.getElementById("cancelDeleteBtn");
 const saveEditBtn = document.getElementById("saveEditBtn");
 const cancelEditBtn = document.getElementById("cancelEditBtn");
 
-/* 🔒 HARD LOCK POPUPS ON LOAD */
+/* INPUTS */
+const typeInput = document.getElementById("type");
+const nameInput = document.getElementById("name");
+const descInput = document.getElementById("desc");
+const tagsInput = document.getElementById("tags");
+
+const editType = document.getElementById("editType");
+const editName = document.getElementById("editName");
+const editDesc = document.getElementById("editDesc");
+const editTags = document.getElementById("editTags");
+
+/* TYPE OPTIONS */
+const TYPE_OPTIONS = ["VIDEO", "ARTICLE", "TOOL", "CODE", "REFERENCE"];
+
+/* LOCK POPUPS */
 window.addEventListener("DOMContentLoaded", () => {
   editOverlay.classList.add("hidden");
   confirmBox.classList.add("hidden");
@@ -42,19 +57,38 @@ onAuthStateChanged(auth, u => {
   loadLinks();
 });
 
-/* ADD */
+/* ADD FORM */
 toggleForm.onclick = () => linkForm.classList.toggle("hidden");
 
 saveLinkBtn.onclick = async () => {
+  if (!user) return;
+
+  const type = typeInput.value;
+  const name = nameInput.value.trim();
+  const desc = descInput.value.trim();
+  const tags = tagsInput.value
+    .split(",")
+    .map(t => t.trim().toLowerCase())
+    .filter(Boolean);
+
+  if (!type || !name) {
+    alert("Type and Name are required");
+    return;
+  }
+
   await addDoc(collection(db, "links"), {
     uid: user.uid,
-    type: type.value,
-    name: name.value,
-    desc: desc.value
+    type,
+    name,
+    desc,
+    tags
   });
 
   linkForm.classList.add("hidden");
-  type.value = name.value = desc.value = "";
+  typeInput.value = "";
+  nameInput.value = "";
+  descInput.value = "";
+  tagsInput.value = "";
 };
 
 /* LOAD */
@@ -66,7 +100,7 @@ function loadLinks() {
   });
 }
 
-/* RENDER (NO INLINE JS) */
+/* RENDER */
 function render(list) {
   linkList.innerHTML = "";
 
@@ -76,9 +110,12 @@ function render(list) {
 
     row.innerHTML = `
       <div class="link-text">
-        <span>${l.type}</span>
+        <strong>${l.type}</strong>
         <span>${l.name}</span>
-        <span>${l.desc}</span>
+        <span>${l.desc || ""}</span>
+        <div>
+          ${(l.tags || []).map(t => `<span class="tag">#${t}</span>`).join("")}
+        </div>
       </div>
       <div class="link-actions">
         <button class="edit-btn">✏️</button>
@@ -93,6 +130,20 @@ function render(list) {
   });
 }
 
+/* SEARCH */
+searchInput.oninput = () => {
+  const q = searchInput.value.toLowerCase();
+
+  const filtered = links.filter(l =>
+    l.type.toLowerCase().includes(q) ||
+    l.name.toLowerCase().includes(q) ||
+    (l.desc || "").toLowerCase().includes(q) ||
+    (l.tags || []).some(t => t.includes(q))
+  );
+
+  render(filtered);
+};
+
 /* SORT */
 sortNameBtn.onclick = () =>
   render([...links].sort((a,b)=>a.name.localeCompare(b.name)));
@@ -105,9 +156,13 @@ function openEdit(id) {
   const l = links.find(x => x.id === id);
   editId = id;
 
-  editType.value = l.type;
+  editType.innerHTML = TYPE_OPTIONS
+    .map(t => `<option ${t === l.type ? "selected" : ""}>${t}</option>`)
+    .join("");
+
   editName.value = l.name;
-  editDesc.value = l.desc;
+  editDesc.value = l.desc || "";
+  editTags.value = (l.tags || []).join(", ");
 
   editOverlay.classList.remove("hidden");
 }
@@ -115,10 +170,16 @@ function openEdit(id) {
 saveEditBtn.onclick = async () => {
   if (!editId) return;
 
+  const tags = editTags.value
+    .split(",")
+    .map(t => t.trim().toLowerCase())
+    .filter(Boolean);
+
   await updateDoc(doc(db, "links", editId), {
     type: editType.value,
-    name: editName.value,
-    desc: editDesc.value
+    name: editName.value.trim(),
+    desc: editDesc.value.trim(),
+    tags
   });
 
   closeEdit();
