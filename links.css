@@ -5,6 +5,7 @@ body {
   padding: 20px;
 }
 
+/* TITLE */
 .title {
   text-align: center;
   margin-bottom: 10px;
@@ -15,6 +16,7 @@ body {
   display: flex;
   gap: 10px;
   justify-content: center;
+  flex-wrap: wrap;
 }
 
 .controls input,
@@ -34,7 +36,7 @@ body {
   margin: 10px auto;
 }
 
-/* LINK ROW (MINIMAL HEIGHT) */
+/* LINK ROW */
 .link-row {
   display: flex;
   justify-content: space-between;
@@ -50,6 +52,7 @@ body {
   display: flex;
   gap: 20px;
   font-size: 14px;
+  flex-wrap: wrap;
 }
 
 .link-actions {
@@ -65,32 +68,45 @@ body {
   cursor: pointer;
 }
 
-/* POPUPS */
+/* -------------------------
+   VISIBILITY CONTROL (FIX)
+------------------------- */
 .hidden {
   display: none !important;
 }
 
+/* -------------------------
+   OVERLAYS (FIXED)
+   ❌ no vertical centering
+   ❌ no view blocking
+------------------------- */
 .confirm,
 .edit-overlay {
   position: fixed;
   inset: 0;
   background: rgba(0,0,0,.75);
+  z-index: 999;
+
   display: flex;
   justify-content: center;
   align-items: flex-start;
+
   padding-top: 20px;
   overflow-y: auto;
-  z-index: 999;
 }
 
+/* POPUP BOXES */
 .confirm-box,
 .edit-box {
   background: black;
   border: 2px solid #00ff9c;
   padding: 20px;
   box-shadow: 0 0 15px #00ff9c;
+  max-width: 600px;
+  width: 100%;
 }
 
+/* EDIT INPUTS */
 .edit-box input {
   width: 100%;
   margin: 8px 0;
@@ -100,6 +116,7 @@ body {
   color: #00ff9c;
 }
 
+/* ACTIONS */
 .edit-actions {
   display: flex;
   justify-content: space-between;
