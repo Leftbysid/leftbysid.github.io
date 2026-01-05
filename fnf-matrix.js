@@ -118,21 +118,24 @@ if (nonFictionBtn) {
     rainColor = "#00ff9c";
   });
 }
+
 /* =========================
-   BACKGROUND MUSIC (CHOOSER ONLY)
+   BACKGROUND MUSIC – SAFE AUTOPLAY
 ========================= */
 const music = document.getElementById("bgMusic");
-let musicStarted = false;
 
-function startMusic() {
-  if (musicStarted) return;
-  musicStarted = true;
+if (music) {
+  music.volume = 0.5;
 
-  music.volume = 0.5; // adjust (0.0 – 1.0)
-  music.play().catch(() => {});
+  const enableSound = () => {
+    music.muted = false;
+    music.play().catch(() => {});
+    document.removeEventListener("click", enableSound);
+    document.removeEventListener("touchstart", enableSound);
+    document.removeEventListener("keydown", enableSound);
+  };
+
+  document.addEventListener("click", enableSound);
+  document.addEventListener("touchstart", enableSound);
+  document.addEventListener("keydown", enableSound);
 }
-
-/* Start music on first interaction */
-["click", "touchstart", "keydown"].forEach(evt => {
-  document.addEventListener(evt, startMusic, { once: true });
-});
