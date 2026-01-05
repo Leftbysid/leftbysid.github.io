@@ -136,6 +136,9 @@ body {
 /* ======================
    GLITCH TRANSITION
 ====================== */
+/* ======================
+   STRONG GLITCH TRANSITION
+====================== */
 body {
   opacity: 0;
 }
@@ -143,23 +146,27 @@ body {
 /* ENTRY */
 body.page-loaded {
   opacity: 1;
-  animation: glitchIn 0.35s steps(2);
+  animation: glitchIn 0.7s steps(3);
 }
 
 /* EXIT */
 body.page-exit {
-  animation: glitchOut 0.35s steps(2);
+  animation: glitchOut 0.7s steps(3);
 }
 
 /* ENTRY GLITCH */
 @keyframes glitchIn {
   0% {
-    filter: contrast(3) brightness(1.6) blur(2px);
-    transform: translateX(-3px);
+    filter: contrast(4) brightness(2) blur(4px);
+    transform: translateX(-6px) skewX(-3deg);
   }
-  50% {
+  30% {
+    filter: contrast(2.5) brightness(1.5);
+    transform: translateX(6px) skewX(3deg);
+  }
+  60% {
     filter: contrast(1.8) brightness(1.2);
-    transform: translateX(3px);
+    transform: translateX(-4px);
   }
   100% {
     filter: none;
@@ -172,14 +179,17 @@ body.page-exit {
   0% {
     filter: none;
     transform: none;
+    opacity: 1;
   }
-  50% {
-    filter: contrast(2.5) brightness(1.4) blur(2px);
-    transform: translateX(2px);
+  40% {
+    filter: contrast(3) brightness(1.6) blur(3px);
+    transform: translateX(5px) skewX(2deg);
+  }
+  80% {
+    filter: contrast(4) brightness(2) blur(6px);
+    transform: translateX(-5px) skewX(-3deg);
   }
   100% {
-    filter: contrast(3) brightness(1.8) blur(4px);
-    transform: translateX(-2px);
     opacity: 0;
   }
 }
