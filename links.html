@@ -18,14 +18,8 @@
 <button id="toggleForm">➕ Add Link</button>
 
 <div id="linkForm" class="hidden">
-  <select id="type">
-    <option value="">Select Type</option>
-    <option>VIDEO</option>
-    <option>ARTICLE</option>
-    <option>TOOL</option>
-    <option>CODE</option>
-    <option>REFERENCE</option>
-  </select>
+  <input id="type" list="typeList" placeholder="Type (e.g. VIDEO, AI, TOOL)">
+<datalist id="typeList"></datalist>
 
   <input id="name" placeholder="Link Name">
   <input id="desc" placeholder="Description">
