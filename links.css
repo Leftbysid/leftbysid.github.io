@@ -151,3 +151,22 @@ body {
     grid-template-columns: 1fr;
   }
 }
+
+#linkForm select,
+.edit-box select {
+  padding: 8px;
+  border: 2px solid #00ff9c;
+  background: black;
+  color: #00ff9c;
+  border-radius: 6px;
+  box-shadow: 0 0 10px rgba(0,255,156,.4);
+}
+
+.tag {
+  display: inline-block;
+  margin-right: 6px;
+  padding: 2px 6px;
+  border: 1px solid #00ff9c;
+  border-radius: 4px;
+  font-size: 12px;
+}
