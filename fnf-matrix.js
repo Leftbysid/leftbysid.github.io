@@ -18,7 +18,8 @@ function resizeMatrix() {
   matrix.style.height = window.innerHeight + "px";
   mctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 
-  columns = Array(Math.floor(window.innerWidth / fontSize)).fill(0);
+  const densityMultiplier = 1.8; // 👈 increase this for more density
+  columns = Array(Math.floor((window.innerWidth / fontSize) * densityMultiplier)).fill(0);
 }
 window.addEventListener("resize", resizeMatrix);
 resizeMatrix();
