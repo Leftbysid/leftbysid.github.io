@@ -149,3 +149,53 @@ canvas {
   box-shadow: 0 0 12px #00ff9c;
 }
 
+/* ======================
+   GLITCH TRANSITION
+====================== */
+body {
+  opacity: 0;
+}
+
+/* ENTRY */
+body.page-loaded {
+  opacity: 1;
+  animation: glitchIn 0.35s steps(2);
+}
+
+/* EXIT */
+body.page-exit {
+  animation: glitchOut 0.35s steps(2);
+}
+
+/* ENTRY GLITCH */
+@keyframes glitchIn {
+  0% {
+    filter: contrast(3) brightness(1.6) blur(2px);
+    transform: translateX(-3px);
+  }
+  50% {
+    filter: contrast(1.8) brightness(1.2);
+    transform: translateX(3px);
+  }
+  100% {
+    filter: none;
+    transform: none;
+  }
+}
+
+/* EXIT GLITCH */
+@keyframes glitchOut {
+  0% {
+    filter: none;
+    transform: none;
+  }
+  50% {
+    filter: contrast(2.5) brightness(1.4) blur(2px);
+    transform: translateX(2px);
+  }
+  100% {
+    filter: contrast(3) brightness(1.8) blur(4px);
+    transform: translateX(-2px);
+    opacity: 0;
+  }
+}
