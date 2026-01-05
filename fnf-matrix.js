@@ -1,66 +1,105 @@
-const canvas = document.getElementById("matrix");
-const ctx = canvas.getContext("2d");
+/* =========================
+   MATRIX RAIN
+========================= */
+const matrix = document.getElementById("matrix");
+const mctx = matrix.getContext("2d");
 
-/* CONFIG */
 const chars = "0123456789";
 const fontSize = 16;
-let rainColor = "#00ff9c"; // default green
-
+let rainColor = "#00ff9c";
 let columns = [];
 let lastTime = 0;
 
-/* RESIZE */
-function resize() {
+function resizeMatrix() {
   const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
-  canvas.width = window.innerWidth * dpr;
-  canvas.height = window.innerHeight * dpr;
-  canvas.style.width = window.innerWidth + "px";
-  canvas.style.height = window.innerHeight + "px";
-  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  matrix.width = window.innerWidth * dpr;
+  matrix.height = window.innerHeight * dpr;
+  matrix.style.width = window.innerWidth + "px";
+  matrix.style.height = window.innerHeight + "px";
+  mctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 
-  const colCount = Math.floor(window.innerWidth / fontSize);
-  columns = Array(colCount).fill(0);
+  columns = Array(Math.floor(window.innerWidth / fontSize)).fill(0);
 }
+window.addEventListener("resize", resizeMatrix);
+resizeMatrix();
 
-window.addEventListener("resize", resize);
-resize();
-
-/* MATRIX LOOP – HEAVY */
-function draw(time) {
+function drawMatrix(time) {
   if (time - lastTime < 33) {
-    requestAnimationFrame(draw);
+    requestAnimationFrame(drawMatrix);
     return;
   }
   lastTime = time;
 
-  ctx.fillStyle = "rgba(0,0,0,0.08)";
-  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  mctx.fillStyle = "rgba(0,0,0,0.08)";
+  mctx.fillRect(0, 0, matrix.width, matrix.height);
 
-  ctx.fillStyle = rainColor;
-  ctx.font = `${fontSize}px monospace`;
+  mctx.fillStyle = rainColor;
+  mctx.font = `${fontSize}px monospace`;
 
   columns.forEach((y, i) => {
-    const text = chars[Math.floor(Math.random() * chars.length)];
-    ctx.fillText(text, i * fontSize, y * fontSize);
-
-    if (y * fontSize > canvas.height && Math.random() > 0.96) {
-      columns[i] = 0;
-    }
+    const t = chars[Math.floor(Math.random() * chars.length)];
+    mctx.fillText(t, i * fontSize, y * fontSize);
+    if (y * fontSize > matrix.height && Math.random() > 0.96) columns[i] = 0;
     columns[i]++;
   });
 
-  requestAnimationFrame(draw);
+  requestAnimationFrame(drawMatrix);
+}
+requestAnimationFrame(drawMatrix);
+
+/* =========================
+   RIPPLE EFFECT
+========================= */
+const rippleCanvas = document.getElementById("ripples");
+const rctx = rippleCanvas.getContext("2d");
+let ripples = [];
+
+function resizeRipples() {
+  rippleCanvas.width = window.innerWidth;
+  rippleCanvas.height = window.innerHeight;
+}
+window.addEventListener("resize", resizeRipples);
+resizeRipples();
+
+function addRipple(x, y, color) {
+  ripples.push({ x, y, r: 0, alpha: 1, color });
 }
 
-requestAnimationFrame(draw);
+function drawRipples() {
+  rctx.clearRect(0, 0, rippleCanvas.width, rippleCanvas.height);
 
-/* BUTTON INTERACTIONS */
+  ripples.forEach(r => {
+    rctx.strokeStyle = `rgba(${r.color}, ${r.alpha})`;
+    rctx.lineWidth = 2;
+    rctx.beginPath();
+    rctx.arc(r.x, r.y, r.r, 0, Math.PI * 2);
+    rctx.stroke();
+
+    r.r += 1.5;
+    r.alpha -= 0.008;
+  });
+
+  ripples = ripples.filter(r => r.alpha > 0);
+  requestAnimationFrame(drawRipples);
+}
+drawRipples();
+
+/* =========================
+   BUTTON INTERACTION
+========================= */
 const fictionBtn = document.getElementById("fictionBtn");
 const nonFictionBtn = document.getElementById("nonFictionBtn");
+
+function centerOf(el) {
+  const r = el.getBoundingClientRect();
+  return { x: r.left + r.width / 2, y: r.top + r.height / 2 };
+}
 
 if (fictionBtn) {
   fictionBtn.addEventListener("mouseenter", () => {
     rainColor = "#00aaff";
+    const p = centerOf(fictionBtn);
+    addRipple(p.x, p.y, "0,170,255");
   });
   fictionBtn.addEventListener("mouseleave", () => {
     rainColor = "#00ff9c";
@@ -70,6 +109,8 @@ if (fictionBtn) {
 if (nonFictionBtn) {
   nonFictionBtn.addEventListener("mouseenter", () => {
     rainColor = "#ff2b2b";
+    const p = centerOf(nonFictionBtn);
+    addRipple(p.x, p.y, "255,43,43");
   });
   nonFictionBtn.addEventListener("mouseleave", () => {
     rainColor = "#00ff9c";
