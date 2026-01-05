@@ -120,22 +120,24 @@ if (nonFictionBtn) {
 }
 
 /* =========================
-   BACKGROUND MUSIC – SAFE AUTOPLAY
+   MUSIC TOGGLE
 ========================= */
 const music = document.getElementById("bgMusic");
+const musicBtn = document.getElementById("musicBtn");
 
-if (music) {
+let playing = false;
+
+if (music && musicBtn) {
   music.volume = 0.5;
 
-  const enableSound = () => {
-    music.muted = false;
-    music.play().catch(() => {});
-    document.removeEventListener("click", enableSound);
-    document.removeEventListener("touchstart", enableSound);
-    document.removeEventListener("keydown", enableSound);
-  };
-
-  document.addEventListener("click", enableSound);
-  document.addEventListener("touchstart", enableSound);
-  document.addEventListener("keydown", enableSound);
+  musicBtn.addEventListener("click", () => {
+    if (!playing) {
+      music.play().catch(() => {});
+      musicBtn.textContent = "⏸";
+    } else {
+      music.pause();
+      musicBtn.textContent = "▶";
+    }
+    playing = !playing;
+  });
 }
