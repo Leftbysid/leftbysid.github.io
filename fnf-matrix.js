@@ -30,9 +30,10 @@ function drawMatrix(time) {
   }
   lastTime = time;
 
-  mctx.fillStyle = "rgba(0,0,0,0.04)";
+  mctx.globalCompositeOperation = "destination-out";
+  mctx.fillStyle = "rgba(0,0,0,0.15)";
   mctx.fillRect(0, 0, matrix.width, matrix.height);
-
+  mctx.globalCompositeOperation = "source-over";
   mctx.fillStyle = rainColor;
   mctx.font = `${fontSize}px monospace`;
 
