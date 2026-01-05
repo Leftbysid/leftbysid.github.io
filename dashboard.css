@@ -100,31 +100,6 @@ body {
 }
 
 /* ======================
-   MOBILE FIX (FOR REAL PHONES)
-====================== */
-/* ======================
-   MOBILE CENTERING FIX
-====================== */
-@media (max-width: 900px), (orientation: portrait) {
-  body {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-  }
-
-  .container {
-    padding-top: 0;
-    margin-top: 0;
-    width: 100%;
-  }
-
-  .title {
-    margin-bottom: 28px;
-  }
-}
-
-
-/* ======================
    MUSIC BUTTON
 ====================== */
 .music-btn {
@@ -142,6 +117,41 @@ body {
 
 .music-btn:hover {
   box-shadow: 0 0 20px rgba(0,255,156,.9);
+}
+
+/* ======================
+   MOBILE: CENTER + SINGLE COLUMN (FIXED)
+====================== */
+@media (max-width: 900px), (orientation: portrait) {
+
+  .container {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+
+    padding-top: 0;
+    padding-bottom: 40px;
+  }
+
+  .menu {
+    grid-template-columns: 1fr;
+    gap: 16px;
+    padding: 0 16px;
+  }
+
+  .menu-link {
+    font-size: 18px;
+    padding: 16px 0;
+  }
+
+  .menu-link.full {
+    grid-column: auto;
+  }
+
+  .title {
+    margin-bottom: 30px;
+  }
 }
 
 
