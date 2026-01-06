@@ -51,7 +51,7 @@ body {
   align-items: center;
   gap: 60px;
 
-  transform: translateY(70px); /* 👈 buttons moved down */
+  transform: translateY(100px); /* 👈 buttons moved down */
 }
 
 .stuffs-btn {
