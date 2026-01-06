@@ -1,16 +1,9 @@
 import { startStuffMatrix } from "./stuff-matrix.js";
 
 /* =========================
-   START MATRIX
+   START MATRIX (ENGINE OWNED)
 ========================= */
-const matrix = startStuffMatrix({
-  canvasId: "matrix",
-  color: "#00ff9c",
-  density: 1.8,
-  fontSize: 14,
-  speed: 1.2,
-  trail: 0.03
-});
+const matrix = startStuffMatrix("matrix");
 
 /* =========================
    BACKGROUND SWITCHING
@@ -30,12 +23,15 @@ function showBg(key) {
 }
 
 /* =========================
-   BUTTON LOGIC
+   UI ELEMENTS
 ========================= */
 const seriesBtn = document.getElementById("seriesBtn");
 const moviesBtn = document.getElementById("moviesBtn");
 const docBtn = document.getElementById("docBtn");
 
+/* =========================
+   HOVER BEHAVIOR (UI ONLY)
+========================= */
 seriesBtn.addEventListener("mouseenter", () => {
   matrix.setColor("#00aaff"); // BLUE
   showBg("series");
@@ -51,9 +47,10 @@ docBtn.addEventListener("mouseenter", () => {
   showBg("documentary");
 });
 
+/* Reset to default */
 [seriesBtn, moviesBtn, docBtn].forEach(btn => {
   btn.addEventListener("mouseleave", () => {
-    matrix.setColor("#00ff9c");
+    matrix.setColor("#00ff9c"); // MATRIX GREEN
     showBg("default");
   });
 });
@@ -61,6 +58,14 @@ docBtn.addEventListener("mouseenter", () => {
 /* =========================
    CLICK ROUTING
 ========================= */
-seriesBtn.onclick = () => location.href = "series.html";
-moviesBtn.onclick = () => location.href = "movies.html";
-docBtn.onclick = () => location.href = "documentary.html";
+seriesBtn.addEventListener("click", () => {
+  location.href = "series.html";
+});
+
+moviesBtn.addEventListener("click", () => {
+  location.href = "movies.html";
+});
+
+docBtn.addEventListener("click", () => {
+  location.href = "documentary.html";
+});
