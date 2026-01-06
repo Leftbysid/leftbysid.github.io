@@ -33,7 +33,7 @@ const docBtn = document.getElementById("docBtn");
    HOVER BEHAVIOR (UI ONLY)
 ========================= */
 seriesBtn.addEventListener("mouseenter", () => {
-  matrix.setColor("#00aaff"); // BLUE
+  matrix.setColor("#cfff04"); // YELLOW
   showBg("series");
 });
 
