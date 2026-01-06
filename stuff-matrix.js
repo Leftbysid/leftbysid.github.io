@@ -5,10 +5,10 @@
 export function startStuffMatrix({
   canvasId = "matrix",
   color = "#00ff9c",
-  density = 1.8,
+  density = 1.4,
   fontSize = 14,
-  speed = 1.2,
-  trail = 0.03
+  speed = 0.9,
+  trail = 0.25
 } = {}) {
 
   const canvas = document.getElementById(canvasId);
@@ -40,7 +40,7 @@ export function startStuffMatrix({
     ctx.font = `${fontSize}px monospace`;
 
     columns.forEach((y, i) => {
-      for (let k = 0; k < 3; k++) {
+      for (let k = 0; k < 2; k++) {
         const t = chars[Math.floor(Math.random() * chars.length)];
         ctx.fillText(t, i * fontSize, (y - k) * fontSize);
       }
