@@ -1,30 +1,28 @@
 /* =========================
    STUFF MATRIX ENGINE
-   (Balanced & Non-Overlapping)
+   (Slow, Clean, Cinematic)
 ========================= */
 
-export function startStuffMatrix({
-  canvasId = "matrix",
-  color = "#00ff9c",
-  density = 1.2,     // calmer horizontal density
-  fontSize = 14,
-  speed = 0.6,       // normal Matrix pace
-  trail = 0.06       // clean long trails (NOT aggressive)
-} = {}) {
+export function startStuffMatrix(canvasId = "matrix") {
 
   const canvas = document.getElementById(canvasId);
   if (!canvas) return;
 
   const ctx = canvas.getContext("2d");
+
+  /* 🔒 LOCKED SETTINGS (SLOW) */
   const chars = "0123456789";
-  let rainColor = color;
+  const fontSize = 14;
+  const density = 1.1;   // slightly calmer
+  const speed = 0.35;    // ⬅️ MAIN SLOWDOWN
+  const trail = 0.06;    // clean long trails
+
+  let rainColor = "#00ff9c";
   let columns = [];
 
   function resize() {
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
-
-    // Each column tracks row index (integer only)
     columns = Array(
       Math.floor((window.innerWidth / fontSize) * density)
     ).fill(0);
@@ -34,7 +32,7 @@ export function startStuffMatrix({
   resize();
 
   function draw() {
-    /* Fade previous frame WITHOUT darkening background */
+    /* Fade previous frame (transparent background preserved) */
     ctx.globalCompositeOperation = "destination-out";
     ctx.fillStyle = `rgba(0,0,0,${trail})`;
     ctx.fillRect(0, 0, canvas.width, canvas.height);
@@ -44,15 +42,14 @@ export function startStuffMatrix({
     ctx.font = `${fontSize}px monospace`;
 
     columns.forEach((row, i) => {
-      // Draw ONE digit per row (no overlap)
       const char = chars[Math.floor(Math.random() * chars.length)];
       const x = i * fontSize;
-      const y = row * fontSize * 1.1; // extra vertical spacing
+      const y = row * fontSize * 1.15; // extra vertical spacing
 
       ctx.fillText(char, x, y);
 
-      // Reset column naturally
-      if (y > canvas.height && Math.random() > 0.97) {
+      // slower, more natural reset
+      if (y > canvas.height && Math.random() > 0.985) {
         columns[i] = 0;
       } else {
         columns[i] += speed;
@@ -64,6 +61,7 @@ export function startStuffMatrix({
 
   draw();
 
+  /* 🔓 LIMITED API */
   return {
     setColor(newColor) {
       rainColor = newColor;
