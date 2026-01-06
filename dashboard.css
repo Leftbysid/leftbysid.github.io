@@ -125,6 +125,7 @@ body {
 @media (max-width: 900px), (orientation: portrait) {
 
   .container {
+      transform: translateX(-16px);
     min-height: 100vh;
     display: flex;
     flex-direction: column;
@@ -152,6 +153,7 @@ body {
     margin-bottom: 30px;
   }
 }
+
 
 
 
