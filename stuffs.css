@@ -71,10 +71,10 @@ body {
 /* =========================
    COLOR-CODED HOVERS
 ========================= */
-/* SERIES – BLUE */
+/* SERIES – yellow */
 #seriesBtn:hover {
-  border-color: #00aaff;
-  color: #00aaff;
+  border-color: #CFFF04;
+  color: #CFFF04;
   box-shadow: 0 0 18px rgba(0,170,255,.9);
 }
 
