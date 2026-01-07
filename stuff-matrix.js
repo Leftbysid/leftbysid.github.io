@@ -14,7 +14,7 @@ export function startStuffMatrix(canvasId = "matrix") {
   const fontSize = 14;
   const density = 1.1;
   const baseSpeed = 0.35;
-  const trail = 0.03;
+  const trail = 0.015;
 
   let rainColor = "#00ff9c";
   let audioEnergy = 0;
