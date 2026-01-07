@@ -231,3 +231,4 @@ window.confirmDelete = async () => {
 window.closeConfirm = () =>
   document.getElementById("confirmBox").classList.add("hidden");
 
+
