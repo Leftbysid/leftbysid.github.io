@@ -1,6 +1,3 @@
-import { requireAuth } from "./auth-guard.js";
-
-requireAuth();
 import { auth, db } from "./firebase.js";
 import {
   collection, addDoc, deleteDoc, updateDoc,
