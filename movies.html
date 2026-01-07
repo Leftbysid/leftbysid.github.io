@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Movies</title>
+  <link rel="stylesheet" href="movies.css">
+</head>
+<body>
+
+<header class="header">
+  <h1>MOVIES</h1>
+  <button id="backBtn">← Back</button>
+</header>
+
+<section class="stats">
+  <span id="totalCount">Total: 0</span>
+  <span id="seenCount">Seen: 0</span>
+  <span id="unseenCount">Not Seen: 0</span>
+</section>
+
+<section class="controls">
+  <input id="search" placeholder="Search title, director, genre...">
+  <select id="filterSeen">
+    <option value="all">All</option>
+    <option value="seen">Seen</option>
+    <option value="unseen">Not Seen</option>
+  </select>
+</section>
+
+<section class="add-movie">
+  <input id="title" placeholder="Movie Title *">
+  <input id="director" placeholder="Director">
+
+  <input id="genreInput" placeholder="Add genre and press Enter">
+  <select id="genreSelect">
+    <option value="">Select genre</option>
+  </select>
+
+  <div id="genreTags" class="genre-tags"></div>
+
+  <select id="seen">
+    <option value="unseen">Not Seen</option>
+    <option value="seen">Seen</option>
+  </select>
+
+  <button id="addMovie">Add Movie</button>
+</section>
+
+<section id="movieList"></section>
+
+<!-- EDIT POPUP -->
+<div id="editOverlay" class="overlay hidden">
+  <div class="popup">
+    <h3>Edit Movie</h3>
+
+    <input id="editTitle">
+    <input id="editDirector">
+
+    <input id="editGenreInput" placeholder="Add genre and press Enter">
+    <select id="editGenreSelect">
+      <option value="">Select genre</option>
+    </select>
+
+    <div id="editGenreTags" class="genre-tags"></div>
+
+    <select id="editSeen">
+      <option value="seen">Seen</option>
+      <option value="unseen">Not Seen</option>
+    </select>
+
+    <div class="actions">
+      <button id="saveEdit">Save</button>
+      <button id="cancelEdit">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- DELETE CONFIRM -->
+<div id="deleteOverlay" class="overlay hidden">
+  <div class="popup">
+    <p>Delete this movie?</p>
+    <div class="actions">
+      <button id="confirmDelete">Yes</button>
+      <button id="cancelDelete">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<script type="module" src="movies.js"></script>
+</body>
+</html>
