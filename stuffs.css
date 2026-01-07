@@ -42,16 +42,16 @@ body {
    CENTERED ROW BUTTON LAYOUT
 ========================= */
 .stuffs-container {
-  position: fixed;
-  inset: 0;
-  z-index: 10;
+  position: relative;
+  z-index: 5;              /* FIX: above canvas & images */
+  height: 100vh;
 
   display: flex;
   justify-content: center;
-  align-items: flex-start;
+  align-items: center;
   gap: 60px;
 
-  padding-top: 300px; /* replaces translateY */
+  transform: translateY(300px);
 }
 
 .stuffs-btn {
