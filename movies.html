@@ -7,17 +7,20 @@
 </head>
 <body>
 
+<!-- HEADER -->
 <header class="header">
   <h1>MOVIES</h1>
   <button id="backBtn">← Back</button>
 </header>
 
+<!-- STATS -->
 <section class="stats">
   <span id="totalCount">Total: 0</span>
   <span id="seenCount">Seen: 0</span>
   <span id="unseenCount">Not Seen: 0</span>
 </section>
 
+<!-- CONTROLS -->
 <section class="controls">
   <input id="search" placeholder="Search title, director, genre...">
   <select id="filterSeen">
@@ -27,9 +30,11 @@
   </select>
 </section>
 
+<!-- ADD MOVIE -->
 <section class="add-movie">
-  <input id="title" placeholder="Movie Title *">
-  <input id="director" placeholder="Director">
+  <!-- ⚠️ ID FIX -->
+  <input id="movieTitle" placeholder="Movie Title *">
+  <input id="movieDirector" placeholder="Director">
 
   <input id="genreInput" placeholder="Add genre and press Enter">
   <select id="genreSelect">
@@ -38,14 +43,16 @@
 
   <div id="genreTags" class="genre-tags"></div>
 
-  <select id="seen">
+  <select id="movieSeen">
     <option value="unseen">Not Seen</option>
     <option value="seen">Seen</option>
   </select>
 
-  <button id="addMovie">Add Movie</button>
+  <!-- ⚠️ ID FIX -->
+  <button id="addMovieBtn">Add Movie</button>
 </section>
 
+<!-- MOVIE LIST -->
 <section id="movieList"></section>
 
 <!-- EDIT POPUP -->
@@ -53,8 +60,8 @@
   <div class="popup">
     <h3>Edit Movie</h3>
 
-    <input id="editTitle">
-    <input id="editDirector">
+    <input id="editMovieTitle">
+    <input id="editMovieDirector">
 
     <input id="editGenreInput" placeholder="Add genre and press Enter">
     <select id="editGenreSelect">
@@ -63,7 +70,7 @@
 
     <div id="editGenreTags" class="genre-tags"></div>
 
-    <select id="editSeen">
+    <select id="editMovieSeen">
       <option value="seen">Seen</option>
       <option value="unseen">Not Seen</option>
     </select>
@@ -87,5 +94,13 @@
 </div>
 
 <script type="module" src="movies.js"></script>
+
+<script>
+  // ✅ Back routing
+  document.getElementById("backBtn").onclick = () => {
+    window.location.href = "stuffs.html";
+  };
+</script>
+
 </body>
 </html>
