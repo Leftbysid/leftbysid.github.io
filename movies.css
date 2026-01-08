@@ -1,6 +1,3 @@
-/* =========================
-   BASE
-========================= */
 body {
   background: black;
   font-family: 'Share Tech Mono', monospace;
@@ -8,17 +5,10 @@ body {
   padding: 20px;
 }
 
-/* =========================
-   TITLE
-========================= */
 .title {
   text-align: center;
-  margin-bottom: 10px;
 }
 
-/* =========================
-   CONTROLS (same as links)
-========================= */
 .controls {
   display: flex;
   gap: 10px;
@@ -36,29 +26,30 @@ body {
   box-shadow: 0 0 12px rgba(31,182,255,.35);
 }
 
-/* ADD BUTTON */
 #toggleForm {
-  display: block;
   margin: 10px auto;
+  display: block;
 }
 
-/* =========================
-   MOVIE ROW (IDENTICAL TO LINKS)
-========================= */
+.stats {
+  text-align: center;
+  margin-bottom: 10px;
+}
+
+.hidden { display: none; }
+
+/* MOVIE CARD (same as link-row) */
 .movie-row {
   display: flex;
   justify-content: space-between;
   align-items: center;
-
   border: 2px solid #1FB6FF;
   padding: 10px 14px;
   margin: 8px auto;
   max-width: 900px;
-
   box-shadow: 0 0 14px rgba(31,182,255,.45);
 }
 
-/* TEXT BLOCK */
 .movie-text {
   display: flex;
   flex-direction: column;
@@ -66,19 +57,14 @@ body {
   font-size: 14px;
 }
 
-/* GENRE TAGS */
-.movie-tags span {
+.genre-tag {
   display: inline-block;
   margin-right: 6px;
-  padding: 2px 6px;
   border: 1px solid #1FB6FF;
+  padding: 2px 6px;
   font-size: 12px;
-  color: #1FB6FF;
 }
 
-/* =========================
-   SEEN / UNSEEN BADGE
-========================= */
 .badge {
   font-weight: bold;
   cursor: pointer;
@@ -86,17 +72,12 @@ body {
 
 .badge.seen {
   color: #1FB6FF;
-  text-shadow: 0 0 10px rgba(31,182,255,.9);
 }
 
 .badge.unseen {
   color: #ff2b2b;
-  text-shadow: 0 0 10px rgba(255,43,43,.8);
 }
 
-/* =========================
-   ACTION ICONS
-========================= */
 .movie-actions {
   display: flex;
   gap: 12px;
@@ -110,41 +91,17 @@ body {
   cursor: pointer;
 }
 
-.movie-actions button:hover {
-  text-shadow: 0 0 12px rgba(31,182,255,.9);
-}
-
-/* =========================
-   FORMS / POPUPS
-========================= */
-.hidden { display: none; }
-
-.confirm,
-.edit-overlay {
+.confirm {
   position: fixed;
   inset: 0;
-  background: rgba(0,0,0,.75);
+  background: rgba(0,0,0,.7);
   display: flex;
-  justify-content: center;
   align-items: center;
-  z-index: 999;
+  justify-content: center;
 }
 
-.confirm-box,
-.edit-box {
+.confirm-box {
   background: black;
   border: 2px solid #1FB6FF;
   padding: 20px;
-  box-shadow: 0 0 18px rgba(31,182,255,.6);
-}
-
-.confirm-box input,
-.edit-box input,
-.confirm-box select {
-  width: 100%;
-  margin: 8px 0;
-  padding: 8px;
-  background: black;
-  border: 1px solid #1FB6FF;
-  color: #1FB6FF;
 }
