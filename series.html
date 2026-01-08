@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Series</title>
+
+  <link rel="stylesheet" href="series.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
+</head>
+<body>
+
+  <header class="top-bar">
+    <h1>SERIES</h1>
+    <button id="addBtn">＋ Add Series</button>
+  </header>
+
+  <!-- ADD / EDIT FORM -->
+  <div class="form-wrapper hidden" id="formWrapper">
+    <form id="seriesForm">
+      <input type="hidden" id="docId">
+
+      <input type="text" id="name" placeholder="Series name" required>
+      <input type="number" id="seasons" placeholder="Number of seasons" required>
+
+      <div class="genre-row">
+        <select id="genre"></select>
+        <button type="button" id="addGenreBtn">＋</button>
+      </div>
+
+      <input type="text" id="newGenre" placeholder="New genre" class="hidden">
+
+      <div class="form-actions">
+        <button type="submit">Save</button>
+        <button type="button" id="cancelBtn">Cancel</button>
+      </div>
+    </form>
+  </div>
+
+  <!-- SERIES LIST -->
+  <section id="seriesList"></section>
+
+  <script type="module" src="series.js"></script>
+</body>
+</html>
