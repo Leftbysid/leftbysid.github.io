@@ -1,4 +1,3 @@
-import { auth } from "./auth.js";
 import { db } from "./firebase.js";
 import {
   collection, addDoc, onSnapshot,
