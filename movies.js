@@ -1,239 +1,104 @@
-import { auth, db } from "./firebase.js";
+import { auth } from "./auth.js";
+import { db } from "./firebase.js";
 import {
-  collection, addDoc, deleteDoc, updateDoc,
-  doc, query, where, onSnapshot
-} from "https://www.gstatic.com/firebasejs/12.7.0/firebase-firestore.js";
-import { onAuthStateChanged } from
-  "https://www.gstatic.com/firebasejs/12.7.0/firebase-auth.js";
+  collection, addDoc, onSnapshot,
+  deleteDoc, doc, updateDoc
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-let movies = [];
-let genres = [];
-let selectedGenres = [];
-let editSelectedGenres = [];
-let editId = null;
-let deleteId = null;
-let user = null;
-
-/* ELEMENTS */
 const list = document.getElementById("movieList");
-const totalCount = document.getElementById("totalCount");
-const seenCount = document.getElementById("seenCount");
-const unseenCount = document.getElementById("unseenCount");
+const overlay = document.getElementById("editOverlay");
+const deleteOverlay = document.getElementById("deleteOverlay");
 
-const genreSelect = document.getElementById("genreSelect");
-const genreInput = document.getElementById("genreInput");
-const genreTags = document.getElementById("genreTags");
+let editingId = null;
+let deletingId = null;
 
-const editGenreSelect = document.getElementById("editGenreSelect");
-const editGenreInput = document.getElementById("editGenreInput");
-const editGenreTags = document.getElementById("editGenreTags");
+const moviesRef = collection(db, "movies");
 
-/* AUTH */
-onAuthStateChanged(auth, u => {
-  if (!u) location.href = "index.html";
-  user = u;
-  loadMovies();
-  loadGenres();
+/* AUTH GUARD */
+auth.onAuthStateChanged(user => {
+  if (!user) location.href = "index.html";
 });
 
-/* GENRES */
-function loadGenres() {
-  onSnapshot(collection(db, "movieGenres"), snap => {
-    genres = snap.docs.map(d => d.data().name);
-    populateGenreSelects();
-  });
-}
-
-function populateGenreSelects() {
-  const opts = `<option value="">Select genre</option>` +
-    genres.map(g => `<option value="${g}">${g}</option>`).join("");
-  genreSelect.innerHTML = opts;
-  editGenreSelect.innerHTML = opts;
-}
-
-async function ensureGenreExists(name) {
-  if (!name || genres.includes(name)) return;
-  await addDoc(collection(db, "movieGenres"), { name });
-}
-
-/* GENRE TAG LOGIC */
-function addGenre(name, isEdit = false) {
-  if (!name) return;
-  const list = isEdit ? editSelectedGenres : selectedGenres;
-  if (list.includes(name)) return;
-
-  list.push(name);
-  ensureGenreExists(name);
-  renderGenreTags(isEdit);
-}
-
-function renderGenreTags(isEdit = false) {
-  const container = isEdit ? editGenreTags : genreTags;
-  const list = isEdit ? editSelectedGenres : selectedGenres;
-  container.innerHTML = "";
-
-  list.forEach(g => {
-    const tag = document.createElement("div");
-    tag.className = "genre-tag";
-    tag.textContent = g;
-    tag.onclick = () => {
-      list.splice(list.indexOf(g), 1);
-      renderGenreTags(isEdit);
-    };
-    container.appendChild(tag);
-  });
-}
-
-genreSelect.onchange = () => {
-  addGenre(genreSelect.value);
-  genreSelect.value = "";
-};
-
-genreInput.onkeydown = e => {
-  if (e.key === "Enter") {
-    addGenre(genreInput.value.trim());
-    genreInput.value = "";
-  }
-};
-
-editGenreSelect.onchange = () => {
-  addGenre(editGenreSelect.value, true);
-  editGenreSelect.value = "";
-};
-
-editGenreInput.onkeydown = e => {
-  if (e.key === "Enter") {
-    addGenre(editGenreInput.value.trim(), true);
-    editGenreInput.value = "";
-  }
-};
-
-/* ADD MOVIE */
-addMovie.onclick = async () => {
-  if (!title.value.trim()) return;
-
-  await addDoc(collection(db, "movies"), {
-    uid: user.uid,
-    title: title.value.trim(),
-    director: director.value,
-    genres: selectedGenres,
-    seen: seen.value
-  });
-
-  title.value = director.value = "";
-  selectedGenres = [];
-  renderGenreTags();
-};
-
-/* LOAD MOVIES */
-function loadMovies() {
-  const q = query(collection(db, "movies"), where("uid", "==", user.uid));
-  onSnapshot(q, snap => {
-    movies = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-    applyFilters();
-    updateStats();
-  });
-}
-
-/* STATS */
-function updateStats() {
-  totalCount.textContent = `Total: ${movies.length}`;
-  seenCount.textContent = `Seen: ${movies.filter(m => m.seen === "seen").length}`;
-  unseenCount.textContent = `Not Seen: ${movies.filter(m => m.seen === "unseen").length}`;
-}
-
 /* RENDER */
-function render(data) {
+onSnapshot(moviesRef, snap => {
   list.innerHTML = "";
-  data.forEach(m => {
+  let seen = 0;
+
+  snap.forEach(docSnap => {
+    const m = docSnap.data();
+    if (m.seen === "seen") seen++;
+
     const card = document.createElement("div");
     card.className = "movie-card";
 
     card.innerHTML = `
-      <div class="movie-info">
-        <strong>${m.title}</strong>
-        <span class="badge ${m.seen}">${m.seen === "seen" ? "Seen" : "Not Seen"}</span>
-        <div>${m.director || ""}</div>
-        <div class="tags">${(m.genres || []).join(", ")}</div>
-      </div>
-      <div class="actions">
-        <button class="edit">✏️</button>
-        <button class="del">🗑️</button>
+      <div class="movie-title">${m.title}</div>
+      <div>${m.director || ""}</div>
+      <div class="tags">${(m.genres||[]).map(g=>`<span>${g}</span>`).join("")}</div>
+      <div class="badge">${m.seen === "seen" ? "Seen" : "Not Seen"}</div>
+      <div class="icons">
+        ✏️ <span class="icon edit"></span>
+        🗑️ <span class="icon delete"></span>
       </div>
     `;
 
-    card.querySelector(".badge").onclick = () => toggleSeen(m.id);
-    card.querySelector(".edit").onclick = () => openEdit(m.id);
-    card.querySelector(".del").onclick = () => askDelete(m.id);
+    card.querySelector(".edit").onclick = () => {
+      editingId = docSnap.id;
+      document.getElementById("movieTitle").value = m.title;
+      document.getElementById("movieDirector").value = m.director || "";
+      document.getElementById("movieSeen").value = m.seen;
+      overlay.classList.remove("hidden");
+    };
+
+    card.querySelector(".delete").onclick = () => {
+      deletingId = docSnap.id;
+      deleteOverlay.classList.remove("hidden");
+    };
 
     list.appendChild(card);
   });
-}
 
-/* SEARCH + FILTER */
-search.oninput = filterSeen.onchange = applyFilters;
+  document.getElementById("totalCount").textContent = `Total: ${snap.size}`;
+  document.getElementById("seenCount").textContent = `Seen: ${seen}`;
+  document.getElementById("unseenCount").textContent = `Not Seen: ${snap.size - seen}`;
+});
 
-function applyFilters() {
-  const q = search.value.toLowerCase();
-  const f = filterSeen.value;
+/* ADD */
+document.getElementById("saveMovie").onclick = async () => {
+  const title = movieTitle.value.trim();
+  if (!title) return;
 
-  render(movies.filter(m =>
-    (!q ||
-      m.title.toLowerCase().includes(q) ||
-      (m.director || "").toLowerCase().includes(q) ||
-      (m.genres || []).join(",").toLowerCase().includes(q)
-    ) &&
-    (f === "all" || m.seen === f)
-  ));
-}
+  const data = {
+    title,
+    director: movieDirector.value.trim(),
+    genres: [...document.querySelectorAll(".tags span")].map(t=>t.textContent),
+    seen: movieSeen.value
+  };
 
-/* TOGGLE SEEN */
-async function toggleSeen(id) {
-  const movie = movies.find(m => m.id === id);
-  await updateDoc(doc(db, "movies", id), {
-    seen: movie.seen === "seen" ? "unseen" : "seen"
-  });
-}
+  if (editingId) {
+    await updateDoc(doc(db, "movies", editingId), data);
+  } else {
+    await addDoc(moviesRef, data);
+  }
 
-/* EDIT */
-function openEdit(id) {
-  const m = movies.find(x => x.id === id);
-  editId = id;
-
-  editTitle.value = m.title;
-  editDirector.value = m.director;
-  editSeen.value = m.seen;
-
-  editSelectedGenres = [...(m.genres || [])];
-  renderGenreTags(true);
-
-  editOverlay.classList.remove("hidden");
-}
-
-saveEdit.onclick = async () => {
-  await updateDoc(doc(db, "movies", editId), {
-    title: editTitle.value,
-    director: editDirector.value,
-    genres: editSelectedGenres,
-    seen: editSeen.value
-  });
-  editOverlay.classList.add("hidden");
+  overlay.classList.add("hidden");
+  editingId = null;
 };
 
-cancelEdit.onclick = () => editOverlay.classList.add("hidden");
+document.getElementById("cancelMovie").onclick = () => {
+  overlay.classList.add("hidden");
+};
 
-/* DELETE */
-function askDelete(id) {
-  deleteId = id;
-  deleteOverlay.classList.remove("hidden");
-}
-
-confirmDelete.onclick = async () => {
-  await deleteDoc(doc(db, "movies", deleteId));
+document.getElementById("confirmDelete").onclick = async () => {
+  await deleteDoc(doc(db, "movies", deletingId));
   deleteOverlay.classList.add("hidden");
 };
 
-cancelDelete.onclick = () => deleteOverlay.classList.add("hidden");
+document.getElementById("cancelDelete").onclick = () => {
+  deleteOverlay.classList.add("hidden");
+};
 
-/* BACK */
-backBtn.onclick = () => history.back();
+document.getElementById("addMovieBtn").onclick = () => {
+  editingId = null;
+  overlay.classList.remove("hidden");
+};
