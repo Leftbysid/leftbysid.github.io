@@ -16,6 +16,8 @@ import {
 let series = [];
 let editingId = null;
 let deleteId = null;
+let genres = [];
+let editGenres = [];
 
 /* =====================
    ELEMENTS
@@ -26,16 +28,15 @@ const seriesList = document.getElementById("seriesList");
 
 const nameInput = document.getElementById("name");
 const seasonsInput = document.getElementById("seasons");
-const genreSelect = document.getElementById("genre");
 
-const newGenreInput = document.getElementById("newGenre");
-const addGenreBtn = document.getElementById("addGenreBtn");
+const genreInput = document.getElementById("genreInput");
+const genreTags = document.getElementById("genreTags");
 
-/* EDIT OVERLAY */
+/* EDIT */
 const editOverlay = document.getElementById("editOverlay");
 const editName = document.getElementById("editName");
 const editSeasons = document.getElementById("editSeasons");
-const editGenre = document.getElementById("editGenre");
+const editGenreTags = document.getElementById("editGenreTags");
 
 /* =====================
    UI
@@ -43,42 +44,34 @@ const editGenre = document.getElementById("editGenre");
 addBtn.onclick = () =>
   seriesForm.classList.toggle("hidden");
 
-addGenreBtn.onclick = () => {
-  newGenreInput.classList.toggle("hidden");
-  newGenreInput.focus();
-};
-
 /* =====================
-   GENRES (GLOBAL)
+   GENRE INPUT (ADD)
 ===================== */
-const genresCol = collection(db, "genres");
+genreInput.onkeydown = e => {
+  if (e.key !== "Enter") return;
+  e.preventDefault();
 
-function loadGenres(select = null) {
-  onSnapshot(
-    query(genresCol, orderBy("name")),
-    snap => {
-      genreSelect.innerHTML = "";
-      editGenre.innerHTML = "";
+  const g = genreInput.value.trim();
+  if (!g || genres.includes(g)) return;
 
-      snap.forEach(d => {
-        const g = d.data().name;
-        genreSelect.innerHTML += `<option>${g}</option>`;
-        editGenre.innerHTML += `<option>${g}</option>`;
-      });
-
-      if (select) editGenre.value = select;
-    }
-  );
-}
-
-newGenreInput.onchange = async () => {
-  const g = newGenreInput.value.trim();
-  if (!g) return;
-
-  await addDoc(genresCol, { name: g });
-  newGenreInput.value = "";
-  newGenreInput.classList.add("hidden");
+  genres.push(g);
+  renderGenreTags(genreTags, genres);
+  genreInput.value = "";
 };
+
+function renderGenreTags(container, list) {
+  container.innerHTML = "";
+  list.forEach(g => {
+    const tag = document.createElement("span");
+    tag.className = "genre-tag";
+    tag.textContent = `#${g}`;
+    tag.onclick = () => {
+      list.splice(list.indexOf(g), 1);
+      renderGenreTags(container, list);
+    };
+    container.appendChild(tag);
+  });
+}
 
 /* =====================
    ADD SERIES
@@ -89,12 +82,14 @@ window.addSeries = async () => {
   await addDoc(collection(db, "series"), {
     name: nameInput.value.trim(),
     seasons: Number(seasonsInput.value),
-    genre: genreSelect.value
+    genres
   });
 
   seriesForm.classList.add("hidden");
   nameInput.value = "";
   seasonsInput.value = "";
+  genres = [];
+  renderGenreTags(genreTags, genres);
 };
 
 /* =====================
@@ -123,10 +118,14 @@ function renderSeries(list) {
           <button onclick="askDelete('${s.id}')">🗑️</button>
         </div>
 
-        <p class="series-name">${s.name}</p>
-        <p class="series-meta">
-          ${s.seasons} season${s.seasons !== 1 ? "s" : ""} · ${s.genre}
-        </p>
+        <div class="series-name">${s.name}</div>
+        <div class="series-meta">${s.seasons} seasons</div>
+
+        <div class="series-tags">
+          ${(s.genres || []).map(g =>
+            `<span class="genre-tag">#${g}</span>`
+          ).join("")}
+        </div>
       </div>
     `;
   });
@@ -141,8 +140,9 @@ window.editSeries = id => {
 
   editName.value = s.name;
   editSeasons.value = s.seasons;
-  editGenre.value = s.genre;
+  editGenres = [...(s.genres || [])];
 
+  renderGenreTags(editGenreTags, editGenres);
   editOverlay.classList.remove("hidden");
 };
 
@@ -150,7 +150,7 @@ window.saveEdit = async () => {
   await updateDoc(doc(db, "series", editingId), {
     name: editName.value.trim(),
     seasons: Number(editSeasons.value),
-    genre: editGenre.value
+    genres: editGenres
   });
 
   editOverlay.classList.add("hidden");
@@ -178,5 +178,4 @@ window.closeConfirm = () =>
 /* =====================
    INIT
 ===================== */
-loadGenres();
 loadSeries();
