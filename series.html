@@ -9,45 +9,54 @@
 </head>
 <body>
 
-  <!-- TITLE -->
   <h1 class="title">SERIES</h1>
 
-  <!-- ADD BUTTON -->
   <button id="addBtn">＋ Add Series</button>
 
-  <!-- ADD FORM (HIDDEN) -->
+  <!-- ADD FORM -->
   <form id="seriesForm" class="hidden">
-  <input id="name" placeholder="Series name" />
-  <input id="seasons" type="number" placeholder="Number of seasons" />
+    <input id="name" placeholder="Series name" autocomplete="off" />
+    <input id="seasons" type="number" placeholder="Number of seasons" />
 
-  <!-- MULTI-GENRE INPUT -->
-  <input
-    id="genreInput"
-    placeholder="Type genre and press Enter"
-    autocomplete="off"/>
+    <input
+      id="genreInput"
+      placeholder="Type genre and press Enter"
+      autocomplete="off"
+    />
 
-  <div id="genreTags"></div>
+    <div id="genreTags"></div>
 
-  <button type="button" onclick="addSeries()">Save</button>
-</form>
+    <button type="button" onclick="addSeries()">Save</button>
+  </form>
 
-  <!-- SERIES LIST -->
+  <!-- LIST -->
   <div id="seriesList"></div>
 
   <!-- EDIT OVERLAY -->
   <div id="editOverlay" class="edit-overlay hidden">
-  <div class="edit-box">
-    <input id="editName" />
-    <input id="editSeasons" type="number" />
+    <div class="edit-box">
+      <input id="editName" />
+      <input id="editSeasons" type="number" />
 
-    <div id="editGenreTags"></div>
+      <div id="editGenreTags"></div>
 
-    <div class="edit-actions">
-      <button onclick="saveEdit()">Save</button>
-      <button class="cancel" onclick="closeEdit()">Cancel</button>
+      <div class="edit-actions">
+        <button onclick="saveEdit()">Save</button>
+        <button class="cancel" onclick="closeEdit()">Cancel</button>
+      </div>
     </div>
   </div>
-</div>
+
+  <!-- DELETE CONFIRM -->
+  <div id="confirmBox" class="confirm hidden">
+    <div class="confirm-box">
+      <p>Delete this series?</p>
+      <div class="confirm-actions">
+        <button onclick="confirmDelete()">Yes</button>
+        <button onclick="closeConfirm()">Cancel</button>
+      </div>
+    </div>
+  </div>
 
   <script type="module" src="series.js"></script>
 </body>
