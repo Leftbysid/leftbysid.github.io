@@ -166,3 +166,14 @@ body {
 .seen-toggle {
   accent-color: #4cc9ff;
 }
+.filters {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  margin: 10px 0;
+}
+
+.filter.active {
+  background: #4cc9ff;
+  color: black;
+}
