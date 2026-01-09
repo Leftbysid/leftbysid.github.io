@@ -1,143 +1,147 @@
 body {
   background: black;
-  color: #4cc9ff;
   font-family: 'Share Tech Mono', monospace;
+  color: #4cc9ff;
   padding: 20px;
 }
 
 /* TITLE */
 .title {
   text-align: center;
-  text-shadow: 0 0 20px #4cc9ff;
+  margin-bottom: 12px;
+}
+
+/* CONTROLS */
+.controls {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.controls input,
+.controls button,
+#seriesForm input,
+#seriesForm button,
+#toggleForm {
+  padding: 8px 14px;
+  border: 2px solid #4cc9ff;
+  background: black;
+  color: #4cc9ff;
+  border-radius: 6px;
+  box-shadow: 0 0 10px rgba(76,201,255,.4);
 }
 
 /* ADD BUTTON */
-#addBtn {
+#toggleForm {
   display: block;
-  margin: 18px auto;
-  padding: 10px 24px;
-  background: transparent;
-  border: 2px solid #4cc9ff;
-  color: #4cc9ff;
+  margin: 12px auto;
   cursor: pointer;
 }
 
-#addBtn:hover {
-  background: #4cc9ff;
-  color: black;
-}
-
-/* FORM */
+/* ADD FORM */
 #seriesForm {
-  max-width: 650px;
-  margin: 16px auto;
-  padding: 16px;
+  max-width: 900px;
+  margin: 10px auto;
+  display: grid;
+  grid-template-columns: 2fr 1fr 3fr auto;
+  gap: 10px;
+}
+
+@media (max-width: 700px) {
+  #seriesForm {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* SERIES ROW */
+.series-row {
   border: 2px solid #4cc9ff;
+  margin: 10px auto;
+  max-width: 900px;
+  padding: 12px;
+  box-shadow: 0 0 12px rgba(76,201,255,.35);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
-#seriesForm input,
-#seriesForm button {
-  width: 100%;
-  margin: 6px 0;
-  padding: 10px;
-  background: black;
-  border: 1px solid #4cc9ff;
-  color: #4cc9ff;
+/* SERIES DETAILS */
+.series-text {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 14px;
 }
 
-#seriesForm button:hover {
-  background: #4cc9ff;
-  color: black;
+.series-text > * {
+  padding-bottom: 4px;
+  border-bottom: 1px solid rgba(76,201,255,.25);
+}
+
+.series-text > *:last-child {
+  border-bottom: none;
 }
 
 /* TAGS */
-#genreTags,
-#editGenreTags {
-  display: flex;
-  gap: 6px;
-  flex-wrap: wrap;
-  margin-top: 6px;
-}
-
-.genre-tag {
+.tag {
+  display: inline-block;
+  margin-right: 6px;
+  padding: 2px 6px;
   border: 1px solid #4cc9ff;
-  padding: 4px 8px;
+  border-radius: 4px;
   font-size: 12px;
-  cursor: pointer;
-}
-
-.genre-tag:hover {
-  background: #4cc9ff;
-  color: black;
-}
-
-/* ROW */
-.series-row {
-  max-width: 700px;
-  margin: 20px auto;
-  padding: 14px;
-  border: 2px solid rgba(76,201,255,.7);
-  position: relative;
-}
-
-.series-name {
-  font-size: 18px;
-}
-
-.series-meta {
-  font-size: 14px;
-  opacity: .8;
 }
 
 /* ACTIONS */
 .series-actions {
-  position: absolute;
-  top: 10px;
-  right: 10px;
+  display: flex;
+  gap: 12px;
 }
 
 .series-actions button {
   background: none;
   border: none;
-  color: #4cc9ff;
   font-size: 18px;
+  color: #4cc9ff;
   cursor: pointer;
-  margin-left: 6px;
+}
+
+/* VISIBILITY */
+.hidden {
+  display: none !important;
 }
 
 /* OVERLAYS */
-.edit-overlay,
-.confirm {
+.confirm,
+.edit-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0,0,0,.85);
+  background: rgba(0,0,0,.75);
+  z-index: 999;
   display: flex;
   justify-content: center;
-  align-items: center;
+  align-items: flex-start;
+  padding-top: 20px;
 }
 
-.edit-box,
-.confirm-box {
+.confirm-box,
+.edit-box {
   background: black;
   border: 2px solid #4cc9ff;
   padding: 20px;
-  min-width: 280px;
+  box-shadow: 0 0 15px #4cc9ff;
+  max-width: 600px;
+  width: 100%;
 }
 
-.edit-actions,
-.confirm-actions {
+.edit-actions {
   display: flex;
   justify-content: space-between;
-  margin-top: 12px;
+  margin-top: 10px;
 }
 
 .edit-actions .cancel {
   background: #ff2b2b;
   color: black;
-  border: none;
-}
-
-/* UTIL */
-.hidden {
-  display: none;
 }
