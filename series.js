@@ -6,6 +6,7 @@ import {
 import {
   onAuthStateChanged
 } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-auth.js";
+const genresCol = collection(db, "genres");
 
 let currentFilter = "all";
 let series = [];
@@ -17,6 +18,9 @@ let user = null;
 const seriesForm = document.getElementById("seriesForm");
 const seriesList = document.getElementById("seriesList");
 const confirmBox = document.getElementById("confirmBox");
+const genreSelect = document.getElementById("genreSelect");
+const addGenreBtn = document.getElementById("addGenreBtn");
+const newGenreInput = document.getElementById("newGenre");
 const editOverlay = document.getElementById("editOverlay");
 
 const toggleForm = document.getElementById("toggleForm");
@@ -55,6 +59,7 @@ const editGenres = document.getElementById("editGenres");
 onAuthStateChanged(auth, u => {
   if (!u) location.href = "index.html";
   user = u;
+  loadGenres();
   loadSeries();
 });
 
@@ -64,7 +69,7 @@ toggleForm.onclick = () => seriesForm.classList.toggle("hidden");
 saveSeriesBtn.onclick = async () => {
   const name = nameInput.value.trim();
   const seasons = Number(seasonsInput.value);
-  const genres = genresInput.value.split(",").map(g=>g.trim()).filter(Boolean);
+  const genres = [genreSelect.value];
 
   if (!name || !seasons) return alert("Name and seasons required");
 
@@ -88,7 +93,43 @@ function loadSeries() {
     series = snap.docs.map(d => ({ id: d.id, ...d.data() }));
     applyFilters();
   });
+  
 }
+function loadGenres(selected = null) {
+  onSnapshot(genresCol, snap => {
+    genreSelect.innerHTML = "";
+
+    snap.docs
+      .map(d => d.data().name)
+      .sort()
+      .forEach(name => {
+        const opt = document.createElement("option");
+        opt.value = name;
+        opt.textContent = name;
+        genreSelect.appendChild(opt);
+      });
+
+    if (selected) genreSelect.value = selected;
+  });
+}
+
+addGenreBtn.onclick = () => {
+  newGenreInput.classList.toggle("hidden");
+  newGenreInput.focus();
+};
+
+newGenreInput.onkeydown = async e => {
+  if (e.key !== "Enter") return;
+
+  const name = newGenreInput.value.trim();
+  if (!name) return;
+
+  await addDoc(genresCol, { name });
+
+  newGenreInput.value = "";
+  newGenreInput.classList.add("hidden");
+};
+
 function applyFilters() {
   let list = [...series];
 
