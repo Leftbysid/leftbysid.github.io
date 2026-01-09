@@ -9,35 +9,69 @@
 </head>
 <body>
 
-  <header class="top-bar">
-    <h1>SERIES</h1>
-    <button id="addBtn">＋ Add Series</button>
-  </header>
+  <!-- TITLE -->
+  <h1 class="title">SERIES</h1>
 
-  <!-- ADD / EDIT FORM -->
-  <div class="form-wrapper hidden" id="formWrapper">
-    <form id="seriesForm">
-      <input type="hidden" id="docId">
+  <!-- ADD BUTTON -->
+  <button id="addBtn">＋ Add Series</button>
 
-      <input type="text" id="name" placeholder="Series name" required>
-      <input type="number" id="seasons" placeholder="Number of seasons" required>
+  <!-- ADD FORM (HIDDEN) -->
+  <form id="seriesForm" class="hidden">
+    <input
+      type="text"
+      id="name"
+      placeholder="Series name"
+      autocomplete="off"
+    />
 
-      <div class="genre-row">
-        <select id="genre"></select>
-        <button type="button" id="addGenreBtn">＋</button>
-      </div>
+    <input
+      type="number"
+      id="seasons"
+      placeholder="Number of seasons"
+    />
 
-      <input type="text" id="newGenre" placeholder="New genre" class="hidden">
+    <select id="genre"></select>
 
-      <div class="form-actions">
-        <button type="submit">Save</button>
-        <button type="button" id="cancelBtn">Cancel</button>
-      </div>
-    </form>
-  </div>
+    <button type="button" id="addGenreBtn">＋ Add Genre</button>
+
+    <input
+      type="text"
+      id="newGenre"
+      class="hidden"
+      placeholder="New genre"
+      autocomplete="off"
+    />
+
+    <button type="button" onclick="addSeries()">Save</button>
+  </form>
 
   <!-- SERIES LIST -->
-  <section id="seriesList"></section>
+  <div id="seriesList"></div>
+
+  <!-- EDIT OVERLAY -->
+  <div id="editOverlay" class="edit-overlay hidden">
+    <div class="edit-box">
+      <input id="editName" placeholder="Series name" />
+      <input id="editSeasons" type="number" placeholder="Seasons" />
+      <select id="editGenre"></select>
+
+      <div class="edit-actions">
+        <button onclick="saveEdit()">Save</button>
+        <button class="cancel" onclick="closeEdit()">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- DELETE CONFIRM -->
+  <div id="confirmBox" class="confirm hidden">
+    <div class="confirm-box">
+      <p>Delete this series?</p>
+      <div class="confirm-actions">
+        <button onclick="confirmDelete()">Yes</button>
+        <button onclick="closeConfirm()">Cancel</button>
+      </div>
+    </div>
+  </div>
 
   <script type="module" src="series.js"></script>
 </body>
