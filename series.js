@@ -27,7 +27,6 @@ const toggleForm = document.getElementById("toggleForm");
 const saveSeriesBtn = document.getElementById("saveSeries");
 
 const sortNameBtn = document.getElementById("sortName");
-const sortSeasonsBtn = document.getElementById("sortSeasons");
 const searchInput = document.getElementById("search");
 
 const confirmDeleteBtn = document.getElementById("confirmDeleteBtn");
@@ -196,8 +195,6 @@ searchInput.oninput = () => {
 /* SORT */
 sortNameBtn.onclick = () =>
   render([...series].sort((a,b)=>a.name.localeCompare(b.name)));
-sortSeasonsBtn.onclick = () =>
-  render([...series].sort((a,b)=>a.seasons-b.seasons));
 
 /* EDIT */
 function openEdit(id) {
