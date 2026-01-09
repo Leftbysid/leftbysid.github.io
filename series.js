@@ -88,15 +88,28 @@ function render(list) {
 
     row.innerHTML = `
       <div class="series-text">
-        <strong>${s.name}</strong>
+        <strong>
+          ${s.name}
+          <span class="status ${s.seen ? "seen" : "unseen"}">
+            ${s.seen ? "SEEN" : "UNSEEN"}
+          </span>
+        </strong>
+
         <span>${s.seasons} seasons</span>
         <div>${(s.genres||[]).map(g=>`<span class="tag">#${g}</span>`).join("")}</div>
       </div>
       <div class="series-actions">
+        <input type="checkbox" class="seen-toggle" ${s.seen ? "checked" : ""}>
         <button class="edit-btn">✏️</button>
         <button class="del-btn">🗑️</button>
       </div>
     `;
+    
+    row.querySelector(".seen-toggle").onchange = e => {
+  updateDoc(doc(db, "series", s.id), {
+    seen: e.target.checked
+  });
+};
 
     row.querySelector(".edit-btn").onclick = () => openEdit(s.id);
     row.querySelector(".del-btn").onclick = () => askDelete(s.id);
