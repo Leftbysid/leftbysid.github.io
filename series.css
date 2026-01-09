@@ -1,6 +1,6 @@
 body {
   background: black;
-  color: #00aaff;
+  color: #4cc9ff;
   font-family: 'Share Tech Mono', monospace;
   padding: 20px;
 }
@@ -8,31 +8,31 @@ body {
 /* TITLE */
 .title {
   text-align: center;
-  text-shadow: 0 0 18px #00aaff;
+  text-shadow: 0 0 20px #4cc9ff;
 }
 
 /* ADD BUTTON */
 #addBtn {
   display: block;
-  margin: 15px auto;
-  padding: 10px 22px;
-  border: 2px solid #00aaff;
+  margin: 18px auto;
+  padding: 10px 24px;
   background: transparent;
-  color: #00aaff;
+  border: 2px solid #4cc9ff;
+  color: #4cc9ff;
   cursor: pointer;
 }
 
 #addBtn:hover {
-  background: #00aaff;
+  background: #4cc9ff;
   color: black;
 }
 
 /* FORM */
 #seriesForm {
   max-width: 650px;
-  margin: 15px auto;
-  padding: 15px;
-  border: 2px solid #00aaff;
+  margin: 16px auto;
+  padding: 16px;
+  border: 2px solid #4cc9ff;
 }
 
 #seriesForm input,
@@ -41,17 +41,18 @@ body {
   margin: 6px 0;
   padding: 10px;
   background: black;
-  border: 1px solid #00aaff;
-  color: #00aaff;
+  border: 1px solid #4cc9ff;
+  color: #4cc9ff;
 }
 
 #seriesForm button:hover {
-  background: #00aaff;
+  background: #4cc9ff;
   color: black;
 }
 
-/* GENRE TAG INPUT */
-#genreTags {
+/* TAGS */
+#genreTags,
+#editGenreTags {
   display: flex;
   gap: 6px;
   flex-wrap: wrap;
@@ -59,41 +60,33 @@ body {
 }
 
 .genre-tag {
-  border: 1px solid #00aaff;
+  border: 1px solid #4cc9ff;
   padding: 4px 8px;
   font-size: 12px;
   cursor: pointer;
 }
 
 .genre-tag:hover {
-  background: #00aaff;
+  background: #4cc9ff;
   color: black;
 }
 
-/* SERIES ROW (LIKE SCREENSHOT) */
+/* ROW */
 .series-row {
   max-width: 700px;
-  margin: 18px auto;
+  margin: 20px auto;
   padding: 14px;
-  border: 2px solid rgba(0,170,255,.7);
+  border: 2px solid rgba(76,201,255,.7);
   position: relative;
 }
 
 .series-name {
   font-size: 18px;
-  margin-bottom: 4px;
 }
 
 .series-meta {
   font-size: 14px;
   opacity: .8;
-}
-
-.series-tags {
-  margin-top: 6px;
-  display: flex;
-  gap: 6px;
-  flex-wrap: wrap;
 }
 
 /* ACTIONS */
@@ -106,7 +99,7 @@ body {
 .series-actions button {
   background: none;
   border: none;
-  color: #00aaff;
+  color: #4cc9ff;
   font-size: 18px;
   cursor: pointer;
   margin-left: 6px;
@@ -126,18 +119,9 @@ body {
 .edit-box,
 .confirm-box {
   background: black;
-  border: 2px solid #00aaff;
+  border: 2px solid #4cc9ff;
   padding: 20px;
   min-width: 280px;
-}
-
-.edit-box input {
-  width: 100%;
-  margin: 6px 0;
-  padding: 10px;
-  background: black;
-  border: 1px solid #00aaff;
-  color: #00aaff;
 }
 
 .edit-actions,
