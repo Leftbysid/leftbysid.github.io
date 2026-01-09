@@ -10,25 +10,8 @@ body {
 ====================== */
 .title {
   text-align: center;
-  text-shadow: 0 0 15px #00aaff;
-}
-
-/* ======================
-   CONTROLS
-====================== */
-.controls {
-  display: flex;
-  gap: 10px;
-  justify-content: center;
-  flex-wrap: wrap;
-}
-
-.controls input,
-.controls button {
-  padding: 10px;
-  background: black;
-  border: 2px solid #00aaff;
-  color: #00aaff;
+  text-shadow: 0 0 18px #00aaff;
+  margin-bottom: 10px;
 }
 
 /* ======================
@@ -37,10 +20,16 @@ body {
 #addBtn {
   display: block;
   margin: 15px auto;
-  padding: 10px 20px;
-  border: 2px solid #00aaff;
+  padding: 10px 22px;
   background: transparent;
+  border: 2px solid #00aaff;
   color: #00aaff;
+  cursor: pointer;
+}
+
+#addBtn:hover {
+  background: #00aaff;
+  color: black;
 }
 
 /* ======================
@@ -54,7 +43,8 @@ body {
 }
 
 #seriesForm input,
-#seriesForm select {
+#seriesForm select,
+#seriesForm button {
   width: 100%;
   margin: 6px 0;
   padding: 10px;
@@ -63,21 +53,17 @@ body {
   color: #00aaff;
 }
 
-/* genre add */
-#addGenreBtn {
-  margin-top: 6px;
-  width: 100%;
-  background: transparent;
-  border: 1px dashed #00aaff;
-  color: #00aaff;
+#seriesForm button:hover {
+  background: #00aaff;
+  color: black;
 }
 
 /* ======================
-   SERIES ROW (NO CARD)
+   SERIES ROW
 ====================== */
 .series-row {
   max-width: 700px;
-  margin: 20px auto;
+  margin: 22px auto;
   padding: 10px 0;
   position: relative;
 }
@@ -85,8 +71,8 @@ body {
 .series-row::after {
   content: "";
   display: block;
-  margin-top: 16px;
-  border-bottom: 1px solid rgba(0,170,255,.4);
+  margin-top: 18px;
+  border-bottom: 1px solid rgba(0,170,255,.45);
 }
 
 .series-name {
@@ -114,10 +100,11 @@ body {
   color: #00aaff;
   font-size: 18px;
   cursor: pointer;
+  padding-left: 6px;
 }
 
 /* ======================
-   MODALS
+   OVERLAYS
 ====================== */
 .edit-overlay,
 .confirm {
@@ -125,8 +112,8 @@ body {
   inset: 0;
   background: rgba(0,0,0,.85);
   display: flex;
-  justify-content: center;
   align-items: center;
+  justify-content: center;
 }
 
 .edit-box,
@@ -134,6 +121,7 @@ body {
   background: black;
   border: 2px solid #00aaff;
   padding: 20px;
+  min-width: 280px;
 }
 
 .edit-box input,
@@ -146,6 +134,9 @@ body {
   color: #00aaff;
 }
 
+/* ======================
+   OVERLAY ACTIONS
+====================== */
 .edit-actions,
 .confirm-actions {
   display: flex;
@@ -153,10 +144,29 @@ body {
   margin-top: 12px;
 }
 
+.edit-actions button,
+.confirm-actions button {
+  padding: 8px 14px;
+  border: 1px solid #00aaff;
+  background: transparent;
+  color: #00aaff;
+  cursor: pointer;
+}
+
+.edit-actions button:hover,
+.confirm-actions button:hover {
+  background: #00aaff;
+  color: black;
+}
+
 .edit-actions .cancel {
+  border-color: #ff2b2b;
+  color: #ff2b2b;
+}
+
+.edit-actions .cancel:hover {
   background: #ff2b2b;
   color: black;
-  border: none;
 }
 
 /* ======================
