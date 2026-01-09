@@ -5,24 +5,19 @@ body {
   padding: 20px;
 }
 
-/* ======================
-   TITLE
-====================== */
+/* TITLE */
 .title {
   text-align: center;
   text-shadow: 0 0 18px #00aaff;
-  margin-bottom: 10px;
 }
 
-/* ======================
-   ADD BUTTON
-====================== */
+/* ADD BUTTON */
 #addBtn {
   display: block;
   margin: 15px auto;
   padding: 10px 22px;
-  background: transparent;
   border: 2px solid #00aaff;
+  background: transparent;
   color: #00aaff;
   cursor: pointer;
 }
@@ -32,18 +27,15 @@ body {
   color: black;
 }
 
-/* ======================
-   FORM
-====================== */
+/* FORM */
 #seriesForm {
-  max-width: 600px;
+  max-width: 650px;
   margin: 15px auto;
   padding: 15px;
   border: 2px solid #00aaff;
 }
 
 #seriesForm input,
-#seriesForm select,
 #seriesForm button {
   width: 100%;
   margin: 6px 0;
@@ -58,26 +50,38 @@ body {
   color: black;
 }
 
-/* ======================
-   SERIES ROW
-====================== */
-.series-row {
-  max-width: 700px;
-  margin: 22px auto;
-  padding: 10px 0;
-  position: relative;
+/* GENRE TAG INPUT */
+#genreTags {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-top: 6px;
 }
 
-.series-row::after {
-  content: "";
-  display: block;
-  margin-top: 18px;
-  border-bottom: 1px solid rgba(0,170,255,.45);
+.genre-tag {
+  border: 1px solid #00aaff;
+  padding: 4px 8px;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.genre-tag:hover {
+  background: #00aaff;
+  color: black;
+}
+
+/* SERIES ROW (LIKE SCREENSHOT) */
+.series-row {
+  max-width: 700px;
+  margin: 18px auto;
+  padding: 14px;
+  border: 2px solid rgba(0,170,255,.7);
+  position: relative;
 }
 
 .series-name {
   font-size: 18px;
-  margin-bottom: 6px;
+  margin-bottom: 4px;
 }
 
 .series-meta {
@@ -85,13 +89,18 @@ body {
   opacity: .8;
 }
 
-/* ======================
-   ACTIONS
-====================== */
+.series-tags {
+  margin-top: 6px;
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+/* ACTIONS */
 .series-actions {
   position: absolute;
-  top: 0;
-  right: 0;
+  top: 10px;
+  right: 10px;
 }
 
 .series-actions button {
@@ -100,20 +109,18 @@ body {
   color: #00aaff;
   font-size: 18px;
   cursor: pointer;
-  padding-left: 6px;
+  margin-left: 6px;
 }
 
-/* ======================
-   OVERLAYS
-====================== */
+/* OVERLAYS */
 .edit-overlay,
 .confirm {
   position: fixed;
   inset: 0;
   background: rgba(0,0,0,.85);
   display: flex;
-  align-items: center;
   justify-content: center;
+  align-items: center;
 }
 
 .edit-box,
@@ -124,8 +131,7 @@ body {
   min-width: 280px;
 }
 
-.edit-box input,
-.edit-box select {
+.edit-box input {
   width: 100%;
   margin: 6px 0;
   padding: 10px;
@@ -134,9 +140,6 @@ body {
   color: #00aaff;
 }
 
-/* ======================
-   OVERLAY ACTIONS
-====================== */
 .edit-actions,
 .confirm-actions {
   display: flex;
@@ -144,34 +147,13 @@ body {
   margin-top: 12px;
 }
 
-.edit-actions button,
-.confirm-actions button {
-  padding: 8px 14px;
-  border: 1px solid #00aaff;
-  background: transparent;
-  color: #00aaff;
-  cursor: pointer;
-}
-
-.edit-actions button:hover,
-.confirm-actions button:hover {
-  background: #00aaff;
-  color: black;
-}
-
 .edit-actions .cancel {
-  border-color: #ff2b2b;
-  color: #ff2b2b;
-}
-
-.edit-actions .cancel:hover {
   background: #ff2b2b;
   color: black;
+  border: none;
 }
 
-/* ======================
-   UTIL
-====================== */
+/* UTIL */
 .hidden {
   display: none;
 }
