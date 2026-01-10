@@ -16,16 +16,9 @@ import { onAuthStateChanged } from
 import { requireAuth } from "./auth-guard.js";
 
 requireAuth();
-const params = new URLSearchParams(window.location.search);
-const libraryType = params.get("type"); // fiction | nonfiction
 
 const pageContent = document.getElementById("pageContent");
 
-if (!libraryType) {
-  location.replace("fnf.html");
-} else {
-  pageContent.classList.remove("hidden");
-}
 
 /* FIRESTORE COLLECTION */
 const COLLECTION_NAME = "books_nonfiction";
@@ -228,6 +221,7 @@ window.confirmDelete = async () => {
 
 window.closeConfirm = () =>
   document.getElementById("confirmBox").classList.add("hidden");
+
 
 
 
