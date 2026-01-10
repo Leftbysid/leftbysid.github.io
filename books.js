@@ -9,11 +9,6 @@ import {
 import { onAuthStateChanged } from
   "https://www.gstatic.com/firebasejs/12.7.0/firebase-auth.js";
 
-/* FIRESTORE COLLECTION */
-const COLLECTION_NAME =
-  libraryType === "fiction"
-    ? "books_fiction"
-    : "books_nonfiction";
 
 /* ===============================
    ROUTE GUARD + LIBRARY TYPE
@@ -32,7 +27,11 @@ if (!libraryType) {
   pageContent.classList.remove("hidden");
 }
 
-
+/* FIRESTORE COLLECTION */
+const COLLECTION_NAME =
+  libraryType === "fiction"
+    ? "books_fiction"
+    : "books_nonfiction";
 
 /* ===============================
    STATE
@@ -232,6 +231,7 @@ window.confirmDelete = async () => {
 
 window.closeConfirm = () =>
   document.getElementById("confirmBox").classList.add("hidden");
+
 
 
 
