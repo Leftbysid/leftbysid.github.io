@@ -1,13 +1,16 @@
 import { auth, db } from "./firebase.js";
 import {
   collection, addDoc, deleteDoc, updateDoc,
-  doc, query, where, onSnapshot
+  doc, query, where, onSnapshot, getDocs
 } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-firestore.js";
 import {
   onAuthStateChanged
 } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-auth.js";
+
+/* COLLECTIONS */
 const genresCol = collection(db, "genres");
 
+/* STATE */
 let currentFilter = "all";
 let series = [];
 let editId = null;
@@ -18,9 +21,6 @@ let user = null;
 const seriesForm = document.getElementById("seriesForm");
 const seriesList = document.getElementById("seriesList");
 const confirmBox = document.getElementById("confirmBox");
-const genreSelect = document.getElementById("genreSelect");
-const addGenreBtn = document.getElementById("addGenreBtn");
-const newGenreInput = document.getElementById("newGenre");
 const editOverlay = document.getElementById("editOverlay");
 
 const toggleForm = document.getElementById("toggleForm");
@@ -33,26 +33,29 @@ const confirmDeleteBtn = document.getElementById("confirmDeleteBtn");
 const cancelDeleteBtn = document.getElementById("cancelDeleteBtn");
 const saveEditBtn = document.getElementById("saveEditBtn");
 const cancelEditBtn = document.getElementById("cancelEditBtn");
+
+/* GENRE INPUT (DATALIST STYLE) */
+const genreInput = document.getElementById("genreInput");
+const genreList = document.getElementById("genreList");
+
+/* INPUTS */
+const nameInput = document.getElementById("name");
+const seasonsInput = document.getElementById("seasons");
+
+const editName = document.getElementById("editName");
+const editSeasons = document.getElementById("editSeasons");
+const editGenres = document.getElementById("editGenres");
+
+/* FILTER BUTTONS */
 document.querySelectorAll(".filter").forEach(btn => {
   btn.onclick = () => {
     document.querySelectorAll(".filter")
       .forEach(b => b.classList.remove("active"));
-
     btn.classList.add("active");
     currentFilter = btn.dataset.filter;
     applyFilters();
   };
 });
-
-
-/* INPUTS */
-const nameInput = document.getElementById("name");
-const seasonsInput = document.getElementById("seasons");
-const genresInput = document.getElementById("genres");
-
-const editName = document.getElementById("editName");
-const editSeasons = document.getElementById("editSeasons");
-const editGenres = document.getElementById("editGenres");
 
 /* AUTH */
 onAuthStateChanged(auth, u => {
@@ -62,86 +65,103 @@ onAuthStateChanged(auth, u => {
   loadSeries();
 });
 
-/* ADD */
-toggleForm.onclick = () => seriesForm.classList.toggle("hidden");
+/* HELPERS */
+function parseGenres(value) {
+  return value
+    .split(",")
+    .map(g => g.trim())
+    .filter(Boolean);
+}
+
+/* ADD SERIES */
+toggleForm.onclick = () =>
+  seriesForm.classList.toggle("hidden");
 
 saveSeriesBtn.onclick = async () => {
   const name = nameInput.value.trim();
   const seasons = Number(seasonsInput.value);
-  const genres = [genreSelect.value];
+  const genres = parseGenres(genreInput.value);
 
   if (!name || !seasons) return alert("Name and seasons required");
 
   await addDoc(collection(db, "series"), {
-  uid: user.uid,
-  name,
-  seasons,
-  genres,
-  seen: false   // 👈 ADD THIS
-});
-
+    uid: user.uid,
+    name,
+    seasons,
+    genres,
+    seen: false
+  });
 
   seriesForm.classList.add("hidden");
-  nameInput.value = seasonsInput.value = genresInput.value = "";
+  nameInput.value = seasonsInput.value = genreInput.value = "";
 };
 
-/* LOAD */
+/* LOAD SERIES */
 function loadSeries() {
   const q = query(collection(db, "series"), where("uid", "==", user.uid));
   onSnapshot(q, snap => {
     series = snap.docs.map(d => ({ id: d.id, ...d.data() }));
     applyFilters();
   });
-  
 }
-function loadGenres(selected = null) {
-  onSnapshot(genresCol, snap => {
-    genreSelect.innerHTML = "";
 
+/* LOAD GENRES (SUGGESTIONS) */
+function loadGenres() {
+  onSnapshot(genresCol, snap => {
+    genreList.innerHTML = "";
     snap.docs
       .map(d => d.data().name)
       .sort()
       .forEach(name => {
         const opt = document.createElement("option");
         opt.value = name;
-        opt.textContent = name;
-        genreSelect.appendChild(opt);
+        genreList.appendChild(opt);
       });
-
-    if (selected) genreSelect.value = selected;
   });
 }
 
-addGenreBtn.onclick = () => {
-  newGenreInput.classList.toggle("hidden");
-  newGenreInput.focus();
+/* SAVE NEW GENRES (COMMA AWARE) */
+genreInput.onchange = async () => {
+  const inputGenres = parseGenres(genreInput.value);
+  if (!inputGenres.length) return;
+
+  const snap = await getDocs(genresCol);
+  const existing = snap.docs.map(d => d.data().name.toLowerCase());
+
+  for (const g of inputGenres) {
+    if (!existing.includes(g.toLowerCase())) {
+      await addDoc(genresCol, { name: g });
+    }
+  }
 };
 
-newGenreInput.onkeydown = async e => {
-  if (e.key !== "Enter") return;
-
-  const name = newGenreInput.value.trim();
-  if (!name) return;
-
-  await addDoc(genresCol, { name });
-
-  newGenreInput.value = "";
-  newGenreInput.classList.add("hidden");
-};
-
+/* FILTER + SEARCH */
 function applyFilters() {
   let list = [...series];
 
   if (currentFilter === "seen") {
     list = list.filter(s => s.seen);
   }
-
   if (currentFilter === "unseen") {
     list = list.filter(s => !s.seen);
   }
 
+  const q = searchInput.value.toLowerCase();
+  if (q) {
+    list = list.filter(s =>
+      s.name.toLowerCase().includes(q) ||
+      (s.genres || []).some(g => g.toLowerCase().includes(q))
+    );
+  }
+
   render(list);
 }
+
+searchInput.oninput = applyFilters;
+
+/* SORT */
+sortNameBtn.onclick = () =>
+  render([...series].sort((a,b)=>a.name.localeCompare(b.name)));
 
 /* RENDER */
 function render(list) {
@@ -159,7 +179,6 @@ function render(list) {
             ${s.seen ? "SEEN" : "UNSEEN"}
           </span>
         </strong>
-
         <span>${s.seasons} seasons</span>
         <div>${(s.genres||[]).map(g=>`<span class="tag">#${g}</span>`).join("")}</div>
       </div>
@@ -169,12 +188,9 @@ function render(list) {
         <button class="del-btn">🗑️</button>
       </div>
     `;
-    
-    row.querySelector(".seen-toggle").onchange = e => {
-  updateDoc(doc(db, "series", s.id), {
-    seen: e.target.checked
-  });
-};
+
+    row.querySelector(".seen-toggle").onchange = e =>
+      updateDoc(doc(db, "series", s.id), { seen: e.target.checked });
 
     row.querySelector(".edit-btn").onclick = () => openEdit(s.id);
     row.querySelector(".del-btn").onclick = () => askDelete(s.id);
@@ -183,28 +199,13 @@ function render(list) {
   });
 }
 
-/* SEARCH */
-searchInput.oninput = () => {
-  const q = searchInput.value.toLowerCase();
-  render(series.filter(s =>
-    s.name.toLowerCase().includes(q) ||
-    (s.genres||[]).some(g=>g.toLowerCase().includes(q))
-  ));
-};
-
-/* SORT */
-sortNameBtn.onclick = () =>
-  render([...series].sort((a,b)=>a.name.localeCompare(b.name)));
-
 /* EDIT */
 function openEdit(id) {
   const s = series.find(x=>x.id===id);
   editId = id;
-
   editName.value = s.name;
   editSeasons.value = s.seasons;
   editGenres.value = (s.genres||[]).join(", ");
-
   editOverlay.classList.remove("hidden");
 }
 
@@ -212,12 +213,13 @@ saveEditBtn.onclick = async () => {
   await updateDoc(doc(db,"series",editId),{
     name: editName.value,
     seasons: Number(editSeasons.value),
-    genres: editGenres.value.split(",").map(g=>g.trim()).filter(Boolean)
+    genres: parseGenres(editGenres.value)
   });
   editOverlay.classList.add("hidden");
 };
 
-cancelEditBtn.onclick = () => editOverlay.classList.add("hidden");
+cancelEditBtn.onclick = () =>
+  editOverlay.classList.add("hidden");
 
 /* DELETE */
 function askDelete(id) {
@@ -228,4 +230,5 @@ confirmDeleteBtn.onclick = async () => {
   await deleteDoc(doc(db,"series",deleteId));
   confirmBox.classList.add("hidden");
 };
-cancelDeleteBtn.onclick = () => confirmBox.classList.add("hidden");
+cancelDeleteBtn.onclick = () =>
+  confirmBox.classList.add("hidden");
