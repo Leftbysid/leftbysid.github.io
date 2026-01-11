@@ -175,8 +175,6 @@ window.sortByDate = () =>
 ================================ */
 window.toggleRead = async (id, current) =>
   updateDoc(doc(db, COLLECTION_NAME, id), { read: !current });
-window.toggleOwned = async (id, current) =>
-  updateDoc(doc(db, COLLECTION_NAME, id), { owned: !current });
 
 
 /* ===============================
@@ -220,6 +218,7 @@ window.confirmDelete = async () => {
 
 window.closeConfirm = () =>
   document.getElementById("confirmBox").classList.add("hidden");
+
 
 
 
