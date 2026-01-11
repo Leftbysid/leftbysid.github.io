@@ -120,34 +120,39 @@ function renderBooks(list) {
 
   list.forEach(b => {
     bookList.innerHTML += `
-      <div class="book-row ${b.read ? "read" : ""}">
-        <div>
-          <span class="book-title">${b.title}</span>
-          <span class="book-author">— ${b.author}</span>
-          <span class="status-badge ${b.read ? "read" : "unread"}">
-            ${b.read ? "READ" : "UNREAD"}
-          </span>
+      <div class="book-row-wrapper">
+
+        <!-- LEFT ICON (OUTSIDE CARD) -->
+        <span class="owned-icon ${b.owned ? "owned" : "not-owned"}">📘</span>
+
+        <!-- BOOK CARD -->
+        <div class="book-row ${b.read ? "read" : ""}">
+          <div>
+            <span class="book-title">${b.title}</span>
+            <span class="book-author">— ${b.author}</span>
+            <span class="status-badge ${b.read ? "read" : "unread"}">
+              ${b.read ? "READ" : "UNREAD"}
+            </span>
+          </div>
+
+          <div>
+            <span>${b.category || ""}</span><br>
+            <span>${b.date || ""}</span>
+          </div>
         </div>
 
-        <div>
-          <span>${b.category || ""}</span><br>
-          <span>${b.date || ""}</span>
-        </div>
-
+        <!-- ACTIONS (RIGHT SIDE) -->
         <div class="book-actions">
 
-          <!-- OWNED TOGGLE -->
-          <label class="owned-wrapper">
-            <input
-              type="checkbox"
-              class="owned-checkbox"
-              ${b.owned ? "checked" : ""}
-              onchange="toggleOwned('${b.id}', this.checked)"
-            >
-            <span class="owned-icon">📘</span>
-          </label>
+          <!-- OWNED CHECKBOX -->
+          <input
+            type="checkbox"
+            ${b.owned ? "checked" : ""}
+            onchange="toggleOwned('${b.id}', this.checked)"
+            title="Owned"
+          >
 
-          <!-- READ TOGGLE -->
+          <!-- READ CHECKBOX -->
           <button onclick="toggleRead('${b.id}', ${b.read})">
             ${b.read ? "✅" : "⬜"}
           </button>
@@ -155,6 +160,7 @@ function renderBooks(list) {
           <button onclick="editBook('${b.id}')">✏️</button>
           <button onclick="askDelete('${b.id}')">🗑️</button>
         </div>
+
       </div>
     `;
   });
@@ -163,6 +169,7 @@ function renderBooks(list) {
   readCount.textContent = list.filter(b => b.read).length;
   unreadCount.textContent = list.filter(b => !b.read).length;
 }
+
 
 /* ===============================
    SEARCH
@@ -237,3 +244,4 @@ window.confirmDelete = async () => {
 
 window.closeConfirm = () =>
   document.getElementById("confirmBox").classList.add("hidden");
+
