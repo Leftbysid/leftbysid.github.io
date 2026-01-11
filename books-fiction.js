@@ -61,7 +61,7 @@ document.getElementById("toggleForm").onclick =
    AUTH
 ================================ */
 onAuthStateChanged(auth, user => {
-  if (!user) location.href = "index.html";
+  if (!user) return;
   currentUser = user;
   loadBooks();
 });
@@ -217,3 +217,4 @@ window.confirmDelete = async () => {
 
 window.closeConfirm = () =>
   document.getElementById("confirmBox").classList.add("hidden");
+
