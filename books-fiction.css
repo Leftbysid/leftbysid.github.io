@@ -195,7 +195,24 @@ body {
   z-index: -1;
 }
 
+/* OWNED BOOK ICON */
+.owned-toggle {
+  background: none;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+  opacity: 0.3;
+  filter: grayscale(1);
+  transition: all 0.2s ease;
+}
 
+/* OWNED = ACTIVE */
+.owned-toggle.owned {
+  opacity: 1;
+  filter: grayscale(0);
+  text-shadow: 0 0 10px #00ff9c;
+}
 
-
-
+.owned-toggle:hover {
+  transform: scale(1.15);
+}
