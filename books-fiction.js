@@ -77,7 +77,9 @@ onAuthStateChanged(auth, user => {
 ================================ */
 window.addBook = async () => {
   if (!titleInput.value || !authorInput.value) return;
-
+// ✅ DEFINE VARIABLES (THIS WAS MISSING)
+  const newTitle = titleInput.value.trim().toLowerCase();
+  const newAuthor = authorInput.value.trim().toLowerCase();
    const exists = books.some(b =>
     b.title.toLowerCase() === newTitle &&
     b.author.toLowerCase() === newAuthor
@@ -277,4 +279,5 @@ window.confirmDelete = async () => {
 
 window.closeConfirm = () =>
   document.getElementById("confirmBox").classList.add("hidden");
+
 
