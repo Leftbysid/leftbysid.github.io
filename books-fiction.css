@@ -105,14 +105,30 @@ body {
   transition: color .2s ease, text-shadow .2s ease;
 }
 
-/* NOT OWNED */
-.owned-icon.not-owned {
-  color: #ff2b2b;
+/* ===============================
+   LEFT OWNED ICON (OUTSIDE CARD)
+================================ */
+.owned-icon {
+  font-size: 22px;
+  width: 26px;
+  text-align: center;
+
+  /* hidden by default */
+  opacity: 0;
+  transform: scale(0.6);
+  pointer-events: none;
+
+  color: #4cc9ff;
+  transition:
+    opacity .2s ease,
+    transform .2s ease,
+    text-shadow .2s ease;
 }
 
-/* OWNED */
+/* SHOW ONLY WHEN OWNED */
 .owned-icon.owned {
-  color: #4cc9ff;
+  opacity: 1;
+  transform: scale(1);
   text-shadow: 0 0 10px rgba(76,201,255,.8);
 }
 
@@ -209,3 +225,4 @@ body {
 .hidden {
   display: none;
 }
+
