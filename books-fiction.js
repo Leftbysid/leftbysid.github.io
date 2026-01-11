@@ -78,6 +78,16 @@ onAuthStateChanged(auth, user => {
 window.addBook = async () => {
   if (!titleInput.value || !authorInput.value) return;
 
+   const exists = books.some(b =>
+    b.title.toLowerCase() === newTitle &&
+    b.author.toLowerCase() === newAuthor
+  );
+
+  if (exists) {
+    alert("This book already exists in your library.");
+    return;
+  }
+
   await addDoc(collection(db, COLLECTION_NAME), {
     uid: currentUser.uid,
     title: titleInput.value,
@@ -267,3 +277,4 @@ window.confirmDelete = async () => {
 
 window.closeConfirm = () =>
   document.getElementById("confirmBox").classList.add("hidden");
+
