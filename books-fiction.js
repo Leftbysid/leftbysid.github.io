@@ -77,34 +77,49 @@ onAuthStateChanged(auth, user => {
 ================================ */
 window.addBook = async () => {
   if (!titleInput.value || !authorInput.value) return;
-// ✅ DEFINE VARIABLES (THIS WAS MISSING)
+
+  // 🔒 Normalize input
   const newTitle = titleInput.value.trim().toLowerCase();
   const newAuthor = authorInput.value.trim().toLowerCase();
-   const exists = books.some(b =>
-    b.title.toLowerCase() === newTitle &&
-    b.author.toLowerCase() === newAuthor
-  );
+
+  // 🚫 Safety: ensure books are loaded
+  if (!books.length) {
+    alert("Library still loading, try again in a moment.");
+    return;
+  }
+
+  // 🧠 Duplicate detection (case-insensitive, trimmed)
+  const exists = books.some(b => {
+    const t = (b.title || "").trim().toLowerCase();
+    const a = (b.author || "").trim().toLowerCase();
+    return t === newTitle && a === newAuthor;
+  });
 
   if (exists) {
     alert("This book already exists in your library.");
     return;
   }
 
+  // ✅ Safe to add
   await addDoc(collection(db, COLLECTION_NAME), {
     uid: currentUser.uid,
-    title: titleInput.value,
-    author: authorInput.value,
-    category: categoryInput ? categoryInput.value : "",
+    title: titleInput.value.trim(),
+    author: authorInput.value.trim(),
+    category: categoryInput ? categoryInput.value.trim() : "",
     date: dateInput.value,
     read: false,
     owned: false,
-    createdAt: Date.now() // 🔥 required for recent
+    createdAt: Date.now()
   });
 
+  // 🧹 Reset
   bookForm.classList.add("hidden");
-  titleInput.value = authorInput.value = dateInput.value = "";
+  titleInput.value = "";
+  authorInput.value = "";
+  dateInput.value = "";
   if (categoryInput) categoryInput.value = "";
 };
+
 
 /* ===============================
    LOAD BOOKS
@@ -279,5 +294,6 @@ window.confirmDelete = async () => {
 
 window.closeConfirm = () =>
   document.getElementById("confirmBox").classList.add("hidden");
+
 
 
