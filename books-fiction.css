@@ -1,3 +1,6 @@
+/* ===============================
+   BASE
+================================ */
 body {
   background: black;
   color: #00ff9c;
@@ -10,7 +13,9 @@ body {
   text-shadow: 0 0 15px #00ff9c;
 }
 
-/* STATS */
+/* ===============================
+   STATS
+================================ */
 .stats {
   display: flex;
   gap: 20px;
@@ -20,6 +25,9 @@ body {
   opacity: .85;
 }
 
+/* ===============================
+   CONTROLS
+================================ */
 .controls {
   display: flex;
   gap: 10px;
@@ -42,9 +50,12 @@ body {
   border: 2px solid #00ff9c;
   background: transparent;
   color: #00ff9c;
+  cursor: pointer;
 }
 
-/* INPUT BAR */
+/* ===============================
+   ADD FORM
+================================ */
 .book-form {
   display: flex;
   gap: 10px;
@@ -73,20 +84,52 @@ body {
   cursor: pointer;
 }
 
-/* BOOK ROW */
-.book-row {
-  display: grid;
-  grid-template-columns: 2fr 1.2fr auto;
-  gap: 10px;
-  max-width: 900px;
+/* ===============================
+   ROW WRAPPER (ICON | CARD | ACTIONS)
+================================ */
+.book-row-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  max-width: 980px;
   margin: 10px auto;
+}
+
+/* ===============================
+   LEFT OWNED ICON (OUTSIDE CARD)
+================================ */
+.owned-icon {
+  font-size: 22px;
+  width: 26px;
+  text-align: center;
+  transition: color .2s ease, text-shadow .2s ease;
+}
+
+/* NOT OWNED */
+.owned-icon.not-owned {
+  color: #ff2b2b;
+}
+
+/* OWNED */
+.owned-icon.owned {
+  color: #4cc9ff;
+  text-shadow: 0 0 10px rgba(76,201,255,.8);
+}
+
+/* ===============================
+   BOOK CARD
+================================ */
+.book-row {
+  flex: 1;
+  display: grid;
+  grid-template-columns: 2fr 1.2fr;
+  gap: 10px;
   padding: 12px;
   border: 1px solid rgba(0,255,156,.4);
   background: rgba(0,0,0,.6);
-  transition: transform .15s ease, box-shadow .15s ease; /* ✅ ADDED */
+  transition: transform .15s ease, box-shadow .15s ease;
 }
 
-/* 🔥 HOVER GLOW */
 .book-row:hover {
   transform: translateY(-2px);
   box-shadow:
@@ -98,7 +141,9 @@ body {
   opacity: .75;
 }
 
-/* BADGES */
+/* ===============================
+   BADGES
+================================ */
 .status-badge {
   font-size: 11px;
   padding: 3px 8px;
@@ -115,7 +160,15 @@ body {
   color: #ff5050;
 }
 
-/* ACTIONS */
+/* ===============================
+   ACTIONS (RIGHT SIDE)
+================================ */
+.book-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
 .book-actions button {
   background: none;
   border: none;
@@ -124,7 +177,14 @@ body {
   cursor: pointer;
 }
 
-/* MODALS */
+.book-actions input[type="checkbox"] {
+  cursor: pointer;
+  accent-color: #4cc9ff;
+}
+
+/* ===============================
+   MODALS
+================================ */
 .edit-overlay,
 .confirm {
   position: fixed;
@@ -143,83 +203,9 @@ body {
   padding: 20px;
 }
 
-/* HIDE */
+/* ===============================
+   UTIL
+================================ */
 .hidden {
   display: none;
 }
-
-/* LIBRARY CHOOSER */
-.choice-container {
-  display: flex;
-  justify-content: center;
-  gap: 50px;
-  margin-top: 80px;
-}
-
-.choice-card {
-  padding: 40px 70px;
-  font-size: 24px;
-  border: 2px solid #00ff9c;
-  color: #00ff9c;
-  text-decoration: none;
-  background: rgba(0,0,0,.6);
-  transition: transform .2s ease, box-shadow .2s ease;
-}
-
-/* 🔥 CHOOSER HOVER GLOW */
-.choice-card:hover {
-  transform: translateY(-6px);
-  box-shadow:
-    0 0 14px rgba(0,255,156,.7),
-    0 0 36px rgba(0,255,156,.5);
-}
-
-/* MATRIX BACKGROUND (CHOOSER ONLY) */
-#matrix {
-  position: fixed;
-  inset: 0;
-  z-index: -1;
-  background: black;
-}
-
-/* Ensure UI stays above matrix */
-.choice-container,
-.title {
-  position: relative;
-  z-index: 1;
-}
-#matrix {
-  position: fixed;
-  inset: 0;
-  background: black;
-  z-index: -1;
-}
-
-/* OWNED TOGGLE */
-.owned-wrapper {
-  display: inline-flex;
-  align-items: center;
-  cursor: pointer;
-}
-
-/* hide checkbox */
-.owned-checkbox {
-  display: none;
-}
-
-/* book icon base */
-.owned-icon {
-  font-size: 20px;
-  margin-right: 6px;
-  color: #ff2b2b;       /* RED = not owned */
-  transition: all 0.2s ease;
-}
-
-/* owned = blue */
-.owned-checkbox:checked + .owned-icon {
-  color: #00aaff;       /* BLUE = owned */
-  text-shadow: 0 0 10px rgba(0,170,255,0.9);
-}
-
-
-
