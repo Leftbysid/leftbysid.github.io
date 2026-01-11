@@ -52,7 +52,7 @@ const editDate = document.getElementById("editDate");
 /* ===============================
    UI INIT
 ================================ */
-document.querySelector(".title").textContent = "📖 FICTION ARCHIVE";
+document.querySelector(".title").textContent = "📖 NON-FICTION ARCHIVE";
 
 document.getElementById("toggleForm").onclick =
   () => bookForm.classList.toggle("hidden");
@@ -217,3 +217,4 @@ window.confirmDelete = async () => {
 
 window.closeConfirm = () =>
   document.getElementById("confirmBox").classList.add("hidden");
+
