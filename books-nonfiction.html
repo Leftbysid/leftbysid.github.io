@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>non fiction</title>
+  <title>fiction</title>
   <link rel="stylesheet" href="books-nonfiction.css">
 </head>
 
@@ -18,9 +18,17 @@
   </div>
 
   <div class="controls">
-    <input id="search" placeholder="Search books...">
-    <button onclick="sortByName()">Sort A–Z</button>
-    <button onclick="sortByDate()">Sort by Date</button>
+  <input id="search" placeholder="Search books...">
+
+  <button id="recentBtn">⏱ Recently Added</button>
+
+  <select id="filterSelect">
+    <option value="all">All</option>
+    <option value="owned">Owned</option>
+    <option value="not-owned">Not Owned</option>
+    <option value="read">Read</option>
+    <option value="not-read">Not Read</option>
+  </select>
   </div>
 
   <button id="toggleForm">➕ Add Book</button>
