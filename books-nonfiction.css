@@ -52,6 +52,25 @@ body {
   color: #00ff9c;
   cursor: pointer;
 }
+.controls button,
+.controls select {
+  padding: 10px;
+  background: black;
+  border: 2px solid #00ff9c;
+  color: #00ff9c;
+  font-family: 'Share Tech Mono', monospace;
+  cursor: pointer;
+}
+
+#recentBtn {
+  text-shadow: 0 0 8px rgba(0,255,156,.6);
+}
+
+#recentBtn:hover {
+  background: #00ff9c;
+  color: black;
+}
+
 
 /* ===============================
    ADD FORM
@@ -224,4 +243,5 @@ body {
 ================================ */
 .hidden {
   display: none;
-  }
+}
+
