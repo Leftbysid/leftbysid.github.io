@@ -38,6 +38,10 @@ const titleInput = document.getElementById("title");
 const authorInput = document.getElementById("author");
 const categoryInput = document.getElementById("category");
 const dateInput = document.getElementById("date");
+
+const authorSuggestions = document.getElementById("authorSuggestions");
+const categorySuggestions = document.getElementById("categorySuggestions");
+
 const bookList = document.getElementById("bookList");
 const searchInput = document.getElementById("search");
 const bookForm = document.getElementById("bookForm");
@@ -78,48 +82,44 @@ onAuthStateChanged(auth, user => {
 window.addBook = async () => {
   if (!titleInput.value || !authorInput.value) return;
 
-  // 🔒 Normalize input
   const newTitle = titleInput.value.trim().toLowerCase();
   const newAuthor = authorInput.value.trim().toLowerCase();
 
-  // 🚫 Safety: ensure books are loaded
   if (!books.length) {
     alert("Library still loading, try again in a moment.");
     return;
   }
 
-  // 🧠 Duplicate detection (case-insensitive, trimmed)
-  const exists = books.some(b => {
-    const t = (b.title || "").trim().toLowerCase();
-    const a = (b.author || "").trim().toLowerCase();
-    return t === newTitle && a === newAuthor;
-  });
+  const exists = books.some(b =>
+    (b.title || "").trim().toLowerCase() === newTitle &&
+    (b.author || "").trim().toLowerCase() === newAuthor
+  );
 
   if (exists) {
     alert("This book already exists in your library.");
     return;
   }
 
-  // ✅ Safe to add
   await addDoc(collection(db, COLLECTION_NAME), {
     uid: currentUser.uid,
     title: titleInput.value.trim(),
     author: authorInput.value.trim(),
-    category: categoryInput ? categoryInput.value.trim() : "",
+    category: categoryInput.value.trim(),
     date: dateInput.value,
     read: false,
     owned: false,
     createdAt: Date.now()
   });
 
-  // 🧹 Reset
   bookForm.classList.add("hidden");
   titleInput.value = "";
   authorInput.value = "";
+  categoryInput.value = "";
   dateInput.value = "";
-  if (categoryInput) categoryInput.value = "";
-};
 
+  authorSuggestions.classList.add("hidden");
+  categorySuggestions.classList.add("hidden");
+};
 
 /* ===============================
    LOAD BOOKS
@@ -137,12 +137,70 @@ function loadBooks() {
 }
 
 /* ===============================
-   VIEW LOGIC (FILTER + SORT)
+   SUGGESTION HELPERS
+================================ */
+function getUniqueValues(key) {
+  return [...new Set(
+    books.map(b => (b[key] || "").trim()).filter(Boolean)
+  )];
+}
+
+function renderSuggestions(input, container, values) {
+  const q = input.value.trim().toLowerCase();
+  container.innerHTML = "";
+
+  if (!q) {
+    container.classList.add("hidden");
+    return;
+  }
+
+  const matches = values.filter(v =>
+    v.toLowerCase().startsWith(q)
+  );
+
+  if (!matches.length) {
+    container.classList.add("hidden");
+    return;
+  }
+
+  matches.forEach(v => {
+    const div = document.createElement("div");
+    div.textContent = v;
+    div.onclick = () => {
+      input.value = v;
+      container.classList.add("hidden");
+    };
+    container.appendChild(div);
+  });
+
+  container.classList.remove("hidden");
+}
+
+/* ===============================
+   SUGGESTION LISTENERS
+================================ */
+authorInput.addEventListener("input", () => {
+  renderSuggestions(
+    authorInput,
+    authorSuggestions,
+    getUniqueValues("author")
+  );
+});
+
+categoryInput.addEventListener("input", () => {
+  renderSuggestions(
+    categoryInput,
+    categorySuggestions,
+    getUniqueValues("category")
+  );
+});
+
+/* ===============================
+   VIEW LOGIC
 ================================ */
 function applyView() {
   let list = [...books];
 
-  // FILTER
   switch (currentFilter) {
     case "owned":
       list = list.filter(b => b.owned);
@@ -158,7 +216,6 @@ function applyView() {
       break;
   }
 
-  // SORT
   if (sortMode === "recent") {
     list.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
   }
@@ -205,7 +262,6 @@ function renderBooks(list) {
   list.forEach(b => {
     bookList.innerHTML += `
       <div class="book-row-wrapper">
-
         <span class="owned-icon ${b.owned ? "owned" : ""}">📘</span>
 
         <div class="book-row ${b.read ? "read" : ""}">
@@ -227,11 +283,9 @@ function renderBooks(list) {
             ${b.owned ? "checked" : ""}
             onchange="toggleOwned('${b.id}', this.checked)"
           >
-
           <button onclick="toggleRead('${b.id}', ${b.read})">
             ${b.read ? "✅" : "⬜"}
           </button>
-
           <button onclick="editBook('${b.id}')">✏️</button>
           <button onclick="askDelete('${b.id}')">🗑️</button>
         </div>
@@ -294,6 +348,3 @@ window.confirmDelete = async () => {
 
 window.closeConfirm = () =>
   document.getElementById("confirmBox").classList.add("hidden");
-
-
-
