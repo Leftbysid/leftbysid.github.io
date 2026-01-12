@@ -83,10 +83,11 @@ window.addBook = async () => {
   const newAuthor = authorInput.value.trim().toLowerCase();
 
   // 🚫 Safety: ensure books are loaded
-  if (!books.length) {
-    alert("Library still loading, try again in a moment.");
-    return;
-  }
+  const exists = books.some(b => {
+  const t = (b.title || "").trim().toLowerCase();
+  const a = (b.author || "").trim().toLowerCase();
+  return t === newTitle && a === newAuthor;
+});
 
   // 🧠 Duplicate detection (case-insensitive, trimmed)
   const exists = books.some(b => {
@@ -294,5 +295,6 @@ window.confirmDelete = async () => {
 
 window.closeConfirm = () =>
   document.getElementById("confirmBox").classList.add("hidden");
+
 
 
