@@ -20,6 +20,8 @@ let editingId = null;
 let deleteId = null;
 let currentUser = null;
 
+let sortMode = "recent";
+
 /* =====================
    ELEMENTS
 ===================== */
@@ -29,6 +31,8 @@ const dateInput = document.getElementById("date");
 const quoteList = document.getElementById("quoteList");
 const searchInput = document.getElementById("search");
 const quoteForm = document.getElementById("quoteForm");
+
+const recentBtn = document.getElementById("recentBtn");
 
 const editOverlay = document.getElementById("editOverlay");
 const editQuote = document.getElementById("editQuote");
@@ -73,7 +77,8 @@ window.addQuote = async () => {
     uid: currentUser.uid,
     text: rawText,
     author: authorInput.value.trim() || "",
-    date: dateInput.value || ""
+    date: dateInput.value || "",
+    createdAt: Date.now() // 🔥 for recent sorting
   });
 
   quoteForm.classList.add("hidden");
@@ -81,6 +86,7 @@ window.addQuote = async () => {
   authorInput.value = "";
   dateInput.value = "";
 };
+
 /* =====================
    LOAD QUOTES
 ===================== */
@@ -88,9 +94,45 @@ function loadQuotes() {
   const q = query(collection(db, "quotes"), where("uid", "==", currentUser.uid));
   onSnapshot(q, snap => {
     quotes = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-    renderQuotes(quotes);
+    applyView();
   });
 }
+
+/* =====================
+   VIEW (RECENT)
+===================== */
+function applyView() {
+  let list = [...quotes];
+
+  if (sortMode === "recent") {
+    list.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+  }
+
+  renderQuotes(list);
+}
+
+/* =====================
+   CONTROLS
+===================== */
+if (recentBtn) {
+  recentBtn.onclick = () => {
+    sortMode = "recent";
+    applyView();
+  };
+}
+
+/* =====================
+   SEARCH
+===================== */
+searchInput.oninput = () => {
+  const q = searchInput.value.toLowerCase();
+  renderQuotes(
+    quotes.filter(x =>
+      x.text.toLowerCase().includes(q) ||
+      (x.author && x.author.toLowerCase().includes(q))
+    )
+  );
+};
 
 /* =====================
    RENDER
@@ -113,32 +155,6 @@ function renderQuotes(list) {
     `;
   });
 }
-
-/* =====================
-   SEARCH
-===================== */
-searchInput.oninput = () => {
-  const q = searchInput.value.toLowerCase();
-  renderQuotes(
-    quotes.filter(x =>
-      x.text.toLowerCase().includes(q) ||
-      (x.author && x.author.toLowerCase().includes(q))
-    )
-  );
-};
-
-/* =====================
-   SORT
-===================== */
-window.sortByAuthor = () =>
-  renderQuotes([...quotes].sort((a, b) =>
-    (a.author || "").localeCompare(b.author || "")
-  ));
-
-window.sortByDate = () =>
-  renderQuotes([...quotes].sort((a, b) =>
-    new Date(b.date || 0) - new Date(a.date || 0)
-  ));
 
 /* =====================
    EDIT
