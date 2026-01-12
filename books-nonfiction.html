@@ -35,8 +35,17 @@
 
   <div id="bookForm" class="book-form hidden">
     <input id="title" placeholder="Title">
-    <input id="author" placeholder="Author">
-    <input id="category" placeholder="Category">
+        <!-- AUTHOR -->
+    <div style="position: relative;">
+      <input id="author" placeholder="Author">
+      <div id="authorSuggestions" class="suggestions hidden"></div>
+    </div>
+
+    <!-- CATEGORY -->
+    <div style="position: relative;">
+      <input id="category" placeholder="Category">
+      <div id="categorySuggestions" class="suggestions hidden"></div>
+    </div>
     <input id="date" type="date">
     <button onclick="addBook()">Save</button>
   </div>
@@ -74,6 +83,7 @@
 <script type="module" src="books-nonfiction.js"></script>
 </body>
 </html>
+
 
 
 
