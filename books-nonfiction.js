@@ -78,18 +78,11 @@ onAuthStateChanged(auth, user => {
 window.addBook = async () => {
   if (!titleInput.value || !authorInput.value) return;
 
-  // 🔒 Normalize input
+  // Normalize input
   const newTitle = titleInput.value.trim().toLowerCase();
   const newAuthor = authorInput.value.trim().toLowerCase();
 
-  // 🚫 Safety: ensure books are loaded
-  const exists = books.some(b => {
-  const t = (b.title || "").trim().toLowerCase();
-  const a = (b.author || "").trim().toLowerCase();
-  return t === newTitle && a === newAuthor;
-});
-
-  // 🧠 Duplicate detection (case-insensitive, trimmed)
+  // Duplicate detection (safe even when books = [])
   const exists = books.some(b => {
     const t = (b.title || "").trim().toLowerCase();
     const a = (b.author || "").trim().toLowerCase();
@@ -101,7 +94,7 @@ window.addBook = async () => {
     return;
   }
 
-  // ✅ Safe to add
+  // Add to Firestore
   await addDoc(collection(db, COLLECTION_NAME), {
     uid: currentUser.uid,
     title: titleInput.value.trim(),
@@ -113,7 +106,7 @@ window.addBook = async () => {
     createdAt: Date.now()
   });
 
-  // 🧹 Reset
+  // Reset form
   bookForm.classList.add("hidden");
   titleInput.value = "";
   authorInput.value = "";
@@ -295,6 +288,7 @@ window.confirmDelete = async () => {
 
 window.closeConfirm = () =>
   document.getElementById("confirmBox").classList.add("hidden");
+
 
 
 
