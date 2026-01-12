@@ -21,6 +21,7 @@ let deleteId = null;
 let currentUser = null;
 
 let sortMode = "recent";
+let searchQuery = "";
 
 /* =====================
    ELEMENTS
@@ -31,7 +32,6 @@ const dateInput = document.getElementById("date");
 const quoteList = document.getElementById("quoteList");
 const searchInput = document.getElementById("search");
 const quoteForm = document.getElementById("quoteForm");
-
 const recentBtn = document.getElementById("recentBtn");
 
 const editOverlay = document.getElementById("editOverlay");
@@ -61,11 +61,10 @@ window.addQuote = async () => {
   const rawText = quoteText.value.trim();
   if (!rawText) return;
 
-  const newText = rawText.toLowerCase();
+  const normalized = rawText.toLowerCase();
 
-  // DUPLICATE CHECK
   const exists = quotes.some(q =>
-    q.text.trim().toLowerCase() === newText
+    q.text.trim().toLowerCase() === normalized
   );
 
   if (exists) {
@@ -78,7 +77,7 @@ window.addQuote = async () => {
     text: rawText,
     author: authorInput.value.trim() || "",
     date: dateInput.value || "",
-    createdAt: Date.now() // 🔥 for recent sorting
+    createdAt: Date.now()
   });
 
   quoteForm.classList.add("hidden");
@@ -91,7 +90,11 @@ window.addQuote = async () => {
    LOAD QUOTES
 ===================== */
 function loadQuotes() {
-  const q = query(collection(db, "quotes"), where("uid", "==", currentUser.uid));
+  const q = query(
+    collection(db, "quotes"),
+    where("uid", "==", currentUser.uid)
+  );
+
   onSnapshot(q, snap => {
     quotes = snap.docs.map(d => ({ id: d.id, ...d.data() }));
     applyView();
@@ -99,11 +102,20 @@ function loadQuotes() {
 }
 
 /* =====================
-   VIEW (RECENT)
+   VIEW (SEARCH + SORT)
 ===================== */
 function applyView() {
   let list = [...quotes];
 
+  // SEARCH
+  if (searchQuery) {
+    list = list.filter(q =>
+      q.text.toLowerCase().includes(searchQuery) ||
+      (q.author && q.author.toLowerCase().includes(searchQuery))
+    );
+  }
+
+  // SORT
   if (sortMode === "recent") {
     list.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
   }
@@ -125,13 +137,8 @@ if (recentBtn) {
    SEARCH
 ===================== */
 searchInput.oninput = () => {
-  const q = searchInput.value.toLowerCase();
-  renderQuotes(
-    quotes.filter(x =>
-      x.text.toLowerCase().includes(q) ||
-      (x.author && x.author.toLowerCase().includes(q))
-    )
-  );
+  searchQuery = searchInput.value.trim().toLowerCase();
+  applyView();
 };
 
 /* =====================
