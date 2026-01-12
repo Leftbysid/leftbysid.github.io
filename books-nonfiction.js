@@ -55,6 +55,10 @@ const editAuthor = document.getElementById("editAuthor");
 const editCategory = document.getElementById("editCategory");
 const editDate = document.getElementById("editDate");
 
+/* 🔹 SUGGESTION BOXES */
+const authorSuggestions = document.getElementById("authorSuggestions");
+const categorySuggestions = document.getElementById("categorySuggestions");
+
 /* ===============================
    UI INIT
 ================================ */
@@ -78,11 +82,9 @@ onAuthStateChanged(auth, user => {
 window.addBook = async () => {
   if (!titleInput.value || !authorInput.value) return;
 
-  // Normalize input
   const newTitle = titleInput.value.trim().toLowerCase();
   const newAuthor = authorInput.value.trim().toLowerCase();
 
-  // Duplicate detection (safe even when books = [])
   const exists = books.some(b => {
     const t = (b.title || "").trim().toLowerCase();
     const a = (b.author || "").trim().toLowerCase();
@@ -94,7 +96,6 @@ window.addBook = async () => {
     return;
   }
 
-  // Add to Firestore
   await addDoc(collection(db, COLLECTION_NAME), {
     uid: currentUser.uid,
     title: titleInput.value.trim(),
@@ -106,14 +107,12 @@ window.addBook = async () => {
     createdAt: Date.now()
   });
 
-  // Reset form
   bookForm.classList.add("hidden");
   titleInput.value = "";
   authorInput.value = "";
   dateInput.value = "";
   if (categoryInput) categoryInput.value = "";
 };
-
 
 /* ===============================
    LOAD BOOKS
@@ -131,28 +130,18 @@ function loadBooks() {
 }
 
 /* ===============================
-   VIEW LOGIC (FILTER + SORT)
+   VIEW LOGIC
 ================================ */
 function applyView() {
   let list = [...books];
 
-  // FILTER
   switch (currentFilter) {
-    case "owned":
-      list = list.filter(b => b.owned);
-      break;
-    case "not-owned":
-      list = list.filter(b => !b.owned);
-      break;
-    case "read":
-      list = list.filter(b => b.read);
-      break;
-    case "not-read":
-      list = list.filter(b => !b.read);
-      break;
+    case "owned": list = list.filter(b => b.owned); break;
+    case "not-owned": list = list.filter(b => !b.owned); break;
+    case "read": list = list.filter(b => b.read); break;
+    case "not-read": list = list.filter(b => !b.read); break;
   }
 
-  // SORT
   if (sortMode === "recent") {
     list.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
   }
@@ -199,7 +188,6 @@ function renderBooks(list) {
   list.forEach(b => {
     bookList.innerHTML += `
       <div class="book-row-wrapper">
-
         <span class="owned-icon ${b.owned ? "owned" : ""}">📕</span>
 
         <div class="book-row ${b.read ? "read" : ""}">
@@ -219,13 +207,10 @@ function renderBooks(list) {
         <div class="book-actions">
           <input type="checkbox"
             ${b.owned ? "checked" : ""}
-            onchange="toggleOwned('${b.id}', this.checked)"
-          >
-
+            onchange="toggleOwned('${b.id}', this.checked)">
           <button onclick="toggleRead('${b.id}', ${b.read})">
             ${b.read ? "✅" : "⬜"}
           </button>
-
           <button onclick="editBook('${b.id}')">✏️</button>
           <button onclick="askDelete('${b.id}')">🗑️</button>
         </div>
@@ -289,7 +274,54 @@ window.confirmDelete = async () => {
 window.closeConfirm = () =>
   document.getElementById("confirmBox").classList.add("hidden");
 
+/* ===============================
+   🔹 SUGGESTION LOGIC (ADDED ONLY)
+================================ */
+function showSuggestions(inputEl, boxEl, values) {
+  const q = inputEl.value.trim().toLowerCase();
+  if (!q) {
+    boxEl.classList.add("hidden");
+    return;
+  }
 
+  const matches = [...new Set(values)]
+    .filter(v => v.toLowerCase().startsWith(q))
+    .slice(0, 5);
 
+  if (!matches.length) {
+    boxEl.classList.add("hidden");
+    return;
+  }
 
+  boxEl.innerHTML = "";
+  matches.forEach(v => {
+    const div = document.createElement("div");
+    div.textContent = v;
+    div.onclick = () => {
+      inputEl.value = v;
+      boxEl.classList.add("hidden");
+    };
+    boxEl.appendChild(div);
+  });
 
+  boxEl.classList.remove("hidden");
+}
+
+authorInput.addEventListener("input", () => {
+  const authors = books.map(b => b.author).filter(Boolean);
+  showSuggestions(authorInput, authorSuggestions, authors);
+});
+
+categoryInput.addEventListener("input", () => {
+  const categories = books.map(b => b.category).filter(Boolean);
+  showSuggestions(categoryInput, categorySuggestions, categories);
+});
+
+document.addEventListener("click", e => {
+  if (!authorSuggestions.contains(e.target) && e.target !== authorInput) {
+    authorSuggestions.classList.add("hidden");
+  }
+  if (!categorySuggestions.contains(e.target) && e.target !== categoryInput) {
+    categorySuggestions.classList.add("hidden");
+  }
+});
