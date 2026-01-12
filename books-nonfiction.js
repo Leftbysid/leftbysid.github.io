@@ -200,7 +200,7 @@ function renderBooks(list) {
     bookList.innerHTML += `
       <div class="book-row-wrapper">
 
-        <span class="owned-icon ${b.owned ? "owned" : ""}">📘</span>
+        <span class="owned-icon ${b.owned ? "owned" : ""}">📕</span>
 
         <div class="book-row ${b.read ? "read" : ""}">
           <div>
@@ -288,6 +288,7 @@ window.confirmDelete = async () => {
 
 window.closeConfirm = () =>
   document.getElementById("confirmBox").classList.add("hidden");
+
 
 
 
