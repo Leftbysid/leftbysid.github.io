@@ -6,9 +6,14 @@ import {
   collection, addDoc, deleteDoc, updateDoc,
   doc, query, where, onSnapshot
 } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-firestore.js";
-import {
-  onAuthStateChanged
-} from "https://www.gstatic.com/firebasejs/12.7.0/firebase-auth.js";
+import { onAuthStateChanged }
+  from "https://www.gstatic.com/firebasejs/12.7.0/firebase-auth.js";
+import { requireAuth } from "./auth-guard.js";
+
+/* ===============================
+   ROUTE GUARD
+================================ */
+requireAuth();
 
 /* ===============================
    FIRESTORE COLLECTION
@@ -59,31 +64,31 @@ document.getElementById("toggleForm").onclick =
   () => bookForm.classList.toggle("hidden");
 
 /* ===============================
-   AUTH (SINGLE SOURCE OF TRUTH)
+   AUTH
 ================================ */
 onAuthStateChanged(auth, user => {
-  if (!user) {
-    location.href = "index.html";
-    return;
-  }
+  if (!user) return;
   currentUser = user;
   loadBooks();
 });
 
 /* ===============================
-   ADD BOOK (WITH DUPLICATE CHECK)
+   ADD BOOK
 ================================ */
 window.addBook = async () => {
   if (!titleInput.value || !authorInput.value) return;
 
+  // 🔒 Normalize input
   const newTitle = titleInput.value.trim().toLowerCase();
   const newAuthor = authorInput.value.trim().toLowerCase();
 
+  // 🚫 Safety: ensure books are loaded
   if (!books.length) {
     alert("Library still loading, try again in a moment.");
     return;
   }
 
+  // 🧠 Duplicate detection (case-insensitive, trimmed)
   const exists = books.some(b => {
     const t = (b.title || "").trim().toLowerCase();
     const a = (b.author || "").trim().toLowerCase();
@@ -95,6 +100,7 @@ window.addBook = async () => {
     return;
   }
 
+  // ✅ Safe to add
   await addDoc(collection(db, COLLECTION_NAME), {
     uid: currentUser.uid,
     title: titleInput.value.trim(),
@@ -106,12 +112,14 @@ window.addBook = async () => {
     createdAt: Date.now()
   });
 
+  // 🧹 Reset
   bookForm.classList.add("hidden");
   titleInput.value = "";
   authorInput.value = "";
   dateInput.value = "";
   if (categoryInput) categoryInput.value = "";
 };
+
 
 /* ===============================
    LOAD BOOKS
@@ -134,6 +142,7 @@ function loadBooks() {
 function applyView() {
   let list = [...books];
 
+  // FILTER
   switch (currentFilter) {
     case "owned":
       list = list.filter(b => b.owned);
@@ -149,6 +158,7 @@ function applyView() {
       break;
   }
 
+  // SORT
   if (sortMode === "recent") {
     list.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
   }
@@ -196,7 +206,7 @@ function renderBooks(list) {
     bookList.innerHTML += `
       <div class="book-row-wrapper">
 
-        ${b.owned ? `<span class="owned-icon owned">📕</span>` : `<span class="owned-icon"></span>`}
+        <span class="owned-icon ${b.owned ? "owned" : ""}">📘</span>
 
         <div class="book-row ${b.read ? "read" : ""}">
           <div>
@@ -216,7 +226,6 @@ function renderBooks(list) {
           <input type="checkbox"
             ${b.owned ? "checked" : ""}
             onchange="toggleOwned('${b.id}', this.checked)"
-            title="Owned"
           >
 
           <button onclick="toggleRead('${b.id}', ${b.read})">
@@ -285,3 +294,5 @@ window.confirmDelete = async () => {
 
 window.closeConfirm = () =>
   document.getElementById("confirmBox").classList.add("hidden");
+
+
