@@ -1,6 +1,4 @@
-/* ===============================
-   BASE
-================================ */
+
 body {
   background: black;
   color: #00ff9c;
@@ -277,5 +275,6 @@ body {
 .hidden {
   display: none !important;
 }
+
 
 
