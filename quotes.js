@@ -55,6 +55,19 @@ onAuthStateChanged(auth, user => {
 ===================== */
 window.addQuote = async () => {
   if (!quoteText.value.trim()) return;
+  const newText = quoteInput.value.trim().toLowerCase();
+
+if (!newText) return;
+
+// DUPLICATE CHECK
+const exists = quotes.some(q =>
+  q.text.trim().toLowerCase() === newText
+);
+
+if (exists) {
+  alert("This quote already exists.");
+  return;
+}
 
   await addDoc(collection(db, "quotes"), {
     uid: currentUser.uid,
