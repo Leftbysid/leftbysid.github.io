@@ -54,24 +54,24 @@ onAuthStateChanged(auth, user => {
    ADD QUOTE
 ===================== */
 window.addQuote = async () => {
-  if (!quoteText.value.trim()) return;
-  const newText = quoteInput.value.trim().toLowerCase();
+  const rawText = quoteText.value.trim();
+  if (!rawText) return;
 
-if (!newText) return;
+  const newText = rawText.toLowerCase();
 
-// DUPLICATE CHECK
-const exists = quotes.some(q =>
-  q.text.trim().toLowerCase() === newText
-);
+  // DUPLICATE CHECK
+  const exists = quotes.some(q =>
+    q.text.trim().toLowerCase() === newText
+  );
 
-if (exists) {
-  alert("This quote already exists.");
-  return;
-}
+  if (exists) {
+    alert("This quote already exists.");
+    return;
+  }
 
   await addDoc(collection(db, "quotes"), {
     uid: currentUser.uid,
-    text: quoteText.value.trim(),
+    text: rawText,
     author: authorInput.value.trim() || "",
     date: dateInput.value || ""
   });
@@ -81,7 +81,6 @@ if (exists) {
   authorInput.value = "";
   dateInput.value = "";
 };
-
 /* =====================
    LOAD QUOTES
 ===================== */
