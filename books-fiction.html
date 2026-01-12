@@ -36,12 +36,16 @@
     <input id="title" placeholder="Title">
 
     <!-- AUTHOR -->
-    <input id="author" placeholder="Author">
-    <div id="authorSuggestions" class="suggestions hidden"></div>
+    <div style="position: relative;">
+      <input id="author" placeholder="Author">
+      <div id="authorSuggestions" class="suggestions hidden"></div>
+    </div>
 
     <!-- CATEGORY -->
-    <input id="category" placeholder="Category">
-    <div id="categorySuggestions" class="suggestions hidden"></div>
+    <div style="position: relative;">
+      <input id="category" placeholder="Category">
+      <div id="categorySuggestions" class="suggestions hidden"></div>
+    </div>
 
     <input id="date" type="date">
     <button onclick="addBook()">Save</button>
@@ -78,3 +82,4 @@
   <script type="module" src="books-fiction.js"></script>
 </body>
 </html>
+
