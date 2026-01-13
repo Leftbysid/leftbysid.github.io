@@ -87,7 +87,7 @@ window.addQuote = async () => {
 };
 
 /* =====================
-   LOAD QUOTES
+   LOAD QUOTES (🔥 LAG FIX)
 ===================== */
 function loadQuotes() {
   const q = query(
@@ -96,7 +96,23 @@ function loadQuotes() {
   );
 
   onSnapshot(q, snap => {
-    quotes = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    snap.docChanges().forEach(change => {
+      const data = { id: change.doc.id, ...change.doc.data() };
+
+      if (change.type === "added") {
+        quotes.push(data);
+      }
+
+      if (change.type === "modified") {
+        const i = quotes.findIndex(q => q.id === data.id);
+        if (i !== -1) quotes[i] = data;
+      }
+
+      if (change.type === "removed") {
+        quotes = quotes.filter(q => q.id !== data.id);
+      }
+    });
+
     applyView();
   });
 }
@@ -107,7 +123,6 @@ function loadQuotes() {
 function applyView() {
   let list = [...quotes];
 
-  // SEARCH
   if (searchQuery) {
     list = list.filter(q =>
       q.text.toLowerCase().includes(searchQuery) ||
@@ -115,7 +130,6 @@ function applyView() {
     );
   }
 
-  // SORT
   if (sortMode === "recent") {
     list.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
   }
