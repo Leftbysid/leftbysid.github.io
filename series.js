@@ -87,8 +87,8 @@ saveSeriesBtn.onclick = async () => {
   const year = Number(yearInput.value);
   const genres = parseGenres(genreInput.value);
 
-  if (!name || !year) {
-    alert("Name and year required");
+  if (!name) {
+    alert("Name is required");
     return;
   }
 
