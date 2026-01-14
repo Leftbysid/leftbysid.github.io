@@ -106,14 +106,17 @@ saveSeriesBtn.onclick = async () => {
     return;
   }
 
-  await addDoc(seriesCol, {
-    uid: user.uid,
-    name,
-    year,
-    genres,
-    seen: false,
-    createdAt: serverTimestamp()
-  });
+  const data = {
+  uid: user.uid,
+  name,
+  genres,
+  seen: false,
+  createdAt: serverTimestamp()
+};
+
+if (year) data.year = year;
+
+await addDoc(seriesCol, data);
 
   seriesForm.classList.add("hidden");
   nameInput.value = yearInput.value = genreInput.value = "";
@@ -203,7 +206,7 @@ function render(list) {
             ${s.seen ? "SEEN" : "UNSEEN"}
           </span>
         </strong>
-        <span>${s.year}</span>
+        ${s.year ? `<span>${s.year}</span>` : ""}
         <div>${(s.genres||[]).map(g=>`<span class="tag">#${g}</span>`).join("")}</div>
       </div>
       <div class="series-actions">
