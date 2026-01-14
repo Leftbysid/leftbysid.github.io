@@ -13,7 +13,7 @@ const documentariesCol = collection(db, "documentaries");
 
 /* STATE */
 let currentFilter = "all";
-let movies = [];
+let documentaries = [];
 let editId = null;
 let deleteId = null;
 let user = null;
@@ -63,7 +63,7 @@ onAuthStateChanged(auth, u => {
   if (!u) location.href = "index.html";
   user = u;
   loadGenres();
-  loadMovies();
+  loadDocumentaries();
 });
 
 /* HELPERS */
@@ -78,7 +78,7 @@ function normalize(str) {
   return str.toLowerCase().trim().replace(/\s+/g, " ");
 }
 
-/* ADD MOVIE */
+/* ADD DOCUMENTARY */
 toggleForm.onclick = () =>
   seriesForm.classList.toggle("hidden");
 
@@ -93,7 +93,7 @@ saveSeriesBtn.onclick = async () => {
   }
 
   const snap = await getDocs(
-    query(moviesCol, where("uid", "==", user.uid))
+    query(documentariesCol, where("uid", "==", user.uid))
   );
 
   const exists = snap.docs.some(d =>
@@ -115,17 +115,17 @@ saveSeriesBtn.onclick = async () => {
 
   if (year) data.year = year;
 
-  await addDoc(moviesCol, data);
+  await addDoc(documentariesCol, data);
 
   seriesForm.classList.add("hidden");
   nameInput.value = yearInput.value = genreInput.value = "";
 };
 
-/* LOAD MOVIES */
-function loadMovies() {
-  const q = query(moviesCol, where("uid", "==", user.uid));
+/* LOAD DOCUMENTARIES */
+function loadDocumentaries() {
+  const q = query(documentariesCol, where("uid", "==", user.uid));
   onSnapshot(q, snap => {
-    movies = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    documentaries = snap.docs.map(d => ({ id: d.id, ...d.data() }));
     applyFilters();
   });
 }
@@ -162,16 +162,16 @@ genreInput.onchange = async () => {
 
 /* FILTER + SEARCH */
 function applyFilters() {
-  let list = [...movies];
+  let list = [...documentaries];
 
-  if (currentFilter === "seen") list = list.filter(m => m.seen);
-  if (currentFilter === "unseen") list = list.filter(m => !m.seen);
+  if (currentFilter === "seen") list = list.filter(d => d.seen);
+  if (currentFilter === "unseen") list = list.filter(d => !d.seen);
 
   const q = searchInput.value.toLowerCase();
   if (q) {
-    list = list.filter(m =>
-      m.name.toLowerCase().includes(q) ||
-      (m.genres || []).some(g => g.toLowerCase().includes(q))
+    list = list.filter(d =>
+      d.name.toLowerCase().includes(q) ||
+      (d.genres || []).some(g => g.toLowerCase().includes(q))
     );
   }
 
@@ -188,33 +188,33 @@ searchInput.oninput = applyFilters;
 function render(list) {
   seriesList.innerHTML = "";
 
-  list.forEach(m => {
+  list.forEach(d => {
     const row = document.createElement("div");
     row.className = "series-row";
 
     row.innerHTML = `
       <div class="series-text">
         <strong>
-          ${m.name}
-          <span class="status ${m.seen ? "seen" : "unseen"}">
-            ${m.seen ? "SEEN" : "UNSEEN"}
+          ${d.name}
+          <span class="status ${d.seen ? "seen" : "unseen"}">
+            ${d.seen ? "SEEN" : "UNSEEN"}
           </span>
         </strong>
-        ${m.year ? `<span>${m.year}</span>` : ""}
-        <div>${(m.genres||[]).map(g=>`<span class="tag">#${g}</span>`).join("")}</div>
+        ${d.year ? `<span>${d.year}</span>` : ""}
+        <div>${(d.genres||[]).map(g=>`<span class="tag">#${g}</span>`).join("")}</div>
       </div>
       <div class="series-actions">
-        <input type="checkbox" class="seen-toggle" ${m.seen ? "checked" : ""}>
+        <input type="checkbox" class="seen-toggle" ${d.seen ? "checked" : ""}>
         <button class="edit-btn">✏️</button>
         <button class="del-btn">🗑️</button>
       </div>
     `;
 
     row.querySelector(".seen-toggle").onchange = e =>
-      updateDoc(doc(db, "movies", m.id), { seen: e.target.checked });
+      updateDoc(doc(db, "documentaries", d.id), { seen: e.target.checked });
 
-    row.querySelector(".edit-btn").onclick = () => openEdit(m.id);
-    row.querySelector(".del-btn").onclick = () => askDelete(m.id);
+    row.querySelector(".edit-btn").onclick = () => openEdit(d.id);
+    row.querySelector(".del-btn").onclick = () => askDelete(d.id);
 
     seriesList.appendChild(row);
   });
@@ -222,16 +222,16 @@ function render(list) {
 
 /* EDIT */
 function openEdit(id) {
-  const m = movies.find(x => x.id === id);
+  const d = documentaries.find(x => x.id === id);
   editId = id;
-  editName.value = m.name;
-  editYear.value = m.year;
-  editGenres.value = (m.genres || []).join(", ");
+  editName.value = d.name;
+  editYear.value = d.year;
+  editGenres.value = (d.genres || []).join(", ");
   editOverlay.classList.remove("hidden");
 }
 
 saveEditBtn.onclick = async () => {
-  await updateDoc(doc(db, "movies", editId), {
+  await updateDoc(doc(db, "documentaries", editId), {
     name: editName.value.trim(),
     year: Number(editYear.value),
     genres: parseGenres(editGenres.value)
@@ -249,7 +249,7 @@ function askDelete(id) {
 }
 
 confirmDeleteBtn.onclick = async () => {
-  await deleteDoc(doc(db, "movies", deleteId));
+  await deleteDoc(doc(db, "documentaries", deleteId));
   confirmBox.classList.add("hidden");
 };
 
