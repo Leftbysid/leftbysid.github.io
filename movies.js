@@ -97,9 +97,9 @@ saveSeriesBtn.onclick = async () => {
   );
 
   const exists = snap.docs.some(d => {
-  const data = d.data();
-  if (!data.name) return false;
-  return normalize(data.name) === normalize(name);
+   const data = d.data();
+   if (!data.name) return false;
+   return normalize(data.name) === normalize(name);
 });
 
   if (exists) {
