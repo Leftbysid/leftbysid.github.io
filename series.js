@@ -88,7 +88,7 @@ saveSeriesBtn.onclick = async () => {
   const genres = parseGenres(genreInput.value);
 
   if (!name) {
-    alert("Name is required");
+    alert("You fking idiot");
     return;
   }
 
