@@ -74,7 +74,7 @@ function parseGenres(value) {
     .filter(Boolean);
 }
 
-function normalize(str) {
+function normalize(str = "") {
   return str.toLowerCase().trim().replace(/\s+/g, " ");
 }
 
@@ -96,9 +96,11 @@ saveSeriesBtn.onclick = async () => {
     query(moviesCol, where("uid", "==", user.uid))
   );
 
-  const exists = snap.docs.some(d =>
-    normalize(d.data().name) === normalize(name)
-  );
+  const exists = snap.docs.some(d => {
+  const data = d.data();
+  if (!data.name) return false;
+  return normalize(data.name) === normalize(name);
+});
 
   if (exists) {
     alert("Movie already exists");
