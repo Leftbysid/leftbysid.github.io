@@ -1,7 +1,7 @@
 import { auth, db } from "./firebase.js";
 import {
   collection, addDoc, deleteDoc, updateDoc,
-  doc, query, where, onSnapshot
+  doc, query, where, onSnapshot, getDocs
 } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-firestore.js";
 import { onAuthStateChanged }
   from "https://www.gstatic.com/firebasejs/12.7.0/firebase-auth.js";
@@ -42,6 +42,11 @@ const editName = document.getElementById("editName");
 const editDesc = document.getElementById("editDesc");
 const editTags = document.getElementById("editTags");
 
+/* HELPERS */
+function normalize(str = "") {
+  return str.toLowerCase().trim().replace(/\s+/g, "");
+}
+
 /* AUTH */
 onAuthStateChanged(auth, u => {
   if (!u) location.href = "index.html";
@@ -50,19 +55,45 @@ onAuthStateChanged(auth, u => {
 });
 
 /* ADD */
-toggleForm.onclick = () => linkForm.classList.toggle("hidden");
+toggleForm.onclick = () =>
+  linkForm.classList.toggle("hidden");
 
 saveLinkBtn.onclick = async () => {
   const type = typeInput.value.trim().toUpperCase();
-  const name = nameInput.value.trim();
+  const name = nameInput.value.trim(); // URL
   const desc = descInput.value.trim();
   const tags = tagsInput.value.split(",").map(t => t.trim()).filter(Boolean);
 
-  if (!type || !name) return alert("Type and Link required");
+  if (!type || !name) {
+    alert("Type and Link required");
+    return;
+  }
+
+  /* DUPLICATE PREVENTION (url + user) */
+  const q = query(
+    collection(db, "links"),
+    where("uid", "==", user.uid)
+  );
+
+  const snap = await getDocs(q);
+
+  const exists = snap.docs.some(d => {
+    const data = d.data();
+    if (!data.name) return false;
+    return normalize(data.name) === normalize(name);
+  });
+
+  if (exists) {
+    alert("Link already exists");
+    return;
+  }
 
   await addDoc(collection(db, "links"), {
     uid: user.uid,
-    type, name, desc, tags
+    type,
+    name,
+    desc,
+    tags
   });
 
   linkForm.classList.add("hidden");
@@ -101,8 +132,8 @@ function render(list) {
 
     row.innerHTML = `
       <div class="link-text">
-        <strong class="type ${l.type.toLowerCase()}">${l.type}</strong>
-        <a class="copy-link" data-url="${l.name}">${l.name}</a>
+        <strong class="type ${(l.type || "").toLowerCase()}">${l.type || ""}</strong>
+        <a class="copy-link" data-url="${l.name || ""}">${l.name || ""}</a>
         <span>${l.desc || ""}</span>
         <div>${(l.tags||[]).map(t=>`<span class="tag">#${t}</span>`).join("")}</div>
       </div>
@@ -128,10 +159,10 @@ function render(list) {
 searchInput.oninput = () => {
   const q = searchInput.value.toLowerCase();
   render(links.filter(l =>
-    l.type.toLowerCase().includes(q) ||
-    l.name.toLowerCase().includes(q) ||
-    (l.desc||"").toLowerCase().includes(q) ||
-    (l.tags||[]).some(t=>t.toLowerCase().includes(q))
+    (l.type || "").toLowerCase().includes(q) ||
+    (l.name || "").toLowerCase().includes(q) ||
+    (l.desc || "").toLowerCase().includes(q) ||
+    (l.tags || []).some(t => t.toLowerCase().includes(q))
   ));
 };
 
@@ -150,7 +181,7 @@ function openEdit(id) {
     `<option ${t===l.type?"selected":""}>${t}</option>`
   ).join("");
 
-  editName.value = l.name;
+  editName.value = l.name || "";
   editDesc.value = l.desc || "";
   editTags.value = (l.tags||[]).join(", ");
   editOverlay.classList.remove("hidden");
@@ -166,18 +197,22 @@ saveEditBtn.onclick = async () => {
   editOverlay.classList.add("hidden");
 };
 
-cancelEditBtn.onclick = () => editOverlay.classList.add("hidden");
+cancelEditBtn.onclick = () =>
+  editOverlay.classList.add("hidden");
 
 /* DELETE */
 function askDelete(id) {
   deleteId = id;
   confirmBox.classList.remove("hidden");
 }
+
 confirmDeleteBtn.onclick = async () => {
   await deleteDoc(doc(db,"links",deleteId));
   confirmBox.classList.add("hidden");
 };
-cancelDeleteBtn.onclick = () => confirmBox.classList.add("hidden");
+
+cancelDeleteBtn.onclick = () =>
+  confirmBox.classList.add("hidden");
 
 /* TOAST */
 function toast(msg){
