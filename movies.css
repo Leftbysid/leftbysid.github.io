@@ -1,0 +1,238 @@
+body {
+  background: black;
+  font-family: 'Share Tech Mono', monospace;
+  color: #ffe600;
+  padding: 20px;
+}
+
+/* TITLE */
+.title {
+  text-align: center;
+  margin-bottom: 12px;
+}
+
+/* FILTERS */
+.filters {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  margin: 10px 0;
+}
+
+.filter {
+  border: 2px solid #ffe600;
+  background: transparent;
+  color: #ffe600;
+  border-radius: 999px;
+  padding: 6px 16px;
+  font-size: 13px;
+  cursor: pointer;
+  transition: box-shadow .2s ease, background .2s ease;
+}
+
+.filter:hover {
+  background: rgba(255,230,0,.08);
+}
+
+.filter.active {
+  background: #ffe600;
+  color: black;
+  box-shadow: 0 0 16px rgba(255,230,0,.9);
+}
+
+/* CONTROLS */
+.controls {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.controls input,
+.controls button,
+#seriesForm input,
+#seriesForm button,
+#toggleForm {
+  padding: 8px 14px;
+  border: 2px solid #ffe600;
+  background: black;
+  color: #ffe600;
+  border-radius: 6px;
+  box-shadow: 0 0 10px rgba(255,230,0,.4);
+  font-family: 'Share Tech Mono', monospace;
+  letter-spacing: .5px;
+  transition: box-shadow .2s ease, background .2s ease, transform .1s ease;
+}
+
+/* ADD BUTTON */
+#toggleForm {
+  display: block;
+  margin: 16px auto;
+  text-align: center;
+  background: linear-gradient(
+    90deg,
+    rgba(255,230,0,.15),
+    rgba(255,230,0,.05)
+  );
+  text-shadow: 0 0 6px rgba(255,230,0,.6);
+  cursor: pointer;
+}
+
+#toggleForm:hover {
+  background: #ffe600;
+  color: black;
+  box-shadow: 0 0 14px rgba(255,230,0,.7);
+  transform: translateY(-1px);
+}
+
+#toggleForm:active {
+  transform: translateY(0);
+  box-shadow: 0 0 6px rgba(255,230,0,.4);
+}
+
+/* ADD FORM */
+#seriesForm {
+  max-width: 900px;
+  margin: 10px auto;
+  display: grid;
+  grid-template-columns: 2fr 1.2fr 3fr auto;
+  gap: 10px;
+}
+
+@media (max-width: 700px) {
+  #seriesForm {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* GENRE INPUT */
+#genreInput {
+  width: 100%;
+}
+
+/* SERIES ROW */
+.series-row {
+  border: 2px solid #ffe600;
+  margin: 10px auto;
+  max-width: 900px;
+  padding: 12px;
+  box-shadow: 0 0 12px rgba(255,230,0,.35);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* SERIES DETAILS */
+.series-text {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 14px;
+}
+
+.series-text > * {
+  padding-bottom: 4px;
+  border-bottom: 1px solid rgba(255,230,0,.25);
+}
+
+.series-text > *:last-child {
+  border-bottom: none;
+}
+
+/* TAGS */
+.tag {
+  display: inline-block;
+  margin-right: 6px;
+  padding: 2px 6px;
+  border: 1px solid #ffe600;
+  border-radius: 4px;
+  font-size: 12px;
+}
+
+/* STATUS */
+.status {
+  margin-left: 8px;
+  padding: 2px 8px;
+  font-size: 11px;
+  border-radius: 20px;
+  border: 1px solid;
+}
+
+.status.seen {
+  color: #00ff9c;
+  border-color: #00ff9c;
+}
+
+.status.unseen {
+  color: #ff4d4d;
+  border-color: #ff4d4d;
+}
+
+/* ACTIONS */
+.series-actions {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.series-actions button {
+  background: none;
+  border: none;
+  font-size: 18px;
+  color: #ffe600;
+  cursor: pointer;
+  opacity: .7;
+}
+
+.series-actions button:hover {
+  opacity: 1;
+  text-shadow: 0 0 10px currentColor;
+}
+
+.series-actions .del-btn:hover {
+  color: #ff4d4d;
+  text-shadow: 0 0 10px #ff4d4d;
+}
+
+.seen-toggle {
+  accent-color: #ffe600;
+}
+
+/* VISIBILITY */
+.hidden {
+  display: none !important;
+}
+
+/* OVERLAYS */
+.confirm,
+.edit-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.75);
+  z-index: 999;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding-top: 20px;
+}
+
+.confirm-box,
+.edit-box {
+  background: black;
+  border: 2px solid #ffe600;
+  padding: 20px;
+  box-shadow: 0 0 15px #ffe600;
+  max-width: 600px;
+  width: 100%;
+}
+
+.edit-actions {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 10px;
+}
+
+.edit-actions .cancel {
+  background: #ff2b2b;
+  color: black;
+}
