@@ -1,7 +1,7 @@
 import { auth, db } from "./firebase.js";
 import {
   collection, addDoc, deleteDoc, updateDoc,
-  doc, query, where, onSnapshot, getDocs
+  doc, query, where, onSnapshot, getDocs, serverTimestamp
 } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-firestore.js";
 import {
   onAuthStateChanged
@@ -9,6 +9,7 @@ import {
 
 /* COLLECTIONS */
 const genresCol = collection(db, "genres");
+const seriesCol = collection(db, "series");
 
 /* STATE */
 let currentFilter = "all";
@@ -26,7 +27,7 @@ const editOverlay = document.getElementById("editOverlay");
 const toggleForm = document.getElementById("toggleForm");
 const saveSeriesBtn = document.getElementById("saveSeries");
 
-const sortNameBtn = document.getElementById("sortName");
+const sortRecentBtn = document.getElementById("sortRecent");
 const searchInput = document.getElementById("search");
 
 const confirmDeleteBtn = document.getElementById("confirmDeleteBtn");
@@ -34,16 +35,16 @@ const cancelDeleteBtn = document.getElementById("cancelDeleteBtn");
 const saveEditBtn = document.getElementById("saveEditBtn");
 const cancelEditBtn = document.getElementById("cancelEditBtn");
 
-/* GENRE INPUT (DATALIST STYLE) */
+/* GENRE INPUT */
 const genreInput = document.getElementById("genreInput");
 const genreList = document.getElementById("genreList");
 
 /* INPUTS */
 const nameInput = document.getElementById("name");
-const seasonsInput = document.getElementById("seasons");
+const yearInput = document.getElementById("year");
 
 const editName = document.getElementById("editName");
-const editSeasons = document.getElementById("editSeasons");
+const editYear = document.getElementById("editYear");
 const editGenres = document.getElementById("editGenres");
 
 /* FILTER BUTTONS */
@@ -73,39 +74,61 @@ function parseGenres(value) {
     .filter(Boolean);
 }
 
+function normalize(str) {
+  return str.toLowerCase().trim().replace(/\s+/g, " ");
+}
+
 /* ADD SERIES */
 toggleForm.onclick = () =>
   seriesForm.classList.toggle("hidden");
 
 saveSeriesBtn.onclick = async () => {
   const name = nameInput.value.trim();
-  const seasons = Number(seasonsInput.value);
+  const year = Number(yearInput.value);
   const genres = parseGenres(genreInput.value);
 
-  if (!name || !seasons) return alert("Name and seasons required");
+  if (!name || !year) {
+    alert("Name and year required");
+    return;
+  }
 
-  await addDoc(collection(db, "series"), {
+  /* DUPLICATE CHECK (title + user) */
+  const snap = await getDocs(
+    query(seriesCol, where("uid", "==", user.uid))
+  );
+
+  const exists = snap.docs.some(d =>
+    normalize(d.data().name) === normalize(name)
+  );
+
+  if (exists) {
+    alert("Series already exists");
+    return;
+  }
+
+  await addDoc(seriesCol, {
     uid: user.uid,
     name,
-    seasons,
+    year,
     genres,
-    seen: false
+    seen: false,
+    createdAt: serverTimestamp()
   });
 
   seriesForm.classList.add("hidden");
-  nameInput.value = seasonsInput.value = genreInput.value = "";
+  nameInput.value = yearInput.value = genreInput.value = "";
 };
 
 /* LOAD SERIES */
 function loadSeries() {
-  const q = query(collection(db, "series"), where("uid", "==", user.uid));
+  const q = query(seriesCol, where("uid", "==", user.uid));
   onSnapshot(q, snap => {
     series = snap.docs.map(d => ({ id: d.id, ...d.data() }));
     applyFilters();
   });
 }
 
-/* LOAD GENRES (SUGGESTIONS) */
+/* LOAD GENRES */
 function loadGenres() {
   onSnapshot(genresCol, snap => {
     genreList.innerHTML = "";
@@ -120,7 +143,7 @@ function loadGenres() {
   });
 }
 
-/* SAVE NEW GENRES (COMMA AWARE) */
+/* SAVE NEW GENRES */
 genreInput.onchange = async () => {
   const inputGenres = parseGenres(genreInput.value);
   if (!inputGenres.length) return;
@@ -154,14 +177,15 @@ function applyFilters() {
     );
   }
 
+  /* RECENTLY ADDED SORT */
+  list.sort((a, b) =>
+    (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0)
+  );
+
   render(list);
 }
 
 searchInput.oninput = applyFilters;
-
-/* SORT */
-sortNameBtn.onclick = () =>
-  render([...series].sort((a,b)=>a.name.localeCompare(b.name)));
 
 /* RENDER */
 function render(list) {
@@ -179,7 +203,7 @@ function render(list) {
             ${s.seen ? "SEEN" : "UNSEEN"}
           </span>
         </strong>
-        <span>${s.seasons} seasons</span>
+        <span>${s.year}</span>
         <div>${(s.genres||[]).map(g=>`<span class="tag">#${g}</span>`).join("")}</div>
       </div>
       <div class="series-actions">
@@ -201,18 +225,18 @@ function render(list) {
 
 /* EDIT */
 function openEdit(id) {
-  const s = series.find(x=>x.id===id);
+  const s = series.find(x => x.id === id);
   editId = id;
   editName.value = s.name;
-  editSeasons.value = s.seasons;
-  editGenres.value = (s.genres||[]).join(", ");
+  editYear.value = s.year;
+  editGenres.value = (s.genres || []).join(", ");
   editOverlay.classList.remove("hidden");
 }
 
 saveEditBtn.onclick = async () => {
-  await updateDoc(doc(db,"series",editId),{
-    name: editName.value,
-    seasons: Number(editSeasons.value),
+  await updateDoc(doc(db, "series", editId), {
+    name: editName.value.trim(),
+    year: Number(editYear.value),
     genres: parseGenres(editGenres.value)
   });
   editOverlay.classList.add("hidden");
@@ -226,9 +250,11 @@ function askDelete(id) {
   deleteId = id;
   confirmBox.classList.remove("hidden");
 }
+
 confirmDeleteBtn.onclick = async () => {
-  await deleteDoc(doc(db,"series",deleteId));
+  await deleteDoc(doc(db, "series", deleteId));
   confirmBox.classList.add("hidden");
 };
+
 cancelDeleteBtn.onclick = () =>
   confirmBox.classList.add("hidden");
