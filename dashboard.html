@@ -13,7 +13,7 @@
 <!-- AUTH GUARD -->
 <script type="module">
 import { auth } from "./firebase.js";
-import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-auth.js";
 
 onAuthStateChanged(auth, user => {
   if (!user) window.location.href = "index.html";
@@ -23,16 +23,20 @@ onAuthStateChanged(auth, user => {
 <!-- MATRIX BACKGROUND -->
 <canvas id="matrix"></canvas>
 
-<!-- MUSIC -->
-<audio id="bgMusic" loop>
-  <source src="bg-music.mp3" type="audio/mpeg">
-</audio>
+<!-- AUDIO ELEMENT -->
+<audio id="bgMusic"></audio>
 
-<button class="music-btn" onclick="toggleMusic()">▶</button>
+<!-- MUSIC CONTROLS -->
+<div class="music-player">
+  <button id="prevTrack" title="Previous">⏮</button>
+  <button id="playPause" title="Play / Pause">▶</button>
+  <button id="nextTrack" title="Next">⏭</button>
+  <span class="track-title" id="trackTitle">No track</span>
+</div>
 
 <div class="container">
 
-  <!-- QUOTE WIDGET (REPLACES SYSTEM SLOGANS) -->
+  <!-- QUOTE WIDGET -->
   <div class="quote-widget" id="quoteWidget">
     <p class="quote-text" id="dashboardQuote">Loading quote...</p>
     <p class="quote-author" id="dashboardAuthor"></p>
@@ -51,30 +55,12 @@ onAuthStateChanged(auth, user => {
 <!-- LOGOUT -->
 <script type="module">
 import { auth } from "./firebase.js";
-import { signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import { signOut } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-auth.js";
 
 window.logout = async function () {
   await signOut(auth);
   window.location.href = "index.html";
 };
-</script>
-
-<!-- MUSIC TOGGLE -->
-<script>
-const music = document.getElementById("bgMusic");
-let playing = false;
-
-function toggleMusic() {
-  if (!playing) {
-    music.play();
-    playing = true;
-    document.querySelector(".music-btn").innerText = "⏸";
-  } else {
-    music.pause();
-    playing = false;
-    document.querySelector(".music-btn").innerText = "▶";
-  }
-}
 </script>
 
 <!-- DASHBOARD LOGIC -->
