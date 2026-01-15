@@ -57,9 +57,8 @@ const titleEl = document.getElementById("trackTitle");
 
 /* PLAYLIST (EDIT THIS) */
 const playlist = [
-  { title: "Night Run", src: "music/night-run.mp3" },
-  { title: "Cyber Dream", src: "music/cyber-dream.mp3" },
-  { title: "Deep Focus", src: "music/deep-focus.mp3" }
+  { title: "POLICE STATE", src: "music/police-state.mp3" },
+  { title: "MALAI KE MARCHAS", src: "music/malai-ke-marchas.mp3" },
 ];
 
 let currentIndex = 0;
