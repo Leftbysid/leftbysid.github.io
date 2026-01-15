@@ -1,1 +1,45 @@
 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Matrix Tetris</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="tetris.css">
+</head>
+<body>
+
+<!-- AUTH GUARD -->
+<script type="module">
+  import { auth } from "../../firebase.js";
+  import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-auth.js";
+
+  onAuthStateChanged(auth, user => {
+    if (!user) window.location.href = "../../index.html";
+  });
+</script>
+
+<div class="tetris-wrapper">
+
+  <div class="hud">
+    <div>Score<br><span id="score">0</span></div>
+    <div>Lines<br><span id="lines">0</span></div>
+    <div>Level<br><span id="level">1</span></div>
+    <div>Best<br><span id="best">—</span></div>
+  </div>
+
+  <canvas id="game" width="240" height="400"></canvas>
+
+  <div class="controls">
+    ← → move · ↑ rotate · ↓ soft · Space hard · P pause
+  </div>
+
+  <button id="startBtn">▶ START</button>
+
+</div>
+
+<script type="module" src="tetris.js"></script>
+</body>
+</html>
