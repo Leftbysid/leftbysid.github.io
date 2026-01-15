@@ -33,7 +33,11 @@ body {
   border-radius: 6px;
   box-shadow: 0 0 10px rgba(0,255,156,.4);
 }
-
+.controls button.active {
+  background: #00ff9c;
+  color: black;
+  box-shadow: 0 0 16px rgba(0,255,156,.9);
+}
 /* ADD BUTTON */
 #toggleForm {
   display: block;
