@@ -33,6 +33,7 @@ const quoteList = document.getElementById("quoteList");
 const searchInput = document.getElementById("search");
 const quoteForm = document.getElementById("quoteForm");
 const recentBtn = document.getElementById("recentBtn");
+const totalQuotesEl = document.getElementById("totalQuotes");
 
 const editOverlay = document.getElementById("editOverlay");
 const editQuote = document.getElementById("editQuote");
@@ -112,6 +113,11 @@ function loadQuotes() {
         quotes = quotes.filter(q => q.id !== data.id);
       }
     });
+
+    /* UPDATE TOTAL COUNT */
+    if (totalQuotesEl) {
+      totalQuotesEl.textContent = quotes.length;
+    }
 
     applyView();
   });
