@@ -31,9 +31,14 @@ onAuthStateChanged(auth, user => {
 <button class="music-btn" onclick="toggleMusic()">▶</button>
 
 <div class="container">
-  <h1 class="title glitch" id="title" data-text="WAKE UP_">WAKE UP_</h1>
 
-  <!-- NAVIGATION (LINKS, NOT BUTTONS) -->
+  <!-- QUOTE WIDGET (REPLACES SYSTEM SLOGANS) -->
+  <div class="quote-widget" id="quoteWidget">
+    <p class="quote-text" id="dashboardQuote">Loading quote...</p>
+    <p class="quote-author" id="dashboardAuthor"></p>
+  </div>
+
+  <!-- NAVIGATION -->
   <div class="menu">
     <a href="fnf.html" class="menu-link">BOOKS</a>
     <a href="quotes.html" class="menu-link">QUOTES</a>
@@ -54,7 +59,7 @@ window.logout = async function () {
 };
 </script>
 
-<!-- MUSIC + TITLE LOGIC -->
+<!-- MUSIC TOGGLE -->
 <script>
 const music = document.getElementById("bgMusic");
 let playing = false;
@@ -70,23 +75,13 @@ function toggleMusic() {
     document.querySelector(".music-btn").innerText = "▶";
   }
 }
-
-const quotes = [
-  "WAKE UP_",
-  "REALITY IS A CONSTRUCT_",
-  "YOU ARE AWAKE_",
-  "CONTROL BEGINS IN THE MIND_",
-  "THINK FOR YOURSELF_",
-  "EXISTENCE PRECEDES ESSENCE_",
-  "SYSTEM ONLINE_"
-];
-
-const title = document.getElementById("title");
-const q = quotes[Math.floor(Math.random() * quotes.length)];
-title.innerText = q;
-title.setAttribute("data-text", q);
 </script>
 
+<!-- DASHBOARD LOGIC -->
+<script type="module" src="dashboard.js"></script>
+
+<!-- MATRIX EFFECT -->
 <script src="matrix.js"></script>
+
 </body>
 </html>
