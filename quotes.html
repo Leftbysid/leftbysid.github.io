@@ -9,6 +9,12 @@
 
 <h1 class="title">💬 QUOTE VAULT</h1>
 
+<!-- EXPORT ACTIONS -->
+<div class="export-actions">
+  <button id="exportJsonBtn">Export JSON</button>
+  <button id="exportPdfBtn">Export PDF</button>
+</div>
+
 <!-- QUOTES STAT BAR -->
 <div class="stats">
   Total: <span id="totalQuotes">0</span>
@@ -24,11 +30,15 @@
 <div id="quoteForm" class="hidden">
   <textarea id="quoteText" placeholder="Quote"></textarea>
   <input id="author" placeholder="Author">
-  <input id="date" type="date">
   <button onclick="addQuote()">Save</button>
 </div>
 
 <div id="quoteList"></div>
+
+<!-- LOAD MORE -->
+<button id="loadMoreQuotes" class="hidden">
+  Load More
+</button>
 
 <!-- DELETE CONFIRM -->
 <div id="confirmBox" class="confirm hidden">
@@ -47,7 +57,6 @@
     <h3>Edit Quote</h3>
     <textarea id="editQuote"></textarea>
     <input id="editAuthor">
-    <input id="editDate" type="date">
     <div class="edit-actions">
       <button onclick="saveEdit()">💾 Save</button>
       <button class="cancel" onclick="closeEdit()">✖ Cancel</button>
