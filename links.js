@@ -1,7 +1,7 @@
 import { auth, db } from "./firebase.js";
 import {
   collection, addDoc, deleteDoc, updateDoc,
-  doc, query, where, onSnapshot, getDocs
+  doc, query, where, onSnapshot, getDocs, serverTimestamp
 } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-firestore.js";
 import { onAuthStateChanged }
   from "https://www.gstatic.com/firebasejs/12.7.0/firebase-auth.js";
@@ -21,8 +21,6 @@ const editOverlay = document.getElementById("editOverlay");
 const toggleForm = document.getElementById("toggleForm");
 const saveLinkBtn = document.getElementById("saveLink");
 
-const sortNameBtn = document.getElementById("sortName");
-const sortTypeBtn = document.getElementById("sortType");
 const searchInput = document.getElementById("search");
 
 const confirmDeleteBtn = document.getElementById("confirmDeleteBtn");
@@ -60,7 +58,7 @@ toggleForm.onclick = () =>
 
 saveLinkBtn.onclick = async () => {
   const type = typeInput.value.trim().toUpperCase();
-  const name = nameInput.value.trim(); // URL
+  const name = nameInput.value.trim();
   const desc = descInput.value.trim();
   const tags = tagsInput.value.split(",").map(t => t.trim()).filter(Boolean);
 
@@ -69,13 +67,10 @@ saveLinkBtn.onclick = async () => {
     return;
   }
 
-  /* DUPLICATE PREVENTION (url + user) */
-  const q = query(
-    collection(db, "links"),
-    where("uid", "==", user.uid)
+  /* DUPLICATE PREVENTION */
+  const snap = await getDocs(
+    query(collection(db, "links"), where("uid", "==", user.uid))
   );
-
-  const snap = await getDocs(q);
 
   const exists = snap.docs.some(d => {
     const data = d.data();
@@ -93,7 +88,8 @@ saveLinkBtn.onclick = async () => {
     type,
     name,
     desc,
-    tags
+    tags,
+    createdAt: serverTimestamp()
   });
 
   linkForm.classList.add("hidden");
@@ -105,6 +101,12 @@ function loadLinks() {
   const q = query(collection(db, "links"), where("uid", "==", user.uid));
   onSnapshot(q, snap => {
     links = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+
+    /* RECENTLY ADDED SORT */
+    links.sort((a, b) =>
+      (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0)
+    );
+
     types.clear();
     links.forEach(l => l.type && types.add(l.type));
     updateTypeList();
@@ -155,7 +157,7 @@ function render(list) {
   });
 }
 
-/* SEARCH */
+/* SEARCH (keeps recent order) */
 searchInput.oninput = () => {
   const q = searchInput.value.toLowerCase();
   render(links.filter(l =>
@@ -165,12 +167,6 @@ searchInput.oninput = () => {
     (l.tags || []).some(t => t.toLowerCase().includes(q))
   ));
 };
-
-/* SORT */
-sortNameBtn.onclick = () =>
-  render([...links].sort((a,b)=>a.name.localeCompare(b.name)));
-sortTypeBtn.onclick = () =>
-  render([...links].sort((a,b)=>a.type.localeCompare(b.type)));
 
 /* EDIT */
 function openEdit(id) {
