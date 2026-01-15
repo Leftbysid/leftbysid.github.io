@@ -25,16 +25,36 @@ body {
   position: relative;
   z-index: 1;
   text-align: center;
-  padding-top: 100px;
+  padding-top: 80px;
+  padding-bottom: 40px;
 }
 
 /* ======================
-   TITLE
+   QUOTE WIDGET
 ====================== */
-.title {
-  font-size: 36px;
-  margin-bottom: 40px;
-  text-shadow: 0 0 20px rgba(0,255,156,.9);
+.quote-widget {
+  max-width: 900px;
+  margin: 0 auto 40px;
+  padding: 20px 24px;
+
+  border: 2px solid rgba(0,255,156,.6);
+  background: rgba(0,0,0,.55);
+
+  box-shadow:
+    inset 0 0 18px rgba(0,255,156,.25),
+    0 0 22px rgba(0,255,156,.4);
+}
+
+.quote-widget .quote-text {
+  font-size: 20px;
+  line-height: 1.5;
+  margin-bottom: 10px;
+  font-style: italic;
+}
+
+.quote-widget .quote-author {
+  font-size: 14px;
+  opacity: .8;
 }
 
 /* ======================
@@ -43,23 +63,23 @@ body {
 .menu {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 20px;
+  gap: 16px;
   max-width: 900px;
   margin: 0 auto;
 }
 
 /* ======================
-   MENU LINKS (BUTTON LOOK)
+   MENU LINKS (COMPACT)
 ====================== */
 .menu-link {
   display: block;
   width: 100%;
-  padding: 18px 0;
+  padding: 14px 0;
 
   background: rgba(0,0,0,.65);
   border: 2px solid #00ff9c;
 
-  font-size: 20px;
+  font-size: 18px;
   letter-spacing: 2px;
   color: #00ff9c;
   text-decoration: none;
@@ -67,7 +87,7 @@ body {
 
   box-shadow:
     inset 0 0 14px rgba(0,255,156,.25),
-    0 0 22px rgba(0,255,156,.4);
+    0 0 20px rgba(0,255,156,.35);
 
   transition: box-shadow .25s ease, transform .25s ease;
 }
@@ -76,7 +96,7 @@ body {
 .menu-link:hover {
   box-shadow:
     inset 0 0 22px rgba(0,255,156,.5),
-    0 0 38px rgba(0,255,156,.95);
+    0 0 34px rgba(0,255,156,.95);
   transform: translateY(-2px);
 }
 
@@ -91,10 +111,10 @@ body {
 .menu-link.disconnect:hover {
   box-shadow:
     inset 0 0 22px rgba(255,59,59,.5),
-    0 0 38px rgba(255,59,59,.95);
+    0 0 34px rgba(255,59,59,.95);
 }
 
-/* MAKE DISCONNECT SPAN FULL ROW ON PC */
+/* FULL ROW */
 .menu-link.full {
   grid-column: 1 / -1;
 }
@@ -120,12 +140,11 @@ body {
 }
 
 /* ======================
-   MOBILE: CENTER + SINGLE COLUMN (FIXED)
+   MOBILE / PORTRAIT
 ====================== */
 @media (max-width: 900px), (orientation: portrait) {
 
   .container {
-      transform: translateX(-16px);
     min-height: 100vh;
     display: flex;
     flex-direction: column;
@@ -134,31 +153,23 @@ body {
     padding-bottom: 40px;
   }
 
+  .quote-widget {
+    margin: 0 16px 32px;
+    padding: 16px 18px;
+  }
+
   .menu {
     grid-template-columns: 1fr;
-    gap: 16px;
+    gap: 14px;
     padding: 0 16px;
   }
 
   .menu-link {
-    font-size: 18px;
-    padding: 16px 24px;
+    font-size: 17px;
+    padding: 14px 24px;
   }
 
   .menu-link.full {
     grid-column: auto;
   }
-
-  .title {
-    margin-bottom: 30px;
-  }
 }
-
-
-
-
-
-
-
-
-
