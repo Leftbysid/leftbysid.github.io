@@ -10,14 +10,11 @@ import {
 } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-auth.js";
 
 /* =====================
-   ELEMENTS
+   QUOTE WIDGET
 ===================== */
 const quoteEl = document.getElementById("dashboardQuote");
 const authorEl = document.getElementById("dashboardAuthor");
 
-/* =====================
-   LOAD RANDOM QUOTE
-===================== */
 onAuthStateChanged(auth, async user => {
   if (!user) return;
 
@@ -48,3 +45,72 @@ onAuthStateChanged(auth, async user => {
     authorEl.textContent = "";
   }
 });
+
+/* =====================
+   MUSIC PLAYER
+===================== */
+const audio = document.getElementById("bgMusic");
+const playBtn = document.getElementById("playPause");
+const nextBtn = document.getElementById("nextTrack");
+const prevBtn = document.getElementById("prevTrack");
+const titleEl = document.getElementById("trackTitle");
+
+/* PLAYLIST (EDIT THIS) */
+const playlist = [
+  { title: "Night Run", src: "music/night-run.mp3" },
+  { title: "Cyber Dream", src: "music/cyber-dream.mp3" },
+  { title: "Deep Focus", src: "music/deep-focus.mp3" }
+];
+
+let currentIndex = 0;
+let isPlaying = false;
+
+/* LOAD TRACK */
+function loadTrack(index) {
+  const track = playlist[index];
+  if (!track) return;
+
+  audio.src = track.src;
+  titleEl.textContent = track.title;
+}
+
+/* PLAY / PAUSE */
+function togglePlay() {
+  if (!audio.src) loadTrack(currentIndex);
+
+  if (isPlaying) {
+    audio.pause();
+    playBtn.textContent = "▶";
+  } else {
+    audio.play().catch(() => {});
+    playBtn.textContent = "⏸";
+  }
+
+  isPlaying = !isPlaying;
+}
+
+/* NEXT */
+function nextTrack() {
+  currentIndex = (currentIndex + 1) % playlist.length;
+  loadTrack(currentIndex);
+  if (isPlaying) audio.play();
+}
+
+/* PREVIOUS */
+function prevTrack() {
+  currentIndex =
+    (currentIndex - 1 + playlist.length) % playlist.length;
+  loadTrack(currentIndex);
+  if (isPlaying) audio.play();
+}
+
+/* AUTO ADVANCE */
+audio.addEventListener("ended", nextTrack);
+
+/* CONTROLS */
+playBtn.onclick = togglePlay;
+nextBtn.onclick = nextTrack;
+prevBtn.onclick = prevTrack;
+
+/* INIT */
+loadTrack(currentIndex);
