@@ -196,7 +196,7 @@ function update(time=0) {
 }
 
 /* ======================
-   INPUT
+   INPUT (KEYBOARD)
 ====================== */
 document.addEventListener("keydown", e => {
   if (!running) return;
@@ -223,6 +223,41 @@ document.addEventListener("keydown", e => {
     if (!paused) requestAnimationFrame(update);
   }
 });
+
+/* ======================
+   INPUT (MOBILE BUTTONS)
+====================== */
+document.querySelectorAll(".mobile-controls button").forEach(btn => {
+  btn.addEventListener("touchstart", e => {
+    e.preventDefault();
+    handleMobileAction(btn.dataset.action);
+  });
+});
+
+function handleMobileAction(action) {
+  if (!running) return;
+
+  switch (action) {
+    case "left":
+      player.pos.x--;
+      if (collide(board, player)) player.pos.x++;
+      break;
+    case "right":
+      player.pos.x++;
+      if (collide(board, player)) player.pos.x--;
+      break;
+    case "down":
+      drop();
+      break;
+    case "rotate":
+      rotate(player.matrix);
+      break;
+    case "pause":
+      paused = !paused;
+      if (!paused) requestAnimationFrame(update);
+      break;
+  }
+}
 
 /* ======================
    UI
