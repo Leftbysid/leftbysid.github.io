@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Images</title>
+  <link rel="stylesheet" href="images.css">
+</head>
+<body>
+
+<h1 class="title">🖼 IMAGE VAULT</h1>
+
+<div class="controls">
+  <input id="search" placeholder="Search images, tags...">
+  <button id="exportJson">⬇ Export JSON</button>
+</div>
+
+<button id="toggleForm">➕ Add Image</button>
+
+<div id="imageForm" class="hidden">
+  <input id="filename" placeholder="Filename (e.g. matrix_01.jpg)">
+  <input id="titleInput" placeholder="Title">
+  <input id="tagsInput" placeholder="Tags (comma separated)">
+  <button id="saveImage">Save</button>
+</div>
+
+<div id="imageGrid"></div>
+
+<!-- DELETE CONFIRM -->
+<div id="confirmBox" class="confirm hidden">
+  <div class="confirm-box">
+    <p>Delete this image?</p>
+    <div class="confirm-actions">
+      <button id="confirmDeleteBtn">Yes</button>
+      <button id="cancelDeleteBtn">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- EDIT -->
+<div id="editOverlay" class="edit-overlay hidden">
+  <div class="edit-box">
+    <h3>Edit Image</h3>
+    <input id="editTitle">
+    <input id="editTags">
+    <div class="edit-actions">
+      <button id="saveEditBtn">💾 Save</button>
+      <button class="cancel" id="cancelEditBtn">✖ Cancel</button>
+    </div>
+  </div>
+</div>
+
+<script type="module" src="images.js"></script>
+</body>
+</html>
