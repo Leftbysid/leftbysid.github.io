@@ -67,11 +67,20 @@ function createMatrix(w, h) {
 function collide(board, p) {
   for (let y = 0; y < p.matrix.length; y++) {
     for (let x = 0; x < p.matrix[y].length; x++) {
-      if (
-        p.matrix[y][x] &&
-        (board[y + p.pos.y] &&
-         board[y + p.pos.y][x + p.pos.x]) !== 0
-      ) return true;
+      if (p.matrix[y][x] !== 0) {
+        const boardY = y + p.pos.y;
+        const boardX = x + p.pos.x;
+
+        if (
+          boardY < 0 ||
+          boardY >= ROWS ||
+          boardX < 0 ||
+          boardX >= COLS ||
+          board[boardY][boardX] !== 0
+        ) {
+          return true;
+        }
+      }
     }
   }
   return false;
