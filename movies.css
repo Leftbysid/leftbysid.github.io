@@ -252,7 +252,7 @@ body {
 ========================= */
 .home-logo {
   position: fixed;
-  top: 18px;
+  bottom: 18px;
   left: 20px;
 
   font-family: 'Share Tech Mono', monospace;
