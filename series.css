@@ -88,13 +88,48 @@ body {
   color: black;
 }
 
-/* LIST CONTAINER (IMPORTANT) */
+/* =========================
+   ADD SERIES FORM (FIXED)
+========================= */
+#seriesForm {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+
+  max-width: 900px;
+  margin: 20px auto;
+  padding: 16px;
+
+  border: 2px solid var(--accent-color);
+  box-shadow: 0 0 18px var(--accent-glow);
+  border-radius: 12px;
+}
+
+#seriesForm input {
+  min-width: 160px;
+  flex: 1;
+}
+
+#seriesForm button {
+  padding: 8px 22px;
+  font-weight: bold;
+  background: var(--accent-color);
+  color: black;
+}
+
+#seriesForm button:hover {
+  box-shadow: 0 0 24px var(--accent-glow);
+}
+
+/* LIST CONTAINER */
 #seriesList {
   max-width: 900px;
   margin: 24px auto;
 }
 
-/* SERIES ROW (MATCHES MOVIES) */
+/* SERIES ROW */
 .series-row {
   border: 2px solid var(--accent-color);
   box-shadow: 0 0 18px var(--accent-glow);
@@ -112,14 +147,12 @@ body {
   gap: 6px;
 }
 
-/* SERIES NAME */
 .series-text strong {
   color: var(--accent-color);
   font-size: 16px;
   text-shadow: 0 0 6px var(--accent-glow);
 }
 
-/* META */
 .series-text span {
   font-size: 13px;
   color: var(--dim-text);
