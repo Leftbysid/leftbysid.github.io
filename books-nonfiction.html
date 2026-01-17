@@ -2,13 +2,19 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>fiction</title>
+  <title>Non-Fiction</title>
   <link rel="stylesheet" href="books-nonfiction.css">
 </head>
 
 <body class="books-page">
 
   <h1 class="title">📚 NON-FICTION ARCHIVE</h1>
+
+  <!-- EXPORT CONTROLS -->
+  <div class="export-controls">
+    <button id="exportJsonBtn">Export JSON</button>
+    <button id="exportPdfBtn">Export PDF</button>
+  </div>
 
   <!-- STATS HEADER -->
   <div class="stats">
@@ -18,24 +24,25 @@
   </div>
 
   <div class="controls">
-  <input id="search" placeholder="Search books...">
+    <input id="search" placeholder="Search books...">
 
-  <button id="recentBtn">⏱ Recently Added</button>
+    <button id="recentBtn">⏱ Recently Added</button>
 
-  <select id="filterSelect">
-    <option value="all">All</option>
-    <option value="owned">Owned</option>
-    <option value="not-owned">Not Owned</option>
-    <option value="read">Read</option>
-    <option value="not-read">Not Read</option>
-  </select>
+    <select id="filterSelect">
+      <option value="all">All</option>
+      <option value="owned">Owned</option>
+      <option value="not-owned">Not Owned</option>
+      <option value="read">Read</option>
+      <option value="not-read">Not Read</option>
+    </select>
   </div>
 
   <button id="toggleForm">➕ Add Book</button>
 
   <div id="bookForm" class="book-form hidden">
     <input id="title" placeholder="Title">
-        <!-- AUTHOR -->
+
+    <!-- AUTHOR -->
     <div style="position: relative;">
       <input id="author" placeholder="Author">
       <div id="authorSuggestions" class="suggestions hidden"></div>
@@ -46,6 +53,7 @@
       <input id="category" placeholder="Category">
       <div id="categorySuggestions" class="suggestions hidden"></div>
     </div>
+
     <input id="date" type="date">
     <button onclick="addBook()">Save</button>
   </div>
@@ -78,13 +86,10 @@
     </div>
   </div>
 
-</div>
+  <!-- PDF LIB -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
-<script type="module" src="books-nonfiction.js"></script>
+  <!-- PAGE LOGIC -->
+  <script type="module" src="books-nonfiction.js"></script>
 </body>
 </html>
-
-
-
-
-
