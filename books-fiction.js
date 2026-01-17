@@ -10,6 +10,9 @@ import { onAuthStateChanged }
   from "https://www.gstatic.com/firebasejs/12.7.0/firebase-auth.js";
 import { requireAuth } from "./auth-guard.js";
 
+/* PDF */
+const { jsPDF } = window.jspdf;
+
 /* ===============================
    ROUTE GUARD
 ================================ */
@@ -53,6 +56,10 @@ const totalCount = document.getElementById("totalCount");
 const readCount = document.getElementById("readCount");
 const unreadCount = document.getElementById("unreadCount");
 
+/* EXPORT */
+const exportJsonBtn = document.getElementById("exportJsonBtn");
+const exportPdfBtn = document.getElementById("exportPdfBtn");
+
 const editOverlay = document.getElementById("editOverlay");
 const editTitle = document.getElementById("editTitle");
 const editAuthor = document.getElementById("editAuthor");
@@ -85,18 +92,13 @@ window.addBook = async () => {
   const newTitle = titleInput.value.trim().toLowerCase();
   const newAuthor = authorInput.value.trim().toLowerCase();
 
-  if (!books.length) {
-    alert("Library still loading, try again in a moment.");
-    return;
-  }
-
   const exists = books.some(b =>
-    (b.title || "").trim().toLowerCase() === newTitle &&
-    (b.author || "").trim().toLowerCase() === newAuthor
+    (b.title || "").toLowerCase() === newTitle &&
+    (b.author || "").toLowerCase() === newAuthor
   );
 
   if (exists) {
-    alert("This book already exists in your library.");
+    alert("This book already exists.");
     return;
   }
 
@@ -112,13 +114,7 @@ window.addBook = async () => {
   });
 
   bookForm.classList.add("hidden");
-  titleInput.value = "";
-  authorInput.value = "";
-  categoryInput.value = "";
-  dateInput.value = "";
-
-  authorSuggestions.classList.add("hidden");
-  categorySuggestions.classList.add("hidden");
+  titleInput.value = authorInput.value = categoryInput.value = dateInput.value = "";
 };
 
 /* ===============================
@@ -137,83 +133,16 @@ function loadBooks() {
 }
 
 /* ===============================
-   SUGGESTION HELPERS
-================================ */
-function getUniqueValues(key) {
-  return [...new Set(
-    books.map(b => (b[key] || "").trim()).filter(Boolean)
-  )];
-}
-
-function renderSuggestions(input, container, values) {
-  const q = input.value.trim().toLowerCase();
-  container.innerHTML = "";
-
-  if (!q) {
-    container.classList.add("hidden");
-    return;
-  }
-
-  const matches = values.filter(v =>
-    v.toLowerCase().startsWith(q)
-  );
-
-  if (!matches.length) {
-    container.classList.add("hidden");
-    return;
-  }
-
-  matches.forEach(v => {
-    const div = document.createElement("div");
-    div.textContent = v;
-    div.onclick = () => {
-      input.value = v;
-      container.classList.add("hidden");
-    };
-    container.appendChild(div);
-  });
-
-  container.classList.remove("hidden");
-}
-
-/* ===============================
-   SUGGESTION LISTENERS
-================================ */
-authorInput.addEventListener("input", () => {
-  renderSuggestions(
-    authorInput,
-    authorSuggestions,
-    getUniqueValues("author")
-  );
-});
-
-categoryInput.addEventListener("input", () => {
-  renderSuggestions(
-    categoryInput,
-    categorySuggestions,
-    getUniqueValues("category")
-  );
-});
-
-/* ===============================
-   VIEW LOGIC
+   VIEW
 ================================ */
 function applyView() {
   let list = [...books];
 
   switch (currentFilter) {
-    case "owned":
-      list = list.filter(b => b.owned);
-      break;
-    case "not-owned":
-      list = list.filter(b => !b.owned);
-      break;
-    case "read":
-      list = list.filter(b => b.read);
-      break;
-    case "not-read":
-      list = list.filter(b => !b.read);
-      break;
+    case "owned": list = list.filter(b => b.owned); break;
+    case "not-owned": list = list.filter(b => !b.owned); break;
+    case "read": list = list.filter(b => b.read); break;
+    case "not-read": list = list.filter(b => !b.read); break;
   }
 
   if (sortMode === "recent") {
@@ -281,8 +210,7 @@ function renderBooks(list) {
         <div class="book-actions">
           <input type="checkbox"
             ${b.owned ? "checked" : ""}
-            onchange="toggleOwned('${b.id}', this.checked)"
-          >
+            onchange="toggleOwned('${b.id}', this.checked)">
           <button onclick="toggleRead('${b.id}', ${b.read})">
             ${b.read ? "✅" : "⬜"}
           </button>
@@ -299,52 +227,51 @@ function renderBooks(list) {
 }
 
 /* ===============================
-   TOGGLES
+   EXPORT JSON
 ================================ */
-window.toggleRead = async (id, current) =>
-  updateDoc(doc(db, COLLECTION_NAME, id), { read: !current });
+exportJsonBtn.onclick = () => {
+  const data = {
+    exportedAt: new Date().toISOString(),
+    fiction: books.map(b => ({
+      title: b.title,
+      author: b.author,
+      category: b.category || "",
+      date: b.date || "",
+      read: b.read,
+      owned: b.owned
+    }))
+  };
 
-window.toggleOwned = async (id, value) =>
-  updateDoc(doc(db, COLLECTION_NAME, id), { owned: value });
-
-/* ===============================
-   EDIT
-================================ */
-window.editBook = id => {
-  const b = books.find(x => x.id === id);
-  editingId = id;
-  editTitle.value = b.title;
-  editAuthor.value = b.author;
-  editCategory.value = b.category || "";
-  editDate.value = b.date || "";
-  editOverlay.classList.remove("hidden");
-};
-
-window.saveEdit = async () => {
-  await updateDoc(doc(db, COLLECTION_NAME, editingId), {
-    title: editTitle.value,
-    author: editAuthor.value,
-    category: editCategory.value,
-    date: editDate.value
+  const blob = new Blob([JSON.stringify(data, null, 2)], {
+    type: "application/json"
   });
-  editOverlay.classList.add("hidden");
-};
 
-window.closeEdit = () =>
-  editOverlay.classList.add("hidden");
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "fiction-books.json";
+  a.click();
+};
 
 /* ===============================
-   DELETE
+   EXPORT PDF
 ================================ */
-window.askDelete = id => {
-  deleteId = id;
-  document.getElementById("confirmBox").classList.remove("hidden");
-};
+exportPdfBtn.onclick = () => {
+  const pdf = new jsPDF();
+  let y = 10;
 
-window.confirmDelete = async () => {
-  await deleteDoc(doc(db, COLLECTION_NAME, deleteId));
-  closeConfirm();
-};
+  pdf.setFontSize(14);
+  pdf.text("Fiction Library", 10, y);
+  y += 10;
 
-window.closeConfirm = () =>
-  document.getElementById("confirmBox").classList.add("hidden");
+  pdf.setFontSize(10);
+  books.forEach(b => {
+    if (y > 280) {
+      pdf.addPage();
+      y = 10;
+    }
+    pdf.text(`• ${b.title} — ${b.author}`, 10, y);
+    y += 6;
+  });
+
+  pdf.save("fiction-books.pdf");
+};
