@@ -246,16 +246,22 @@ window.closeConfirm = () =>
   document.getElementById("confirmBox").classList.add("hidden");
 
 /* =====================
-   EXPORT JSON
+   EXPORT JSON (IMPROVED STRUCTURE)
 ===================== */
 if (exportJsonBtn) {
   exportJsonBtn.onclick = () => {
     const data = {
+      type: "quotes",
+      version: 1,
       exportedAt: new Date().toISOString(),
+      count: quotes.length,
       quotes: quotes.map(q => ({
+        id: q.id,
         text: q.text,
-        author: q.author || "",
-        createdAt: q.createdAt || null
+        author: (q.author || "").trim(),
+        createdAt: q.createdAt
+          ? new Date(q.createdAt).toISOString()
+          : null
       }))
     };
 
