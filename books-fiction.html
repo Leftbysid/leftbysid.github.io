@@ -2,11 +2,17 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>fiction</title>
+  <title>Fiction</title>
   <link rel="stylesheet" href="books-fiction.css">
 </head>
 
 <body class="books-page">
+
+  <!-- EXPORT CONTROLS -->
+  <div class="export-controls">
+    <button id="exportPdfBtn">Export PDF</button>
+    <button id="exportJsonBtn">Export JSON</button>
+  </div>
 
   <h1 class="title">📚 FICTION ARCHIVE</h1>
 
@@ -79,7 +85,9 @@
     </div>
   </div>
 
+  <!-- PDF LIB -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
   <script type="module" src="books-fiction.js"></script>
 </body>
 </html>
-
