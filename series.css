@@ -2,15 +2,15 @@
    SERIES THEME (NEON YELLOW)
 ========================= */
 body.series {
-  --accent-color: #f5ff00; /* neon yellow */
-  --accent-glow: rgba(245, 255, 0, 0.6);
+  --accent-color: #ffe600;
+  --accent-glow: rgba(255, 230, 0, 0.35);
 }
 
 /* BASE */
 body {
   background: black;
   font-family: 'Share Tech Mono', monospace;
-  color: var(--accent-color);
+  color: #d6d6d6; /* readable base text */
   padding: 20px;
 }
 
@@ -18,7 +18,8 @@ body {
 .title {
   text-align: center;
   margin-bottom: 12px;
-  text-shadow: 0 0 8px var(--accent-glow);
+  color: var(--accent-color);
+  text-shadow: 0 0 6px var(--accent-glow);
 }
 
 /* FILTERS */
@@ -37,17 +38,17 @@ body {
   padding: 6px 16px;
   font-size: 13px;
   cursor: pointer;
-  transition: box-shadow .2s ease, background .2s ease;
+  transition: background .2s ease, box-shadow .2s ease;
 }
 
 .filter:hover {
-  background: rgba(245, 255, 0, .08);
+  background: rgba(255, 230, 0, .08);
 }
 
 .filter.active {
   background: var(--accent-color);
   color: black;
-  box-shadow: 0 0 16px var(--accent-glow);
+  box-shadow: 0 0 10px var(--accent-glow);
 }
 
 /* CONTROLS */
@@ -68,21 +69,19 @@ body {
   background: black;
   color: var(--accent-color);
   border-radius: 6px;
-  box-shadow: 0 0 10px rgba(245, 255, 0, .35);
   font-family: 'Share Tech Mono', monospace;
   letter-spacing: .5px;
-  transition: box-shadow .2s ease, background .2s ease, transform .1s ease;
+  transition: background .2s ease, box-shadow .2s ease, transform .1s ease;
 }
 
 /* ADD BUTTON */
 #toggleForm {
   display: block;
   margin: 16px auto;
-  text-align: center;
   background: linear-gradient(
     90deg,
-    rgba(245, 255, 0, .18),
-    rgba(245, 255, 0, .05)
+    rgba(255, 230, 0, .18),
+    rgba(255, 230, 0, .05)
   );
   text-shadow: 0 0 6px var(--accent-glow);
   cursor: pointer;
@@ -91,13 +90,8 @@ body {
 #toggleForm:hover {
   background: var(--accent-color);
   color: black;
-  box-shadow: 0 0 14px var(--accent-glow);
+  box-shadow: 0 0 12px var(--accent-glow);
   transform: translateY(-1px);
-}
-
-#toggleForm:active {
-  transform: translateY(0);
-  box-shadow: 0 0 6px rgba(245, 255, 0, .4);
 }
 
 /* ADD FORM */
@@ -115,18 +109,12 @@ body {
   }
 }
 
-/* GENRE INPUT */
-#genreInput {
-  width: 100%;
-}
-
 /* SERIES ROW */
 .series-row {
   border: 2px solid var(--accent-color);
   margin: 10px auto;
   max-width: 900px;
   padding: 12px;
-  box-shadow: 0 0 12px rgba(245, 255, 0, .35);
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -142,7 +130,7 @@ body {
 
 .series-text > * {
   padding-bottom: 4px;
-  border-bottom: 1px solid rgba(245, 255, 0, .25);
+  border-bottom: 1px solid rgba(255, 230, 0, .25);
 }
 
 .series-text > *:last-child {
@@ -157,6 +145,7 @@ body {
   border: 1px solid var(--accent-color);
   border-radius: 4px;
   font-size: 12px;
+  color: var(--accent-color);
 }
 
 /* STATUS */
@@ -191,17 +180,17 @@ body {
   font-size: 18px;
   color: var(--accent-color);
   cursor: pointer;
-  opacity: .7;
+  opacity: .75;
 }
 
 .series-actions button:hover {
   opacity: 1;
-  text-shadow: 0 0 10px currentColor;
+  text-shadow: 0 0 8px currentColor;
 }
 
 .series-actions .del-btn:hover {
   color: #ff4d4d;
-  text-shadow: 0 0 10px #ff4d4d;
+  text-shadow: 0 0 8px #ff4d4d;
 }
 
 .seen-toggle {
@@ -231,7 +220,7 @@ body {
   background: black;
   border: 2px solid var(--accent-color);
   padding: 20px;
-  box-shadow: 0 0 15px var(--accent-glow);
+  box-shadow: 0 0 12px var(--accent-glow);
   max-width: 600px;
   width: 100%;
 }
