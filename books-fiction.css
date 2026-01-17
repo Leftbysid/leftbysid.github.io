@@ -337,7 +337,7 @@ body {
 ========================= */
 .home-logo {
   position: fixed;
-  button: 18px;
+  buttom: 18px;
   left: 20px;
 
   font-family: 'Share Tech Mono', monospace;
@@ -393,3 +393,4 @@ body {
 .home-logo:hover::after {
   opacity: 0.6;
 }
+
