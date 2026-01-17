@@ -100,11 +100,11 @@ body {
 
   max-width: 900px;
   margin: 20px auto;
-  padding: 16px;
+  padding: 8px; /* light breathing room only */
 
-  border: 2px solid var(--accent-color);
-  box-shadow: 0 0 18px var(--accent-glow);
-  border-radius: 12px;
+  border: none;
+  box-shadow: none;
+  background: transparent;
 }
 
 #seriesForm input {
