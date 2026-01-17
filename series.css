@@ -240,3 +240,65 @@ body {
 .hidden {
   display: none !important;
 }
+
+/* =========================
+   GLOBAL MATRIX HOME LOGO
+========================= */
+.home-logo {
+  position: fixed;
+  top: 18px;
+  left: 20px;
+
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 22px;
+  letter-spacing: 1px;
+
+  color: #00ff9c; /* MATRIX GREEN */
+  text-decoration: none;
+
+  opacity: 0.75;
+  z-index: 1000;
+
+  transition:
+    opacity .2s ease,
+    text-shadow .2s ease,
+    transform .2s ease;
+}
+
+/* hover glow */
+.home-logo:hover {
+  opacity: 1;
+  text-shadow:
+    0 0 6px rgba(0,255,156,.6),
+    0 0 14px rgba(0,255,156,.35);
+  transform: translateY(-1px);
+}
+
+/* blinking cursor */
+.home-logo .cursor {
+  display: inline-block;
+  animation: cursorBlink 1.2s steps(1) infinite;
+}
+
+/* cursor animation */
+@keyframes cursorBlink {
+  50% { opacity: 0; }
+}
+
+/* =========================
+   TOOLTIP
+========================= */
+.home-logo::after {
+  content: " dashboard";
+  font-size: 12px;
+  margin-left: 6px;
+  opacity: 0;
+  color: #00ff9c;
+  white-space: nowrap;
+
+  transition: opacity .2s ease;
+}
+
+.home-logo:hover::after {
+  opacity: 0.6;
+}
