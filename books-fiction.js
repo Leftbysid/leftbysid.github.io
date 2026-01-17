@@ -1,19 +1,23 @@
 /* ===============================
-   IMPORTS
+   IMPORTS (MUST BE FIRST)
 ================================ */
 import { auth, db } from "./firebase.js";
 import {
   collection, addDoc, deleteDoc, updateDoc,
   doc, query, where, onSnapshot
 } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-firestore.js";
-import { onAuthStateChanged } from
-  "https://www.gstatic.com/firebasejs/12.7.0/firebase-auth.js";
+import { onAuthStateChanged }
+  from "https://www.gstatic.com/firebasejs/12.7.0/firebase-auth.js";
 import { requireAuth } from "./auth-guard.js";
 
-const { jsPDF } = window.jspdf;
-
+/* ===============================
+   ROUTE GUARD
+================================ */
 requireAuth();
 
+/* ===============================
+   FIRESTORE COLLECTION
+================================ */
 const COLLECTION_NAME = "books_fiction";
 
 /* ===============================
@@ -30,14 +34,13 @@ let sortMode = "recent";
 /* ===============================
    ELEMENTS
 ================================ */
-const bookList = document.getElementById("bookList");
-const searchInput = document.getElementById("search");
-const bookForm = document.getElementById("bookForm");
-
 const titleInput = document.getElementById("title");
 const authorInput = document.getElementById("author");
 const categoryInput = document.getElementById("category");
 const dateInput = document.getElementById("date");
+const bookList = document.getElementById("bookList");
+const searchInput = document.getElementById("search");
+const bookForm = document.getElementById("bookForm");
 
 const recentBtn = document.getElementById("recentBtn");
 const filterSelect = document.getElementById("filterSelect");
@@ -52,10 +55,17 @@ const editAuthor = document.getElementById("editAuthor");
 const editCategory = document.getElementById("editCategory");
 const editDate = document.getElementById("editDate");
 
-const confirmBox = document.getElementById("confirmBox");
-
+/* EXPORT BUTTONS */
 const exportJsonBtn = document.getElementById("exportJsonBtn");
 const exportPdfBtn = document.getElementById("exportPdfBtn");
+
+/* ===============================
+   UI INIT
+================================ */
+document.querySelector(".title").textContent = "📖 FICTION ARCHIVE";
+
+document.getElementById("toggleForm").onclick =
+  () => bookForm.classList.toggle("hidden");
 
 /* ===============================
    AUTH
@@ -65,6 +75,43 @@ onAuthStateChanged(auth, user => {
   currentUser = user;
   loadBooks();
 });
+
+/* ===============================
+   ADD BOOK
+================================ */
+window.addBook = async () => {
+  if (!titleInput.value || !authorInput.value) return;
+
+  const newTitle = titleInput.value.trim().toLowerCase();
+  const newAuthor = authorInput.value.trim().toLowerCase();
+
+  const exists = books.some(b =>
+    (b.title || "").toLowerCase() === newTitle &&
+    (b.author || "").toLowerCase() === newAuthor
+  );
+
+  if (exists) {
+    alert("This book already exists in your library.");
+    return;
+  }
+
+  await addDoc(collection(db, COLLECTION_NAME), {
+    uid: currentUser.uid,
+    title: titleInput.value.trim(),
+    author: authorInput.value.trim(),
+    category: categoryInput.value.trim(),
+    date: dateInput.value,
+    read: false,
+    owned: false,
+    createdAt: Date.now()
+  });
+
+  bookForm.classList.add("hidden");
+  titleInput.value = "";
+  authorInput.value = "";
+  categoryInput.value = "";
+  dateInput.value = "";
+};
 
 /* ===============================
    LOAD BOOKS
@@ -82,15 +129,17 @@ function loadBooks() {
 }
 
 /* ===============================
-   VIEW
+   VIEW LOGIC
 ================================ */
 function applyView() {
   let list = [...books];
 
-  if (currentFilter === "owned") list = list.filter(b => b.owned);
-  if (currentFilter === "not-owned") list = list.filter(b => !b.owned);
-  if (currentFilter === "read") list = list.filter(b => b.read);
-  if (currentFilter === "not-read") list = list.filter(b => !b.read);
+  switch (currentFilter) {
+    case "owned": list = list.filter(b => b.owned); break;
+    case "not-owned": list = list.filter(b => !b.owned); break;
+    case "read": list = list.filter(b => b.read); break;
+    case "not-read": list = list.filter(b => !b.read); break;
+  }
 
   if (sortMode === "recent") {
     list.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
@@ -100,14 +149,44 @@ function applyView() {
 }
 
 /* ===============================
+   CONTROLS
+================================ */
+recentBtn.onclick = () => {
+  sortMode = "recent";
+  currentFilter = "all";
+  filterSelect.value = "all";
+  applyView();
+};
+
+filterSelect.onchange = () => {
+  currentFilter = filterSelect.value;
+  sortMode = "none";
+  applyView();
+};
+
+/* ===============================
+   SEARCH
+================================ */
+searchInput.oninput = () => {
+  const q = searchInput.value.toLowerCase();
+  renderBooks(
+    books.filter(b =>
+      b.title.toLowerCase().includes(q) ||
+      b.author.toLowerCase().includes(q) ||
+      (b.category || "").toLowerCase().includes(q)
+    )
+  );
+};
+
+/* ===============================
    RENDER
 ================================ */
 function renderBooks(list) {
   bookList.innerHTML = "";
 
   list.forEach(b => {
-    bookList.insertAdjacentHTML("beforeend", `
-      <div class="book-row-wrapper" data-id="${b.id}">
+    bookList.innerHTML += `
+      <div class="book-row-wrapper">
         <span class="owned-icon ${b.owned ? "owned" : ""}">📘</span>
 
         <div class="book-row ${b.read ? "read" : ""}">
@@ -125,13 +204,17 @@ function renderBooks(list) {
         </div>
 
         <div class="book-actions">
-          <input type="checkbox" class="owned-toggle" ${b.owned ? "checked" : ""}>
-          <button class="read-toggle">${b.read ? "✅" : "⬜"}</button>
-          <button class="edit-btn">✏️</button>
-          <button class="delete-btn">🗑️</button>
+          <input type="checkbox"
+            ${b.owned ? "checked" : ""}
+            onchange="toggleOwned('${b.id}', this.checked)">
+          <button onclick="toggleRead('${b.id}', ${b.read})">
+            ${b.read ? "✅" : "⬜"}
+          </button>
+          <button onclick="editBook('${b.id}')">✏️</button>
+          <button onclick="askDelete('${b.id}')">🗑️</button>
         </div>
       </div>
-    `);
+    `;
   });
 
   totalCount.textContent = list.length;
@@ -140,99 +223,63 @@ function renderBooks(list) {
 }
 
 /* ===============================
-   EVENTS (SAFE)
+   TOGGLES
 ================================ */
-bookList.addEventListener("click", async e => {
-  const wrapper = e.target.closest(".book-row-wrapper");
-  if (!wrapper) return;
+window.toggleRead = async (id, current) =>
+  updateDoc(doc(db, COLLECTION_NAME, id), { read: !current });
 
-  const id = wrapper.dataset.id;
-  const book = books.find(b => b.id === id);
-  if (!book) return;
-
-  if (e.target.classList.contains("read-toggle")) {
-    await updateDoc(doc(db, COLLECTION_NAME, id), { read: !book.read });
-  }
-
-  if (e.target.classList.contains("edit-btn")) {
-    editingId = id;
-    editTitle.value = book.title;
-    editAuthor.value = book.author;
-    editCategory.value = book.category || "";
-    editDate.value = book.date || "";
-    editOverlay.classList.remove("hidden");
-  }
-
-  if (e.target.classList.contains("delete-btn")) {
-    deleteId = id;
-    confirmBox.classList.remove("hidden");
-  }
-});
-
-bookList.addEventListener("change", async e => {
-  if (!e.target.classList.contains("owned-toggle")) return;
-
-  const wrapper = e.target.closest(".book-row-wrapper");
-  if (!wrapper) return;
-
-  await updateDoc(
-    doc(db, COLLECTION_NAME, wrapper.dataset.id),
-    { owned: e.target.checked }
-  );
-});
+window.toggleOwned = async (id, value) =>
+  updateDoc(doc(db, COLLECTION_NAME, id), { owned: value });
 
 /* ===============================
    EDIT
 ================================ */
-window.saveEdit = async () => {
-  if (!editingId) return;
+window.editBook = id => {
+  const b = books.find(x => x.id === id);
+  editingId = id;
+  editTitle.value = b.title;
+  editAuthor.value = b.author;
+  editCategory.value = b.category || "";
+  editDate.value = b.date || "";
+  editOverlay.classList.remove("hidden");
+};
 
+window.saveEdit = async () => {
   await updateDoc(doc(db, COLLECTION_NAME, editingId), {
-    title: editTitle.value.trim(),
-    author: editAuthor.value.trim(),
-    category: editCategory.value.trim(),
+    title: editTitle.value,
+    author: editAuthor.value,
+    category: editCategory.value,
     date: editDate.value
   });
-
   editOverlay.classList.add("hidden");
-  editingId = null;
 };
 
-window.closeEdit = () => {
+window.closeEdit = () =>
   editOverlay.classList.add("hidden");
-  editingId = null;
-};
 
 /* ===============================
    DELETE
 ================================ */
+window.askDelete = id => {
+  deleteId = id;
+  document.getElementById("confirmBox").classList.remove("hidden");
+};
+
 window.confirmDelete = async () => {
-  if (!deleteId) return;
-
   await deleteDoc(doc(db, COLLECTION_NAME, deleteId));
-  confirmBox.classList.add("hidden");
-  deleteId = null;
+  closeConfirm();
 };
 
-window.closeConfirm = () => {
-  confirmBox.classList.add("hidden");
-  deleteId = null;
-};
+window.closeConfirm = () =>
+  document.getElementById("confirmBox").classList.add("hidden");
 
 /* ===============================
-   EXPORTS
+   EXPORT JSON
 ================================ */
 exportJsonBtn.onclick = () => {
   const data = {
     exportedAt: new Date().toISOString(),
-    fiction: books.map(b => ({
-      title: b.title,
-      author: b.author,
-      category: b.category || "",
-      date: b.date || "",
-      read: b.read,
-      owned: b.owned
-    }))
+    fiction: books.map(({ id, uid, ...rest }) => rest)
   };
 
   const blob = new Blob([JSON.stringify(data, null, 2)], {
@@ -245,16 +292,25 @@ exportJsonBtn.onclick = () => {
   a.click();
 };
 
+/* ===============================
+   EXPORT PDF
+================================ */
 exportPdfBtn.onclick = () => {
+  const { jsPDF } = window.jspdf;
   const pdf = new jsPDF();
-  let y = 10;
-  pdf.text("Fiction Library", 10, y);
+  let y = 12;
+
+  pdf.text("FICTION BOOKS", 10, y);
   y += 10;
 
-  books.forEach(b => {
-    if (y > 280) { pdf.addPage(); y = 10; }
-    pdf.text(`• ${b.title} — ${b.author}`, 10, y);
-    y += 6;
+  books.forEach((b, i) => {
+    const line = `${i + 1}. ${b.title} — ${b.author}`;
+    pdf.text(line, 10, y);
+    y += 8;
+    if (y > 280) {
+      pdf.addPage();
+      y = 12;
+    }
   });
 
   pdf.save("fiction-books.pdf");
