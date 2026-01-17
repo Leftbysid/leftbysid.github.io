@@ -4,7 +4,7 @@
 import { auth, db } from "./firebase.js";
 import {
   collection, addDoc, deleteDoc, updateDoc,
-  doc, query, where, onSnapshot
+  doc, query, where, onSnapshot, getDocs
 } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-firestore.js";
 import { onAuthStateChanged }
   from "https://www.gstatic.com/firebasejs/12.7.0/firebase-auth.js";
@@ -55,6 +55,10 @@ const editAuthor = document.getElementById("editAuthor");
 const editCategory = document.getElementById("editCategory");
 const editDate = document.getElementById("editDate");
 
+/* EXPORT BUTTONS */
+const exportJsonBtn = document.getElementById("exportJsonBtn");
+const exportPdfBtn = document.getElementById("exportPdfBtn");
+
 /* 🔹 SUGGESTION BOXES */
 const authorSuggestions = document.getElementById("authorSuggestions");
 const categorySuggestions = document.getElementById("categorySuggestions");
@@ -85,11 +89,10 @@ window.addBook = async () => {
   const newTitle = titleInput.value.trim().toLowerCase();
   const newAuthor = authorInput.value.trim().toLowerCase();
 
-  const exists = books.some(b => {
-    const t = (b.title || "").trim().toLowerCase();
-    const a = (b.author || "").trim().toLowerCase();
-    return t === newTitle && a === newAuthor;
-  });
+  const exists = books.some(b =>
+    (b.title || "").toLowerCase() === newTitle &&
+    (b.author || "").toLowerCase() === newAuthor
+  );
 
   if (exists) {
     alert("This book already exists in your library.");
@@ -100,7 +103,7 @@ window.addBook = async () => {
     uid: currentUser.uid,
     title: titleInput.value.trim(),
     author: authorInput.value.trim(),
-    category: categoryInput ? categoryInput.value.trim() : "",
+    category: categoryInput.value.trim(),
     date: dateInput.value,
     read: false,
     owned: false,
@@ -110,8 +113,8 @@ window.addBook = async () => {
   bookForm.classList.add("hidden");
   titleInput.value = "";
   authorInput.value = "";
+  categoryInput.value = "";
   dateInput.value = "";
-  if (categoryInput) categoryInput.value = "";
 };
 
 /* ===============================
@@ -275,53 +278,44 @@ window.closeConfirm = () =>
   document.getElementById("confirmBox").classList.add("hidden");
 
 /* ===============================
-   🔹 SUGGESTION LOGIC (ADDED ONLY)
+   EXPORT JSON
 ================================ */
-function showSuggestions(inputEl, boxEl, values) {
-  const q = inputEl.value.trim().toLowerCase();
-  if (!q) {
-    boxEl.classList.add("hidden");
-    return;
-  }
+exportJsonBtn.onclick = () => {
+  const data = {
+    exportedAt: new Date().toISOString(),
+    nonFiction: books.map(({ id, uid, ...rest }) => rest)
+  };
 
-  const matches = [...new Set(values)]
-    .filter(v => v.toLowerCase().startsWith(q))
-    .slice(0, 5);
-
-  if (!matches.length) {
-    boxEl.classList.add("hidden");
-    return;
-  }
-
-  boxEl.innerHTML = "";
-  matches.forEach(v => {
-    const div = document.createElement("div");
-    div.textContent = v;
-    div.onclick = () => {
-      inputEl.value = v;
-      boxEl.classList.add("hidden");
-    };
-    boxEl.appendChild(div);
+  const blob = new Blob([JSON.stringify(data, null, 2)], {
+    type: "application/json"
   });
 
-  boxEl.classList.remove("hidden");
-}
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "non-fiction-books.json";
+  a.click();
+};
 
-authorInput.addEventListener("input", () => {
-  const authors = books.map(b => b.author).filter(Boolean);
-  showSuggestions(authorInput, authorSuggestions, authors);
-});
+/* ===============================
+   EXPORT PDF
+================================ */
+exportPdfBtn.onclick = () => {
+  const { jsPDF } = window.jspdf;
+  const pdf = new jsPDF();
+  let y = 12;
 
-categoryInput.addEventListener("input", () => {
-  const categories = books.map(b => b.category).filter(Boolean);
-  showSuggestions(categoryInput, categorySuggestions, categories);
-});
+  pdf.text("NON-FICTION BOOKS", 10, y);
+  y += 10;
 
-document.addEventListener("click", e => {
-  if (!authorSuggestions.contains(e.target) && e.target !== authorInput) {
-    authorSuggestions.classList.add("hidden");
-  }
-  if (!categorySuggestions.contains(e.target) && e.target !== categoryInput) {
-    categorySuggestions.classList.add("hidden");
-  }
-});
+  books.forEach((b, i) => {
+    const line = `${i + 1}. ${b.title} — ${b.author}`;
+    pdf.text(line, 10, y);
+    y += 8;
+    if (y > 280) {
+      pdf.addPage();
+      y = 12;
+    }
+  });
+
+  pdf.save("non-fiction-books.pdf");
+};
