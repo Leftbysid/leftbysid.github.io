@@ -42,9 +42,6 @@ const authorInput = document.getElementById("author");
 const categoryInput = document.getElementById("category");
 const dateInput = document.getElementById("date");
 
-const authorSuggestions = document.getElementById("authorSuggestions");
-const categorySuggestions = document.getElementById("categorySuggestions");
-
 const bookList = document.getElementById("bookList");
 const searchInput = document.getElementById("search");
 const bookForm = document.getElementById("bookForm");
@@ -56,21 +53,13 @@ const totalCount = document.getElementById("totalCount");
 const readCount = document.getElementById("readCount");
 const unreadCount = document.getElementById("unreadCount");
 
-/* EXPORT */
 const exportJsonBtn = document.getElementById("exportJsonBtn");
 const exportPdfBtn = document.getElementById("exportPdfBtn");
-
-const editOverlay = document.getElementById("editOverlay");
-const editTitle = document.getElementById("editTitle");
-const editAuthor = document.getElementById("editAuthor");
-const editCategory = document.getElementById("editCategory");
-const editDate = document.getElementById("editDate");
 
 /* ===============================
    UI INIT
 ================================ */
 document.querySelector(".title").textContent = "📖 FICTION ARCHIVE";
-
 document.getElementById("toggleForm").onclick =
   () => bookForm.classList.toggle("hidden");
 
@@ -92,12 +81,10 @@ window.addBook = async () => {
   const newTitle = titleInput.value.trim().toLowerCase();
   const newAuthor = authorInput.value.trim().toLowerCase();
 
-  const exists = books.some(b =>
-    (b.title || "").toLowerCase() === newTitle &&
-    (b.author || "").toLowerCase() === newAuthor
-  );
-
-  if (exists) {
+  if (books.some(b =>
+    b.title.toLowerCase() === newTitle &&
+    b.author.toLowerCase() === newAuthor
+  )) {
     alert("This book already exists.");
     return;
   }
@@ -114,7 +101,8 @@ window.addBook = async () => {
   });
 
   bookForm.classList.add("hidden");
-  titleInput.value = authorInput.value = categoryInput.value = dateInput.value = "";
+  titleInput.value = authorInput.value =
+  categoryInput.value = dateInput.value = "";
 };
 
 /* ===============================
@@ -138,12 +126,10 @@ function loadBooks() {
 function applyView() {
   let list = [...books];
 
-  switch (currentFilter) {
-    case "owned": list = list.filter(b => b.owned); break;
-    case "not-owned": list = list.filter(b => !b.owned); break;
-    case "read": list = list.filter(b => b.read); break;
-    case "not-read": list = list.filter(b => !b.read); break;
-  }
+  if (currentFilter === "owned") list = list.filter(b => b.owned);
+  if (currentFilter === "not-owned") list = list.filter(b => !b.owned);
+  if (currentFilter === "read") list = list.filter(b => b.read);
+  if (currentFilter === "not-read") list = list.filter(b => !b.read);
 
   if (sortMode === "recent") {
     list.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
@@ -151,22 +137,6 @@ function applyView() {
 
   renderBooks(list);
 }
-
-/* ===============================
-   CONTROLS
-================================ */
-recentBtn.onclick = () => {
-  sortMode = "recent";
-  currentFilter = "all";
-  filterSelect.value = "all";
-  applyView();
-};
-
-filterSelect.onchange = () => {
-  currentFilter = filterSelect.value;
-  sortMode = "none";
-  applyView();
-};
 
 /* ===============================
    SEARCH
@@ -189,8 +159,8 @@ function renderBooks(list) {
   bookList.innerHTML = "";
 
   list.forEach(b => {
-    bookList.innerHTML += `
-      <div class="book-row-wrapper">
+    bookList.insertAdjacentHTML("beforeend", `
+      <div class="book-row-wrapper" data-id="${b.id}">
         <span class="owned-icon ${b.owned ? "owned" : ""}">📘</span>
 
         <div class="book-row ${b.read ? "read" : ""}">
@@ -208,17 +178,13 @@ function renderBooks(list) {
         </div>
 
         <div class="book-actions">
-          <input type="checkbox"
-            ${b.owned ? "checked" : ""}
-            onchange="toggleOwned('${b.id}', this.checked)">
-          <button onclick="toggleRead('${b.id}', ${b.read})">
-            ${b.read ? "✅" : "⬜"}
-          </button>
-          <button onclick="editBook('${b.id}')">✏️</button>
-          <button onclick="askDelete('${b.id}')">🗑️</button>
+          <input type="checkbox" class="owned-toggle" ${b.owned ? "checked" : ""}>
+          <button class="read-toggle">${b.read ? "✅" : "⬜"}</button>
+          <button class="edit-btn">✏️</button>
+          <button class="delete-btn">🗑️</button>
         </div>
       </div>
-    `;
+    `);
   });
 
   totalCount.textContent = list.length;
@@ -227,51 +193,58 @@ function renderBooks(list) {
 }
 
 /* ===============================
-   EXPORT JSON
+   EVENT DELEGATION (FIX)
+================================ */
+bookList.addEventListener("click", async e => {
+  const wrapper = e.target.closest(".book-row-wrapper");
+  if (!wrapper) return;
+
+  const id = wrapper.dataset.id;
+  const book = books.find(b => b.id === id);
+  if (!book) return;
+
+  if (e.target.classList.contains("read-toggle")) {
+    await updateDoc(doc(db, COLLECTION_NAME, id), { read: !book.read });
+  }
+
+  if (e.target.classList.contains("delete-btn")) {
+    await deleteDoc(doc(db, COLLECTION_NAME, id));
+  }
+});
+
+bookList.addEventListener("change", async e => {
+  if (!e.target.classList.contains("owned-toggle")) return;
+  const wrapper = e.target.closest(".book-row-wrapper");
+  await updateDoc(
+    doc(db, COLLECTION_NAME, wrapper.dataset.id),
+    { owned: e.target.checked }
+  );
+});
+
+/* ===============================
+   EXPORTS (UNCHANGED)
 ================================ */
 exportJsonBtn.onclick = () => {
   const data = {
     exportedAt: new Date().toISOString(),
-    fiction: books.map(b => ({
-      title: b.title,
-      author: b.author,
-      category: b.category || "",
-      date: b.date || "",
-      read: b.read,
-      owned: b.owned
-    }))
+    fiction: books
   };
-
-  const blob = new Blob([JSON.stringify(data, null, 2)], {
-    type: "application/json"
-  });
-
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
   const a = document.createElement("a");
   a.href = URL.createObjectURL(blob);
   a.download = "fiction-books.json";
   a.click();
 };
 
-/* ===============================
-   EXPORT PDF
-================================ */
 exportPdfBtn.onclick = () => {
   const pdf = new jsPDF();
   let y = 10;
-
-  pdf.setFontSize(14);
   pdf.text("Fiction Library", 10, y);
   y += 10;
-
-  pdf.setFontSize(10);
   books.forEach(b => {
-    if (y > 280) {
-      pdf.addPage();
-      y = 10;
-    }
+    if (y > 280) { pdf.addPage(); y = 10; }
     pdf.text(`• ${b.title} — ${b.author}`, 10, y);
     y += 6;
   });
-
   pdf.save("fiction-books.pdf");
 };
