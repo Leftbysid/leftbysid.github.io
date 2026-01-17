@@ -1,26 +1,19 @@
 /* ===============================
-   IMPORTS (MUST BE FIRST)
+   IMPORTS
 ================================ */
 import { auth, db } from "./firebase.js";
 import {
   collection, addDoc, deleteDoc, updateDoc,
   doc, query, where, onSnapshot
 } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-firestore.js";
-import { onAuthStateChanged }
-  from "https://www.gstatic.com/firebasejs/12.7.0/firebase-auth.js";
+import { onAuthStateChanged } from
+  "https://www.gstatic.com/firebasejs/12.7.0/firebase-auth.js";
 import { requireAuth } from "./auth-guard.js";
 
-/* PDF */
 const { jsPDF } = window.jspdf;
 
-/* ===============================
-   ROUTE GUARD
-================================ */
 requireAuth();
 
-/* ===============================
-   FIRESTORE COLLECTION
-================================ */
 const COLLECTION_NAME = "books_fiction";
 
 /* ===============================
@@ -37,14 +30,14 @@ let sortMode = "recent";
 /* ===============================
    ELEMENTS
 ================================ */
+const bookList = document.getElementById("bookList");
+const searchInput = document.getElementById("search");
+const bookForm = document.getElementById("bookForm");
+
 const titleInput = document.getElementById("title");
 const authorInput = document.getElementById("author");
 const categoryInput = document.getElementById("category");
 const dateInput = document.getElementById("date");
-
-const bookList = document.getElementById("bookList");
-const searchInput = document.getElementById("search");
-const bookForm = document.getElementById("bookForm");
 
 const recentBtn = document.getElementById("recentBtn");
 const filterSelect = document.getElementById("filterSelect");
@@ -53,15 +46,16 @@ const totalCount = document.getElementById("totalCount");
 const readCount = document.getElementById("readCount");
 const unreadCount = document.getElementById("unreadCount");
 
+const editOverlay = document.getElementById("editOverlay");
+const editTitle = document.getElementById("editTitle");
+const editAuthor = document.getElementById("editAuthor");
+const editCategory = document.getElementById("editCategory");
+const editDate = document.getElementById("editDate");
+
+const confirmBox = document.getElementById("confirmBox");
+
 const exportJsonBtn = document.getElementById("exportJsonBtn");
 const exportPdfBtn = document.getElementById("exportPdfBtn");
-
-/* ===============================
-   UI INIT
-================================ */
-document.querySelector(".title").textContent = "📖 FICTION ARCHIVE";
-document.getElementById("toggleForm").onclick =
-  () => bookForm.classList.toggle("hidden");
 
 /* ===============================
    AUTH
@@ -71,39 +65,6 @@ onAuthStateChanged(auth, user => {
   currentUser = user;
   loadBooks();
 });
-
-/* ===============================
-   ADD BOOK
-================================ */
-window.addBook = async () => {
-  if (!titleInput.value || !authorInput.value) return;
-
-  const newTitle = titleInput.value.trim().toLowerCase();
-  const newAuthor = authorInput.value.trim().toLowerCase();
-
-  if (books.some(b =>
-    b.title.toLowerCase() === newTitle &&
-    b.author.toLowerCase() === newAuthor
-  )) {
-    alert("This book already exists.");
-    return;
-  }
-
-  await addDoc(collection(db, COLLECTION_NAME), {
-    uid: currentUser.uid,
-    title: titleInput.value.trim(),
-    author: authorInput.value.trim(),
-    category: categoryInput.value.trim(),
-    date: dateInput.value,
-    read: false,
-    owned: false,
-    createdAt: Date.now()
-  });
-
-  bookForm.classList.add("hidden");
-  titleInput.value = authorInput.value =
-  categoryInput.value = dateInput.value = "";
-};
 
 /* ===============================
    LOAD BOOKS
@@ -137,20 +98,6 @@ function applyView() {
 
   renderBooks(list);
 }
-
-/* ===============================
-   SEARCH
-================================ */
-searchInput.oninput = () => {
-  const q = searchInput.value.toLowerCase();
-  renderBooks(
-    books.filter(b =>
-      b.title.toLowerCase().includes(q) ||
-      b.author.toLowerCase().includes(q) ||
-      (b.category || "").toLowerCase().includes(q)
-    )
-  );
-};
 
 /* ===============================
    RENDER
@@ -193,7 +140,7 @@ function renderBooks(list) {
 }
 
 /* ===============================
-   EVENT DELEGATION (FIX)
+   EVENTS (SAFE)
 ================================ */
 bookList.addEventListener("click", async e => {
   const wrapper = e.target.closest(".book-row-wrapper");
@@ -207,14 +154,27 @@ bookList.addEventListener("click", async e => {
     await updateDoc(doc(db, COLLECTION_NAME, id), { read: !book.read });
   }
 
+  if (e.target.classList.contains("edit-btn")) {
+    editingId = id;
+    editTitle.value = book.title;
+    editAuthor.value = book.author;
+    editCategory.value = book.category || "";
+    editDate.value = book.date || "";
+    editOverlay.classList.remove("hidden");
+  }
+
   if (e.target.classList.contains("delete-btn")) {
-    await deleteDoc(doc(db, COLLECTION_NAME, id));
+    deleteId = id;
+    confirmBox.classList.remove("hidden");
   }
 });
 
 bookList.addEventListener("change", async e => {
   if (!e.target.classList.contains("owned-toggle")) return;
+
   const wrapper = e.target.closest(".book-row-wrapper");
+  if (!wrapper) return;
+
   await updateDoc(
     doc(db, COLLECTION_NAME, wrapper.dataset.id),
     { owned: e.target.checked }
@@ -222,14 +182,63 @@ bookList.addEventListener("change", async e => {
 });
 
 /* ===============================
-   EXPORTS (UNCHANGED)
+   EDIT
+================================ */
+window.saveEdit = async () => {
+  if (!editingId) return;
+
+  await updateDoc(doc(db, COLLECTION_NAME, editingId), {
+    title: editTitle.value.trim(),
+    author: editAuthor.value.trim(),
+    category: editCategory.value.trim(),
+    date: editDate.value
+  });
+
+  editOverlay.classList.add("hidden");
+  editingId = null;
+};
+
+window.closeEdit = () => {
+  editOverlay.classList.add("hidden");
+  editingId = null;
+};
+
+/* ===============================
+   DELETE
+================================ */
+window.confirmDelete = async () => {
+  if (!deleteId) return;
+
+  await deleteDoc(doc(db, COLLECTION_NAME, deleteId));
+  confirmBox.classList.add("hidden");
+  deleteId = null;
+};
+
+window.closeConfirm = () => {
+  confirmBox.classList.add("hidden");
+  deleteId = null;
+};
+
+/* ===============================
+   EXPORTS
 ================================ */
 exportJsonBtn.onclick = () => {
   const data = {
     exportedAt: new Date().toISOString(),
-    fiction: books
+    fiction: books.map(b => ({
+      title: b.title,
+      author: b.author,
+      category: b.category || "",
+      date: b.date || "",
+      read: b.read,
+      owned: b.owned
+    }))
   };
-  const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+
+  const blob = new Blob([JSON.stringify(data, null, 2)], {
+    type: "application/json"
+  });
+
   const a = document.createElement("a");
   a.href = URL.createObjectURL(blob);
   a.download = "fiction-books.json";
@@ -241,10 +250,12 @@ exportPdfBtn.onclick = () => {
   let y = 10;
   pdf.text("Fiction Library", 10, y);
   y += 10;
+
   books.forEach(b => {
     if (y > 280) { pdf.addPage(); y = 10; }
     pdf.text(`• ${b.title} — ${b.author}`, 10, y);
     y += 6;
   });
+
   pdf.save("fiction-books.pdf");
 };
