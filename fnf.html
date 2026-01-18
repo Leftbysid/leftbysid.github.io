@@ -4,13 +4,16 @@
   <meta charset="UTF-8">
   <title>Choose Your Library</title>
   <link rel="stylesheet" href="fnf.css">
+
+  <!-- Preload animated GIF for instant hover -->
+  <link rel="preload" as="image" href="assets/cat.gif">
 </head>
 <body>
 
+<!-- DASHBOARD GIF BUTTON -->
 <a href="dashboard.html" class="home-gif" aria-label="Go to dashboard">
   <img src="assets/cat.png" data-anim="assets/cat.gif" alt="">
 </a>
-
 
 <!-- Matrix rain -->
 <canvas id="matrix"></canvas>
@@ -18,7 +21,7 @@
 <!-- Background image -->
 <img id="matrixBg" src="Morpheus.png" alt="">
 
-<!-- Ripple canvas (above image & rain, below buttons) -->
+<!-- Ripple canvas -->
 <canvas id="ripples"></canvas>
 
 <!-- Choices -->
@@ -31,5 +34,23 @@
 <button id="musicBtn" aria-label="Toggle music">▶</button>
 
 <script src="fnf-matrix.js"></script>
+
+<!-- 🔥 REQUIRED: HOVER-ONLY GIF LOGIC -->
+<script>
+  document.querySelectorAll('.home-gif img').forEach(img => {
+    const staticSrc = img.src;
+    const animatedSrc = img.dataset.anim;
+
+    img.addEventListener('mouseenter', () => {
+      // force reload so GIF animation starts
+      img.src = animatedSrc + '?t=' + Date.now();
+    });
+
+    img.addEventListener('mouseleave', () => {
+      img.src = staticSrc;
+    });
+  });
+</script>
+
 </body>
 </html>
