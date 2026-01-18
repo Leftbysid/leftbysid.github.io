@@ -148,15 +148,9 @@ if (music && musicBtn) {
     const animatedSrc = img.dataset.anim;
 
     img.addEventListener('mouseenter', () => {
-      img.src = animatedSrc;
+      // force reload so animation restarts
+      img.src = animatedSrc + '?t=' + Date.now();
     });
-
-    img.addEventListener('mouseleave', () => {
-      img.src = staticSrc;
-    });
-  });
-</script>
-
 
     img.addEventListener('mouseleave', () => {
       img.src = staticSrc;
