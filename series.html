@@ -4,12 +4,16 @@
   <meta charset="UTF-8">
   <title>Series Archive</title>
   <link rel="stylesheet" href="series.css">
+
+  <!-- Preload animated GIF for instant hover -->
+  <link rel="preload" as="image" href="assets/cat.gif">
 </head>
 
-<!-- ✅ FIX: body now has correct class -->
 <body class="series">
-<a href="stuffs.html" class="home-logo" aria-label="Click if Gay">
-  &gt;<span class="cursor">_</span>
+
+<!-- DASHBOARD GIF BUTTON -->
+<a href="stuffs.html" class="home-gif" aria-label="Go to dashboard">
+  <img src="assets/cat.png" data-anim="assets/cat.gif" alt="">
 </a>
 
 <h1 class="title">📺 SERIES ARCHIVE</h1>
@@ -40,7 +44,7 @@
     required
   >
 
-  <!-- GENRE INPUT (DATALIST STYLE) -->
+  <!-- GENRE INPUT -->
   <input
     id="genreInput"
     list="genreList"
@@ -71,7 +75,6 @@
 
     <input id="editName">
 
-    <!-- YEAR EDIT -->
     <input
       id="editYear"
       type="number"
@@ -89,5 +92,24 @@
 </div>
 
 <script type="module" src="series.js"></script>
+
+<!-- 🔥 REQUIRED: HOVER-ONLY GIF LOGIC -->
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('.home-gif img').forEach(img => {
+      const staticSrc = img.src;
+      const animatedSrc = img.dataset.anim;
+
+      img.addEventListener('mouseenter', () => {
+        img.src = animatedSrc + '?t=' + Date.now();
+      });
+
+      img.addEventListener('mouseleave', () => {
+        img.src = staticSrc;
+      });
+    });
+  });
+</script>
+
 </body>
 </html>
