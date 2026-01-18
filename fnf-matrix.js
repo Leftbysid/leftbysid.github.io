@@ -142,18 +142,3 @@ if (music && musicBtn) {
   });
 }
 
-<script>
-  document.querySelectorAll('.home-gif img').forEach(img => {
-    const staticSrc = img.src;
-    const animatedSrc = img.dataset.anim;
-
-    img.addEventListener('mouseenter', () => {
-      // force reload so animation restarts
-      img.src = animatedSrc + '?t=' + Date.now();
-    });
-
-    img.addEventListener('mouseleave', () => {
-      img.src = staticSrc;
-    });
-  });
-</script>
