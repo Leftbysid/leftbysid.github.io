@@ -149,6 +149,9 @@ body {
   color: black;
 }
 
+/* =========================
+   GIF DASHBOARD BUTTON
+========================= */
 .home-gif {
   position: fixed;
   bottom: 18px;
@@ -160,12 +163,14 @@ body {
 }
 
 .home-gif img {
-  width: 40px;   /* scale 200x200 → 40x40 */
+  width: 40px;      /* scales your 200x200 image */
   height: auto;
   display: block;
 }
 
+/* hover feedback */
 .home-gif:hover {
   opacity: 1;
   transform: scale(1.08);
 }
+
