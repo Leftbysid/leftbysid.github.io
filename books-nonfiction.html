@@ -4,11 +4,16 @@
   <meta charset="UTF-8">
   <title>Non-Fiction</title>
   <link rel="stylesheet" href="books-nonfiction.css">
+
+  <!-- Preload animated GIF for instant hover -->
+  <link rel="preload" as="image" href="assets/cat.gif">
 </head>
 
 <body class="books-page">
-<a href="fnf.html" class="home-logo" aria-label="Go to dashboard">
-  &gt;<span class="cursor">_</span>
+
+<!-- DASHBOARD GIF BUTTON -->
+<a href="fnf.html" class="home-gif" aria-label="Go to dashboard">
+  <img src="assets/cat.png" data-anim="assets/cat.gif" alt="">
 </a>
 
   <h1 class="title">📚 NON-FICTION ARCHIVE</h1>
@@ -28,7 +33,6 @@
 
   <div class="controls">
     <input id="search" placeholder="Search books...">
-
     <button id="recentBtn">⏱ Recently Added</button>
 
     <select id="filterSelect">
@@ -94,6 +98,24 @@
 
   <!-- PAGE LOGIC -->
   <script type="module" src="books-nonfiction.js"></script>
+
+  <!-- 🔥 REQUIRED: HOVER-ONLY GIF LOGIC -->
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      document.querySelectorAll('.home-gif img').forEach(img => {
+        const staticSrc = img.src;
+        const animatedSrc = img.dataset.anim;
+
+        img.addEventListener('mouseenter', () => {
+          img.src = animatedSrc + '?t=' + Date.now();
+        });
+
+        img.addEventListener('mouseleave', () => {
+          img.src = staticSrc;
+        });
+      });
+    });
+  </script>
+
 </body>
 </html>
-
