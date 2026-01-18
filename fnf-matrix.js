@@ -156,3 +156,10 @@ if (music && musicBtn) {
     });
   });
 </script>
+
+
+    img.addEventListener('mouseleave', () => {
+      img.src = staticSrc;
+    });
+  });
+</script>
