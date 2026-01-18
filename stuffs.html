@@ -4,11 +4,15 @@
   <meta charset="UTF-8">
   <title>Stuff Chooser</title>
   <link rel="stylesheet" href="stuffs.css">
+
+  <!-- Preload animated GIF for instant hover -->
+  <link rel="preload" as="image" href="assets/cat.gif">
 </head>
 <body>
 
-<a href="dashboard.html" class="home-logo" aria-label="Go to dashboard">
-  &gt;<span class="cursor">_</span>
+<!-- DASHBOARD GIF BUTTON -->
+<a href="dashboard.html" class="home-gif" aria-label="Go to dashboard">
+  <img src="assets/cat.png" data-anim="assets/cat.gif" alt="">
 </a>
 
 <!-- MATRIX RAIN -->
@@ -28,12 +32,32 @@
 </div>
 
 <script type="module" src="stuffs.js"></script>
-  <!-- BACKGROUND MUSIC -->
+
+<!-- BACKGROUND MUSIC -->
 <audio id="bgMusic" loop>
   <source src="stuffs-music.mp3" type="audio/mpeg">
 </audio>
 
 <!-- MUSIC TOGGLE BUTTON -->
 <button id="musicBtn" class="music-btn">▶</button>
+
+<!-- 🔥 REQUIRED: HOVER-ONLY GIF LOGIC -->
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('.home-gif img').forEach(img => {
+      const staticSrc = img.src;
+      const animatedSrc = img.dataset.anim;
+
+      img.addEventListener('mouseenter', () => {
+        img.src = animatedSrc + '?t=' + Date.now();
+      });
+
+      img.addEventListener('mouseleave', () => {
+        img.src = staticSrc;
+      });
+    });
+  });
+</script>
+
 </body>
 </html>
