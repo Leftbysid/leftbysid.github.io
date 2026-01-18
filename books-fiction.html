@@ -4,11 +4,16 @@
   <meta charset="UTF-8">
   <title>Fiction</title>
   <link rel="stylesheet" href="books-fiction.css">
+
+  <!-- Preload animated GIF for instant hover -->
+  <link rel="preload" as="image" href="assets/cat.gif">
 </head>
 
 <body class="books-page">
-<a href="fnf.html" class="home-logo" aria-label="Go to dashboard">
-  &gt;<span class="cursor">_</span>
+
+<!-- DASHBOARD GIF BUTTON -->
+<a href="fnf.html" class="home-gif" aria-label="Go to dashboard">
+  <img src="assets/cat.png" data-anim="assets/cat.gif" alt="">
 </a>
 
   <!-- EXPORT CONTROLS -->
@@ -92,6 +97,24 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
   <script type="module" src="books-fiction.js"></script>
+
+  <!-- 🔥 REQUIRED: HOVER-ONLY GIF LOGIC -->
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      document.querySelectorAll('.home-gif img').forEach(img => {
+        const staticSrc = img.src;
+        const animatedSrc = img.dataset.anim;
+
+        img.addEventListener('mouseenter', () => {
+          img.src = animatedSrc + '?t=' + Date.now();
+        });
+
+        img.addEventListener('mouseleave', () => {
+          img.src = staticSrc;
+        });
+      });
+    });
+  </script>
+
 </body>
 </html>
-
