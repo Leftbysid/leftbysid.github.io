@@ -4,10 +4,16 @@
   <meta charset="UTF-8">
   <title>Quotes</title>
   <link rel="stylesheet" href="quotes.css">
+
+  <!-- Preload animated GIF for instant hover -->
+  <link rel="preload" as="image" href="assets/cat.gif">
 </head>
+
 <body>
-<a href="dashboard.html" class="home-logo" aria-label="Go to dashboard">
-  &gt;<span class="cursor">_</span>
+
+<!-- DASHBOARD GIF BUTTON -->
+<a href="dashboard.html" class="home-gif" aria-label="Go to dashboard">
+  <img src="assets/cat.png" data-anim="assets/cat.gif" alt="">
 </a>
 
 <h1 class="title">💬 QUOTE VAULT</h1>
@@ -68,5 +74,25 @@
 </div>
 
 <script type="module" src="quotes.js"></script>
+
+<!-- 🔥 REQUIRED: HOVER-ONLY GIF LOGIC -->
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('.home-gif img').forEach(img => {
+      const staticSrc = img.src;
+      const animatedSrc = img.dataset.anim;
+
+      img.addEventListener('mouseenter', () => {
+        // force reload so GIF animation restarts
+        img.src = animatedSrc + '?t=' + Date.now();
+      });
+
+      img.addEventListener('mouseleave', () => {
+        img.src = staticSrc;
+      });
+    });
+  });
+</script>
+
 </body>
 </html>
