@@ -156,16 +156,19 @@ body {
   position: fixed;
   bottom: 18px;
   left: 20px;
-  z-index: 1000;
+
+  z-index: 9999;          /* 🔥 above all canvases */
+  pointer-events: auto;  /* 🔥 force hover to work */
 
   opacity: 0.85;
   transition: opacity .2s ease, transform .2s ease;
 }
 
 .home-gif img {
-  width: 50px;      /* scales your 200x200 image */
+  width: 50px;            /* scales 200x200 → 50x50 */
   height: auto;
   display: block;
+  pointer-events: auto;  /* 🔥 required for hover swap */
 }
 
 /* hover feedback */
