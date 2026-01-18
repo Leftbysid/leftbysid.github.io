@@ -59,6 +59,13 @@ const titleEl = document.getElementById("trackTitle");
 const playlist = [
   { title: "POLICE STATE", src: "music/police-state.mp3" },
   { title: "MALAI KE MARCHAS", src: "music/malai-ke-marchas.mp3" },
+  { title: "B.Y.O.B", src: "music/BYOB.mp3" },
+  { title: "Rage Against The Machine", src: "music/rage-against-the-machine.mp3" },
+  { title: "Green Day - American Idiot", src: "music/green-day_american-idiot.mp3" },
+  { title: "Fight The Power - Public enemy", src: "music/fight_the_power-public_enemy.mp3" },
+  { title: "How the world works", src: "music/how_the_world_works-bo_burnham.mp3" },
+  { title: "Bad Religion - American Jesus", src: "music/bad_religion-american_jesus.mp3" },
+  { title: "Nathalie Cardone - Hasta Siempre", src: "music/nathalie_cardone-hasta_siempre.mp3" },
 ];
 
 let currentIndex = 0;
