@@ -163,7 +163,7 @@ body {
 }
 
 .home-gif img {
-  width: 40px;      /* scales your 200x200 image */
+  width: 50px;      /* scales your 200x200 image */
   height: auto;
   display: block;
 }
