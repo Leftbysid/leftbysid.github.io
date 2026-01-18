@@ -83,7 +83,6 @@
       const animatedSrc = img.dataset.anim;
 
       img.addEventListener('mouseenter', () => {
-        // force reload so GIF animation restarts
         img.src = animatedSrc + '?t=' + Date.now();
       });
 
