@@ -297,45 +297,38 @@ if (exportPdfBtn) {
 }
 
 /* =====================
-   SHARE MODAL (FINAL – CLEAN)
+   PAGE SHARE (WHOLE PAGE)
 ===================== */
+
 import {
   setDoc,
   serverTimestamp,
   Timestamp
 } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-firestore.js";
 
-const shareBtn = document.getElementById("sharePageBtn");
-const overlay = document.getElementById("shareOverlay");
-const closeBtn = document.getElementById("closeShare");
-const resultBox = document.getElementById("shareResult");
-const linkInput = document.getElementById("shareLink");
-const copyBtn = document.getElementById("copyShareLink");
-const actionButtons =
-  document.querySelectorAll(".share-actions button");
+const sharePageBtn = document.getElementById("sharePageBtn");
 
 let activeSharePageId = null;
 
-/* FORCE HIDDEN ON LOAD */
-overlay.classList.add("hidden");
+/* --- simple popup using confirm() for now ---
+   (we can upgrade to modal after this works)
+*/
+if (sharePageBtn) {
+  sharePageBtn.onclick = async () => {
+    if (!currentUser) {
+      alert("Not authenticated");
+      return;
+    }
 
-/* OPEN / CLOSE */
-shareBtn.addEventListener("click", () => {
-  overlay.classList.remove("hidden");
-});
+    const choice = prompt(
+      "Type:\n1 = Permanent\n2 = 24 Hours\n3 = Revoke",
+      "1"
+    );
 
-closeBtn.addEventListener("click", () => {
-  overlay.classList.add("hidden");
-});
-
-/* SHARE ACTIONS */
-actionButtons.forEach(btn => {
-  btn.addEventListener("click", async () => {
-    const mode = btn.dataset.mode;
-
-    if (mode === "revoke") {
+    // REVOKE
+    if (choice === "3") {
       if (!activeSharePageId) {
-        alert("No active share link");
+        alert("No active shared link");
         return;
       }
 
@@ -344,18 +337,18 @@ actionButtons.forEach(btn => {
         { revoked: true }
       );
 
-      resultBox.classList.add("hidden");
-      activeSharePageId = null;
-      alert("Link revoked");
+      alert("Shared link revoked");
       return;
     }
 
     const pageId = crypto.randomUUID();
-    activeSharePageId = pageId;
 
+    // 24 HOURS
     const expiresAt =
-      mode === "24h"
-        ? Timestamp.fromMillis(Date.now() + 86400000)
+      choice === "2"
+        ? Timestamp.fromMillis(
+            Date.now() + 24 * 60 * 60 * 1000
+          )
         : null;
 
     await setDoc(
@@ -368,17 +361,12 @@ actionButtons.forEach(btn => {
       }
     );
 
-    linkInput.value =
+    activeSharePageId = pageId;
+
+    const link =
       `${location.origin}/viewonly/quotes-view.html?page=${pageId}`;
 
-    resultBox.classList.remove("hidden");
-  });
-});
-
-/* COPY LINK */
-copyBtn.addEventListener("click", () => {
-  navigator.clipboard.writeText(linkInput.value);
-  copyBtn.textContent = "Copied!";
-  setTimeout(() => (copyBtn.textContent = "Copy"), 1000);
-});
-
+    navigator.clipboard.writeText(link);
+    alert("Share link copied:\n" + link);
+  };
+}
