@@ -295,3 +295,78 @@ if (exportPdfBtn) {
     win.print();
   };
 }
+
+/* =====================
+   PAGE SHARE (WHOLE PAGE)
+===================== */
+
+import {
+  setDoc,
+  serverTimestamp,
+  Timestamp
+} from "https://www.gstatic.com/firebasejs/12.7.0/firebase-firestore.js";
+
+const sharePageBtn = document.getElementById("sharePageBtn");
+
+let activeSharePageId = null;
+
+/* --- simple popup using confirm() for now ---
+   (we can upgrade to modal after this works)
+*/
+if (sharePageBtn) {
+  sharePageBtn.onclick = async () => {
+    if (!currentUser) {
+      alert("Not authenticated");
+      return;
+    }
+
+    const choice = prompt(
+      "Type:\n1 = Permanent\n2 = 24 Hours\n3 = Revoke",
+      "1"
+    );
+
+    // REVOKE
+    if (choice === "3") {
+      if (!activeSharePageId) {
+        alert("No active shared link");
+        return;
+      }
+
+      await updateDoc(
+        doc(db, "quotes_pages_public", activeSharePageId),
+        { revoked: true }
+      );
+
+      alert("Shared link revoked");
+      return;
+    }
+
+    const pageId = crypto.randomUUID();
+
+    // 24 HOURS
+    const expiresAt =
+      choice === "2"
+        ? Timestamp.fromMillis(
+            Date.now() + 24 * 60 * 60 * 1000
+          )
+        : null;
+
+    await setDoc(
+      doc(db, "quotes_pages_public", pageId),
+      {
+        ownerUid: currentUser.uid,
+        expiresAt,
+        revoked: false,
+        createdAt: serverTimestamp()
+      }
+    );
+
+    activeSharePageId = pageId;
+
+    const link =
+      `${location.origin}/viewonly/quotes-view.html?page=${pageId}`;
+
+    navigator.clipboard.writeText(link);
+    alert("Share link copied:\n" + link);
+  };
+}
