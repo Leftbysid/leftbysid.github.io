@@ -297,7 +297,7 @@ if (exportPdfBtn) {
 }
 
 /* =====================
-   SHARE MODAL (FINAL FIX)
+   SHARE MODAL (FINAL – CLEAN)
 ===================== */
 import {
   setDoc,
@@ -305,77 +305,80 @@ import {
   Timestamp
 } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-firestore.js";
 
-document.addEventListener("DOMContentLoaded", () => {
-  const shareBtn = document.getElementById("sharePageBtn");
-  const overlay = document.getElementById("shareOverlay");
-  const closeBtn = document.getElementById("closeShare");
-  const resultBox = document.getElementById("shareResult");
-  const linkInput = document.getElementById("shareLink");
-  const copyBtn = document.getElementById("copyShareLink");
-  const actionButtons =
-    document.querySelectorAll(".share-actions button");
+const shareBtn = document.getElementById("sharePageBtn");
+const overlay = document.getElementById("shareOverlay");
+const closeBtn = document.getElementById("closeShare");
+const resultBox = document.getElementById("shareResult");
+const linkInput = document.getElementById("shareLink");
+const copyBtn = document.getElementById("copyShareLink");
+const actionButtons =
+  document.querySelectorAll(".share-actions button");
 
-  let activeSharePageId = null;
+let activeSharePageId = null;
 
-  /* 🔒 FORCE HIDDEN ON LOAD */
+/* FORCE HIDDEN ON LOAD */
+overlay.classList.add("hidden");
+
+/* OPEN / CLOSE */
+shareBtn.addEventListener("click", () => {
+  overlay.classList.remove("hidden");
+});
+
+closeBtn.addEventListener("click", () => {
   overlay.classList.add("hidden");
+});
 
-  /* OPEN / CLOSE */
-  shareBtn.onclick = () => overlay.classList.remove("hidden");
-  closeBtn.onclick = () => overlay.classList.add("hidden");
+/* SHARE ACTIONS */
+actionButtons.forEach(btn => {
+  btn.addEventListener("click", async () => {
+    const mode = btn.dataset.mode;
 
-  /* ACTION BUTTONS */
-  actionButtons.forEach(btn => {
-    btn.onclick = async () => {
-      const mode = btn.dataset.mode;
-
-      if (mode === "revoke") {
-        if (!activeSharePageId) {
-          alert("No active share link");
-          return;
-        }
-
-        await updateDoc(
-          doc(db, "quotes_pages_public", activeSharePageId),
-          { revoked: true }
-        );
-
-        resultBox.classList.add("hidden");
-        activeSharePageId = null;
-        alert("Link revoked");
+    if (mode === "revoke") {
+      if (!activeSharePageId) {
+        alert("No active share link");
         return;
       }
 
-      const pageId = crypto.randomUUID();
-      activeSharePageId = pageId;
-
-      const expiresAt =
-        mode === "24h"
-          ? Timestamp.fromMillis(Date.now() + 86400000)
-          : null;
-
-      await setDoc(
-        doc(db, "quotes_pages_public", pageId),
-        {
-          ownerUid: currentUser.uid,
-          expiresAt,
-          revoked: false,
-          createdAt: serverTimestamp()
-        }
+      await updateDoc(
+        doc(db, "quotes_pages_public", activeSharePageId),
+        { revoked: true }
       );
 
-      const link =
-        `${location.origin}/viewonly/quotes-view.html?page=${pageId}`;
+      resultBox.classList.add("hidden");
+      activeSharePageId = null;
+      alert("Link revoked");
+      return;
+    }
 
-      linkInput.value = link;
-      resultBox.classList.remove("hidden");
-    };
+    const pageId = crypto.randomUUID();
+    activeSharePageId = pageId;
+
+    const expiresAt =
+      mode === "24h"
+        ? Timestamp.fromMillis(Date.now() + 86400000)
+        : null;
+
+    await setDoc(
+      doc(db, "quotes_pages_public", pageId),
+      {
+        ownerUid: currentUser.uid,
+        expiresAt,
+        revoked: false,
+        createdAt: serverTimestamp()
+      }
+    );
+
+    linkInput.value =
+      `${location.origin}/viewonly/quotes-view.html?page=${pageId}`;
+
+    resultBox.classList.remove("hidden");
   });
-
-  /* COPY */
-  copyBtn.onclick = () => {
-    navigator.clipboard.writeText(linkInput.value);
-    copyBtn.textContent = "Copied!";
-    setTimeout(() => (copyBtn.textContent = "Copy"), 1000);
-  };
 });
+
+/* COPY LINK */
+copyBtn.addEventListener("click", () => {
+  navigator.clipboard.writeText(linkInput.value);
+  copyBtn.textContent = "Copied!";
+  setTimeout(() => (copyBtn.textContent = "Copy"), 1000);
+});
+
