@@ -323,15 +323,16 @@ document.addEventListener("DOMContentLoaded", () => {
   resultBox.classList.add("hidden");
 
   /* OPEN */
-  shareBtn.onclick = () => {
-    resultBox.classList.add("hidden");
-    overlay.classList.remove("hidden");
-  };
+shareBtn.onclick = () => {
+  resultBox.classList.add("hidden");
+  overlay.classList.add("active");
+};
 
-  /* CLOSE */
-  closeBtn.onclick = () => {
-    overlay.classList.add("hidden");
-  };
+/* CLOSE */
+closeBtn.onclick = () => {
+  overlay.classList.remove("active");
+};
+
 
   /* ACTIONS */
   actionButtons.forEach(btn => {
