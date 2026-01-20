@@ -3,7 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <title>Shared Quotes</title>
-  <link rel="stylesheet" href="quotes.css">
+
+  <!-- CSS lives OUTSIDE viewonly -->
+  <link rel="stylesheet" href="../quotes.css">
 </head>
 
 <body>
@@ -14,6 +16,7 @@
 
 <div id="quoteList"></div>
 
+<!-- JS is inside viewonly -->
 <script type="module" src="quotes-view.js"></script>
 </body>
 </html>
