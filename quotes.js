@@ -297,7 +297,7 @@ if (exportPdfBtn) {
 }
 
 /* =====================
-   SHARE MODAL LOGIC
+   SHARE MODAL (FINAL FIX)
 ===================== */
 import {
   setDoc,
@@ -305,83 +305,77 @@ import {
   Timestamp
 } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-firestore.js";
 
-const shareBtn = document.getElementById("sharePageBtn");
-const overlay = document.getElementById("shareOverlay");
-const closeBtn = document.getElementById("closeShare");
-const resultBox = document.getElementById("shareResult");
-const linkInput = document.getElementById("shareLink");
-const copyBtn = document.getElementById("copyShareLink");
-
-let activeSharePageId = null;
-
-document.querySelectorAll(".share-actions button").forEach(btn => {
-  btn.onclick = async () => {
-    const mode = btn.dataset.mode;
-
-    if (mode === "revoke") {
-      if (!activeSharePageId) {
-        alert("No active share link");
-        return;
-      }
-
-      await updateDoc(
-        doc(db, "quotes_pages_public", activeSharePageId),
-        { revoked: true }
-      );
-
-      resultBox.classList.add("hidden");
-      alert("Link revoked");
-      return;
-    }
-
-    const pageId = crypto.randomUUID();
-    activeSharePageId = pageId;
-
-    const expiresAt =
-      mode === "24h"
-        ? Timestamp.fromMillis(Date.now() + 86400000)
-        : null;
-
-    await setDoc(
-      doc(db, "quotes_pages_public", pageId),
-      {
-        ownerUid: currentUser.uid,
-        expiresAt,
-        revoked: false,
-        createdAt: serverTimestamp()
-      }
-    );
-
-    const link =
-      `${location.origin}/viewonly/quotes-view.html?page=${pageId}`;
-
-    linkInput.value = link;
-    resultBox.classList.remove("hidden");
-  };
-});
-
-copyBtn.onclick = () => {
-  navigator.clipboard.writeText(linkInput.value);
-  copyBtn.textContent = "Copied!";
-  setTimeout(() => (copyBtn.textContent = "Copy"), 1000);
-};
-
-/* =====================
-   SHARE MODAL INIT (SAFE)
-===================== */
 document.addEventListener("DOMContentLoaded", () => {
   const shareBtn = document.getElementById("sharePageBtn");
   const overlay = document.getElementById("shareOverlay");
   const closeBtn = document.getElementById("closeShare");
+  const resultBox = document.getElementById("shareResult");
+  const linkInput = document.getElementById("shareLink");
+  const copyBtn = document.getElementById("copyShareLink");
+  const actionButtons =
+    document.querySelectorAll(".share-actions button");
 
-  // 🔒 FORCE HIDE ON LOAD (important)
+  let activeSharePageId = null;
+
+  /* 🔒 FORCE HIDDEN ON LOAD */
   overlay.classList.add("hidden");
 
-  shareBtn.onclick = () => {
-    overlay.classList.remove("hidden");
-  };
+  /* OPEN / CLOSE */
+  shareBtn.onclick = () => overlay.classList.remove("hidden");
+  closeBtn.onclick = () => overlay.classList.add("hidden");
 
-  closeBtn.onclick = () => {
-    overlay.classList.add("hidden");
+  /* ACTION BUTTONS */
+  actionButtons.forEach(btn => {
+    btn.onclick = async () => {
+      const mode = btn.dataset.mode;
+
+      if (mode === "revoke") {
+        if (!activeSharePageId) {
+          alert("No active share link");
+          return;
+        }
+
+        await updateDoc(
+          doc(db, "quotes_pages_public", activeSharePageId),
+          { revoked: true }
+        );
+
+        resultBox.classList.add("hidden");
+        activeSharePageId = null;
+        alert("Link revoked");
+        return;
+      }
+
+      const pageId = crypto.randomUUID();
+      activeSharePageId = pageId;
+
+      const expiresAt =
+        mode === "24h"
+          ? Timestamp.fromMillis(Date.now() + 86400000)
+          : null;
+
+      await setDoc(
+        doc(db, "quotes_pages_public", pageId),
+        {
+          ownerUid: currentUser.uid,
+          expiresAt,
+          revoked: false,
+          createdAt: serverTimestamp()
+        }
+      );
+
+      const link =
+        `${location.origin}/viewonly/quotes-view.html?page=${pageId}`;
+
+      linkInput.value = link;
+      resultBox.classList.remove("hidden");
+    };
+  });
+
+  /* COPY */
+  copyBtn.onclick = () => {
+    navigator.clipboard.writeText(linkInput.value);
+    copyBtn.textContent = "Copied!";
+    setTimeout(() => (copyBtn.textContent = "Copy"), 1000);
   };
 });
