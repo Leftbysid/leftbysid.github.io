@@ -3,20 +3,111 @@
 <head>
   <meta charset="UTF-8">
   <title>Shared Quotes</title>
-
-  <!-- CSS lives OUTSIDE viewonly -->
-  <link rel="stylesheet" href="../quotes.css">
+  <link rel="stylesheet" href="quotes-view.css">
 </head>
 
 <body>
 
-<h1 class="title">💬 Shared Quotes</h1>
+<h1 class="title">💬 SHARED QUOTES</h1>
 
-<input id="search" placeholder="Search quotes...">
+<!-- STATS -->
+<div class="stats">
+  Total: <span id="totalQuotes">0</span>
+</div>
 
+<!-- SEARCH -->
+<div class="controls">
+  <input id="search" placeholder="Search quotes...">
+</div>
+
+<!-- QUOTES -->
 <div id="quoteList"></div>
 
-<!-- JS is inside viewonly -->
-<script type="module" src="quotes-view.js"></script>
+<script type="module">
+  import { db } from "../firebase.js";
+  import {
+    doc,
+    getDoc,
+    collection,
+    getDocs,
+    query,
+    where
+  } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-firestore.js";
+
+  const params = new URLSearchParams(location.search);
+  const pageId = params.get("page");
+
+  const quoteList = document.getElementById("quoteList");
+  const searchInput = document.getElementById("search");
+  const totalQuotesEl = document.getElementById("totalQuotes");
+
+  let quotes = [];
+
+  if (!pageId) {
+    quoteList.innerHTML = "<p>Invalid share link.</p>";
+    throw new Error("Missing page id");
+  }
+
+  // 🔒 Validate share page
+  const pageSnap = await getDoc(
+    doc(db, "quotes_pages_public", pageId)
+  );
+
+  if (!pageSnap.exists()) {
+    quoteList.innerHTML = "<p>Link not found.</p>";
+    throw new Error("Invalid page");
+  }
+
+  const page = pageSnap.data();
+
+  if (page.revoked) {
+    quoteList.innerHTML = "<p>This link has been revoked.</p>";
+    throw new Error("Revoked");
+  }
+
+  if (page.expiresAt && Date.now() > page.expiresAt.toMillis()) {
+    quoteList.innerHTML = "<p>This link has expired.</p>";
+    throw new Error("Expired");
+  }
+
+  // 📥 Load quotes
+  const q = query(
+    collection(db, "quotes"),
+    where("uid", "==", page.ownerUid)
+  );
+
+  const snap = await getDocs(q);
+
+  quotes = snap.docs.map(d => d.data());
+
+  totalQuotesEl.textContent = quotes.length;
+
+  render(quotes);
+
+  // 🔎 Search
+  searchInput.oninput = () => {
+    const term = searchInput.value.toLowerCase();
+    render(
+      quotes.filter(q =>
+        q.text.toLowerCase().includes(term) ||
+        (q.author || "").toLowerCase().includes(term)
+      )
+    );
+  };
+
+  function render(list) {
+    quoteList.innerHTML = "";
+
+    list.forEach(q => {
+      quoteList.innerHTML += `
+        <div class="quote-row">
+          <p class="quote-text">“${q.text}”</p>
+          ${q.author ? `<p class="quote-author">— ${q.author}</p>` : ""}
+        </div>
+      `;
+    });
+  }
+</script>
+
 </body>
 </html>
