@@ -93,6 +93,25 @@
     });
   });
 </script>
+<!-- SHARE PAGE MODAL -->
+<div id="shareOverlay" class="overlay hidden">
+  <div class="share-box">
+    <h3>🔗 Share Quote Vault</h3>
+
+    <div class="share-actions">
+      <button data-mode="permanent">Permanent</button>
+      <button data-mode="24h">24 Hours</button>
+      <button data-mode="revoke" class="danger">Revoke</button>
+    </div>
+
+    <div id="shareResult" class="share-result hidden">
+      <input id="shareLink" readonly>
+      <button id="copyShareLink">Copy</button>
+    </div>
+
+    <button class="close-btn" id="closeShare">✖ Close</button>
+  </div>
+</div>
 
 </body>
 </html>
