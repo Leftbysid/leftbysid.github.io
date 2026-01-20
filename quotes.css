@@ -218,3 +218,87 @@ body {
   opacity: 1;
   transform: scale(1.08);
 }
+
+/* =========================
+   SHARE MODAL
+========================= */
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.75);
+  z-index: 999;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.share-box {
+  background: #0b0f0d;
+  border: 2px solid #00ff9c;
+  box-shadow: 0 0 20px rgba(0,255,156,.6);
+  padding: 20px;
+  width: 360px;
+  text-align: center;
+}
+
+.share-box h3 {
+  margin-bottom: 14px;
+  color: #00ff9c;
+}
+
+.share-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  margin-bottom: 14px;
+}
+
+.share-actions button {
+  padding: 8px 12px;
+  border: 2px solid #00ff9c;
+  background: transparent;
+  color: #00ff9c;
+  cursor: pointer;
+}
+
+.share-actions button:hover {
+  background: #00ff9c;
+  color: black;
+}
+
+.share-actions .danger {
+  border-color: #ff4d4d;
+  color: #ff4d4d;
+}
+
+.share-actions .danger:hover {
+  background: #ff4d4d;
+  color: black;
+}
+
+.share-result {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 10px;
+}
+
+.share-result input {
+  flex: 1;
+  padding: 6px;
+  background: black;
+  border: 1px solid #00ff9c;
+  color: #00ff9c;
+  font-family: inherit;
+}
+
+.share-result button {
+  padding: 6px 10px;
+}
+
+.close-btn {
+  margin-top: 8px;
+  background: none;
+  border: none;
+  color: #888;
+  cursor: pointer;
+}
