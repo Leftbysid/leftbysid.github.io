@@ -198,22 +198,19 @@ body {
   position: fixed;
   bottom: 18px;
   left: 20px;
-
-  z-index: 9999;          /* 🔥 above all canvases */
-  pointer-events: auto;  /* 🔥 force hover to work */
-
+  z-index: 9999;
+  pointer-events: auto;
   opacity: 0.85;
   transition: opacity .2s ease, transform .2s ease;
 }
 
 .home-gif img {
-  width: 50px;            /* scales 200x200 → 50x50 */
+  width: 50px;
   height: auto;
   display: block;
-  pointer-events: auto;  /* 🔥 required for hover swap */
+  pointer-events: auto;
 }
 
-/* hover feedback */
 .home-gif:hover {
   opacity: 1;
   transform: scale(1.08);
@@ -230,6 +227,7 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
+  pointer-events: auto; /* ✅ IMPORTANT FIX */
 }
 
 .share-box {
