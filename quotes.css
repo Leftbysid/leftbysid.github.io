@@ -217,18 +217,22 @@ body {
 }
 
 /* =========================
-   SHARE MODAL
+   SHARE MODAL (SAFE)
 ========================= */
 .overlay {
   position: fixed;
   inset: 0;
   background: rgba(0,0,0,.75);
   z-index: 999;
-  display: flex;
+  display: none;           /* 🔒 NEVER visible by default */
   justify-content: center;
   align-items: center;
-  pointer-events: auto; /* ✅ IMPORTANT FIX */
 }
+
+.overlay.active {
+  display: flex;
+}
+
 
 .share-box {
   background: #0b0f0d;
