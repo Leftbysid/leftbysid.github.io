@@ -18,10 +18,11 @@
 
 <h1 class="title">💬 QUOTE VAULT</h1>
 
-<!-- EXPORT ACTIONS -->
+<!-- EXPORT + SHARE ACTIONS -->
 <div class="export-actions">
   <button id="exportJsonBtn">Export JSON</button>
   <button id="exportPdfBtn">Export PDF</button>
+  <button id="sharePageBtn">Share</button>
 </div>
 
 <!-- QUOTES STAT BAR -->
@@ -75,7 +76,7 @@
 
 <script type="module" src="quotes.js"></script>
 
-<!-- 🔥 REQUIRED: HOVER-ONLY GIF LOGIC -->
+<!--  REQUIRED: HOVER-ONLY GIF LOGIC -->
 <script>
   document.addEventListener('DOMContentLoaded', () => {
     document.querySelectorAll('.home-gif img').forEach(img => {
