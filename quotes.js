@@ -314,14 +314,6 @@ const copyBtn = document.getElementById("copyShareLink");
 
 let activeSharePageId = null;
 
-shareBtn.onclick = () => {
-  overlay.classList.remove("hidden");
-};
-
-closeBtn.onclick = () => {
-  overlay.classList.add("hidden");
-};
-
 document.querySelectorAll(".share-actions button").forEach(btn => {
   btn.onclick = async () => {
     const mode = btn.dataset.mode;
@@ -374,3 +366,22 @@ copyBtn.onclick = () => {
   setTimeout(() => (copyBtn.textContent = "Copy"), 1000);
 };
 
+/* =====================
+   SHARE MODAL INIT (SAFE)
+===================== */
+document.addEventListener("DOMContentLoaded", () => {
+  const shareBtn = document.getElementById("sharePageBtn");
+  const overlay = document.getElementById("shareOverlay");
+  const closeBtn = document.getElementById("closeShare");
+
+  // 🔒 FORCE HIDE ON LOAD (important)
+  overlay.classList.add("hidden");
+
+  shareBtn.onclick = () => {
+    overlay.classList.remove("hidden");
+  };
+
+  closeBtn.onclick = () => {
+    overlay.classList.add("hidden");
+  };
+});
