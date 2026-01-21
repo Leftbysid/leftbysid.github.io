@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Shared Non-Fiction</title>
+
+  <!-- reuse existing non-fiction styling -->
+  <link rel="stylesheet" href="../books-fiction.css">
+</head>
+
+<body class="books-page">
+
+<h1 class="title">📘 Shared Non-Fiction</h1>
+
+<!-- ✅ STATS BAR (ABOVE SEARCH) -->
+<div class="stats">
+  <span>Total: <b id="totalCount">0</b></span>
+  <span>Read: <b id="readCount">0</b></span>
+  <span>Unread: <b id="unreadCount">0</b></span>
+</div>
+
+<div class="controls">
+  <input id="search" placeholder="Search non-fiction...">
+</div>
+
+<div id="bookList"></div>
+
+<script type="module" src="nonfiction-view.js"></script>
+</body>
+</html>
