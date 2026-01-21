@@ -315,3 +315,92 @@ exportPdfBtn.onclick = () => {
 
   pdf.save("fiction-books.pdf");
 };
+/* ===============================
+   SHARE PAGE (FICTION – VIEW ONLY)
+================================ */
+
+import {
+  setDoc,
+  serverTimestamp,
+  Timestamp
+} from "https://www.gstatic.com/firebasejs/12.7.0/firebase-firestore.js";
+
+document.addEventListener("DOMContentLoaded", () => {
+  const shareBtn = document.getElementById("sharePageBtn");
+  if (!shareBtn) return;
+
+  const overlay = document.getElementById("shareOverlay");
+  const closeBtn = document.getElementById("closeShare");
+  const resultBox = document.getElementById("shareResult");
+  const linkInput = document.getElementById("shareLink");
+  const copyBtn = document.getElementById("copyShareLink");
+  const actionButtons =
+    document.querySelectorAll(".share-actions button");
+
+  let activeSharePageId = null;
+
+  /* FORCE HIDDEN ON LOAD */
+  overlay.classList.add("hidden");
+
+  /* OPEN / CLOSE */
+  shareBtn.onclick = () => overlay.classList.remove("hidden");
+  closeBtn.onclick = () => overlay.classList.add("hidden");
+
+  /* ACTIONS */
+  actionButtons.forEach(btn => {
+    btn.onclick = async () => {
+      const mode = btn.dataset.mode;
+
+      // REVOKE
+      if (mode === "revoke") {
+        if (!activeSharePageId) {
+          alert("No active share link");
+          return;
+        }
+
+        await updateDoc(
+          doc(db, "books_pages_public", activeSharePageId),
+          { revoked: true }
+        );
+
+        activeSharePageId = null;
+        resultBox.classList.add("hidden");
+        alert("Share link revoked");
+        return;
+      }
+
+      // CREATE
+      const pageId = crypto.randomUUID();
+      activeSharePageId = pageId;
+
+      const expiresAt =
+        mode === "24h"
+          ? Timestamp.fromMillis(Date.now() + 86400000)
+          : null;
+
+      await setDoc(
+        doc(db, "books_pages_public", pageId),
+        {
+          ownerUid: currentUser.uid,
+          type: "fiction",
+          expiresAt,
+          revoked: false,
+          createdAt: serverTimestamp()
+        }
+      );
+
+      const link =
+        `${location.origin}/viewonly/fiction-view.html?page=${pageId}`;
+
+      linkInput.value = link;
+      resultBox.classList.remove("hidden");
+    };
+  });
+
+  /* COPY */
+  copyBtn.onclick = () => {
+    navigator.clipboard.writeText(linkInput.value);
+    copyBtn.textContent = "Copied!";
+    setTimeout(() => (copyBtn.textContent = "Copy"), 1000);
+  };
+});
