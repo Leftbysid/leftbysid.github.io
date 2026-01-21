@@ -27,10 +27,10 @@ import { requireAuth } from "./auth-guard.js";
 requireAuth();
 
 /* ===============================
-   FIRESTORE COLLECTIONS
+   FIRESTORE COLLECTION
 ================================ */
-const COLLECTION_NAME = "books_nonfiction";
-const SHARE_COLLECTION = "books_nonfiction_pages_public";
+const COLLECTION_NAME = "books_fiction";
+const SHARE_COLLECTION = "books_fiction_pages_public";
 
 /* ===============================
    STATE
@@ -196,7 +196,7 @@ searchInput.oninput = () => {
 };
 
 /* ===============================
-   RENDER (UNCHANGED)
+   RENDER (FIXED — NOTHING REMOVED)
 ================================ */
 function renderBooks(list) {
   bookList.innerHTML = "";
@@ -299,7 +299,7 @@ exportJsonBtn.onclick = () => {
   );
   const a = document.createElement("a");
   a.href = URL.createObjectURL(blob);
-  a.download = "nonfiction-books.json";
+  a.download = "fiction-books.json";
   a.click();
 };
 
@@ -314,11 +314,11 @@ exportPdfBtn.onclick = () => {
     if (y > 280) { pdf.addPage(); y = 12; }
   });
 
-  pdf.save("nonfiction-books.pdf");
+  pdf.save("fiction-books.pdf");
 };
 
 /* ===============================
-   SHARE LOGIC
+   SHARE LOGIC (FIXED)
 ================================ */
 shareBtn.onclick = () => {
   shareOverlay.classList.remove("hidden");
@@ -364,7 +364,7 @@ shareButtons.forEach(btn => {
     );
 
     const link =
-      `${location.origin}/viewonly/nonfiction-view.html?page=${pageId}`;
+      `${location.origin}/viewonly/fiction-view.html?page=${pageId}`;
 
     shareLinkInput.value = link;
     shareResult.classList.remove("hidden");
