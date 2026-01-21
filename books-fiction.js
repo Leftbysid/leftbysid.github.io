@@ -11,7 +11,7 @@ import {
   doc,
   query,
   where,
-  onSnapshot,
+  getDocs,
   serverTimestamp,
   Timestamp
 } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-firestore.js";
@@ -42,6 +42,7 @@ let deleteId = null;
 
 let currentFilter = "all";
 let sortMode = "recent";
+let searchQuery = "";
 
 let activeShareId = null;
 
@@ -93,7 +94,7 @@ document.getElementById("toggleForm").onclick =
 onAuthStateChanged(auth, user => {
   if (!user) return;
   currentUser = user;
-  loadBooks();
+  loadBooks(); // 🔥 one-time read
 });
 
 /* ===============================
@@ -126,6 +127,7 @@ window.addBook = async () => {
     createdAt: Date.now()
   });
 
+  await loadBooks(); // 🔥 manual refresh
   bookForm.classList.add("hidden");
   titleInput.value = "";
   authorInput.value = "";
@@ -134,18 +136,17 @@ window.addBook = async () => {
 };
 
 /* ===============================
-   LOAD BOOKS
+   LOAD BOOKS (READ SAFE)
 ================================ */
-function loadBooks() {
+async function loadBooks() {
   const q = query(
     collection(db, COLLECTION_NAME),
     where("uid", "==", currentUser.uid)
   );
 
-  onSnapshot(q, snap => {
-    books = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-    applyView();
-  });
+  const snap = await getDocs(q);
+  books = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+  applyView();
 }
 
 /* ===============================
@@ -154,6 +155,23 @@ function loadBooks() {
 function applyView() {
   let list = [...books];
 
+  /* 🔍 SEARCH */
+  if (searchQuery) {
+    if (searchQuery.startsWith("@")) {
+      const authorOnly = searchQuery.slice(1);
+      list = list.filter(b =>
+        b.author.toLowerCase().includes(authorOnly)
+      );
+    } else {
+      list = list.filter(b =>
+        b.title.toLowerCase().includes(searchQuery) ||
+        b.author.toLowerCase().includes(searchQuery) ||
+        (b.category || "").toLowerCase().includes(searchQuery)
+      );
+    }
+  }
+
+  /* FILTERS */
   switch (currentFilter) {
     case "owned": list = list.filter(b => b.owned); break;
     case "not-owned": list = list.filter(b => !b.owned); break;
@@ -184,19 +202,20 @@ filterSelect.onchange = () => {
   applyView();
 };
 
+/* ===============================
+   SEARCH (DEBOUNCED + @AUTHOR)
+================================ */
+let searchTimer = null;
 searchInput.oninput = () => {
-  const q = searchInput.value.toLowerCase();
-  renderBooks(
-    books.filter(b =>
-      b.title.toLowerCase().includes(q) ||
-      b.author.toLowerCase().includes(q) ||
-      (b.category || "").toLowerCase().includes(q)
-    )
-  );
+  clearTimeout(searchTimer);
+  searchTimer = setTimeout(() => {
+    searchQuery = searchInput.value.trim().toLowerCase();
+    applyView();
+  }, 300);
 };
 
 /* ===============================
-   RENDER (FIXED — NOTHING REMOVED)
+   RENDER (UNCHANGED)
 ================================ */
 function renderBooks(list) {
   bookList.innerHTML = "";
@@ -204,7 +223,6 @@ function renderBooks(list) {
   list.forEach(b => {
     bookList.innerHTML += `
       <div class="book-row-wrapper">
-
         <span class="owned-icon ${b.owned ? "owned" : ""}">📘</span>
 
         <div class="book-row ${b.read ? "read" : ""}">
@@ -231,7 +249,6 @@ function renderBooks(list) {
           <button onclick="editBook('${b.id}')">✏️</button>
           <button onclick="askDelete('${b.id}')">🗑️</button>
         </div>
-
       </div>
     `;
   });
@@ -244,11 +261,15 @@ function renderBooks(list) {
 /* ===============================
    TOGGLES
 ================================ */
-window.toggleRead = async (id, current) =>
-  updateDoc(doc(db, COLLECTION_NAME, id), { read: !current });
+window.toggleRead = async (id, current) => {
+  await updateDoc(doc(db, COLLECTION_NAME, id), { read: !current });
+  await loadBooks();
+};
 
-window.toggleOwned = async (id, value) =>
-  updateDoc(doc(db, COLLECTION_NAME, id), { owned: value });
+window.toggleOwned = async (id, value) => {
+  await updateDoc(doc(db, COLLECTION_NAME, id), { owned: value });
+  await loadBooks();
+};
 
 /* ===============================
    EDIT
@@ -271,6 +292,7 @@ window.saveEdit = async () => {
     date: editDate.value
   });
   editOverlay.classList.add("hidden");
+  await loadBooks();
 };
 
 window.closeEdit = () =>
@@ -287,38 +309,11 @@ window.askDelete = id => {
 window.confirmDelete = async () => {
   await deleteDoc(doc(db, COLLECTION_NAME, deleteId));
   document.getElementById("confirmBox").classList.add("hidden");
+  await loadBooks();
 };
 
 /* ===============================
-   EXPORTS
-================================ */
-exportJsonBtn.onclick = () => {
-  const blob = new Blob(
-    [JSON.stringify(books, null, 2)],
-    { type: "application/json" }
-  );
-  const a = document.createElement("a");
-  a.href = URL.createObjectURL(blob);
-  a.download = "fiction-books.json";
-  a.click();
-};
-
-exportPdfBtn.onclick = () => {
-  const { jsPDF } = window.jspdf;
-  const pdf = new jsPDF();
-  let y = 12;
-
-  books.forEach((b, i) => {
-    pdf.text(`${i + 1}. ${b.title} — ${b.author}`, 10, y);
-    y += 8;
-    if (y > 280) { pdf.addPage(); y = 12; }
-  });
-
-  pdf.save("fiction-books.pdf");
-};
-
-/* ===============================
-   SHARE LOGIC (FIXED)
+   SHARE LOGIC (UNCHANGED)
 ================================ */
 shareBtn.onclick = () => {
   shareOverlay.classList.remove("hidden");
