@@ -137,11 +137,23 @@ function applyView() {
   let list = [...quotes];
 
   if (searchQuery) {
-    list = list.filter(q =>
-      q.text.toLowerCase().includes(searchQuery) ||
-      (q.author && q.author.toLowerCase().includes(searchQuery))
-    );
-  }
+  const isAuthorOnly = searchQuery.startsWith("@");
+  const term = isAuthorOnly
+    ? searchQuery.slice(1)
+    : searchQuery;
+
+  list = list.filter(q => {
+    const text = q.text.toLowerCase();
+    const author = (q.author || "").toLowerCase();
+
+    if (isAuthorOnly) {
+      return author.includes(term);
+    }
+
+    return text.includes(term) || author.includes(term);
+  });
+}
+
 
   if (sortMode === "recent") {
     list.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
