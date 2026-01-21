@@ -4,13 +4,18 @@ import {
   addDoc,
   deleteDoc,
   updateDoc,
+  setDoc,
   doc,
   query,
   where,
-  onSnapshot
+  getDocs,
+  serverTimestamp,
+  Timestamp
 } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-firestore.js";
-import { onAuthStateChanged } from
-  "https://www.gstatic.com/firebasejs/12.7.0/firebase-auth.js";
+
+import {
+  onAuthStateChanged
+} from "https://www.gstatic.com/firebasejs/12.7.0/firebase-auth.js";
 
 /* =====================
    STATE
@@ -23,7 +28,7 @@ let currentUser = null;
 let sortMode = "recent";
 let searchQuery = "";
 
-/* LOAD MORE (DOM LEVEL) */
+/* LOAD MORE */
 const PAGE_SIZE = 20;
 let visibleCount = PAGE_SIZE;
 
@@ -45,6 +50,17 @@ const exportPdfBtn = document.getElementById("exportPdfBtn");
 const editOverlay = document.getElementById("editOverlay");
 const editQuote = document.getElementById("editQuote");
 const editAuthor = document.getElementById("editAuthor");
+
+/* SHARE UI */
+const shareBtn = document.getElementById("sharePageBtn");
+const shareOverlay = document.getElementById("shareOverlay");
+const closeShareBtn = document.getElementById("closeShare");
+const shareResult = document.getElementById("shareResult");
+const shareLinkInput = document.getElementById("shareLink");
+const copyShareBtn = document.getElementById("copyShareLink");
+const shareButtons = document.querySelectorAll(".share-actions button");
+
+let activeSharePageId = null;
 
 /* =====================
    UI
@@ -75,10 +91,8 @@ window.addQuote = async () => {
   const rawText = quoteText.value.trim();
   if (!rawText) return;
 
-  const normalized = rawText.toLowerCase();
-
   const exists = quotes.some(q =>
-    q.text.trim().toLowerCase() === normalized
+    q.text.toLowerCase() === rawText.toLowerCase()
   );
 
   if (exists) {
@@ -96,43 +110,28 @@ window.addQuote = async () => {
   quoteForm.classList.add("hidden");
   quoteText.value = "";
   authorInput.value = "";
+
+  loadQuotes(); // refresh once
 };
 
 /* =====================
-   LOAD QUOTES (INCREMENTAL SNAPSHOT)
+   LOAD QUOTES (NO SNAPSHOT)
 ===================== */
-function loadQuotes() {
+async function loadQuotes() {
   const q = query(
     collection(db, "quotes"),
     where("uid", "==", currentUser.uid)
   );
 
-  onSnapshot(q, snap => {
-    snap.docChanges().forEach(change => {
-      const data = { id: change.doc.id, ...change.doc.data() };
+  const snap = await getDocs(q);
+  quotes = snap.docs.map(d => ({ id: d.id, ...d.data() }));
 
-      if (change.type === "added") quotes.push(data);
-
-      if (change.type === "modified") {
-        const i = quotes.findIndex(q => q.id === data.id);
-        if (i !== -1) quotes[i] = data;
-      }
-
-      if (change.type === "removed") {
-        quotes = quotes.filter(q => q.id !== data.id);
-      }
-    });
-
-    if (totalQuotesEl) {
-      totalQuotesEl.textContent = quotes.length;
-    }
-
-    applyView();
-  });
+  totalQuotesEl.textContent = quotes.length;
+  applyView();
 }
 
 /* =====================
-   VIEW (SEARCH + SORT + PAGINATION)
+   VIEW
 ===================== */
 function applyView() {
   let list = [...quotes];
@@ -148,29 +147,18 @@ function applyView() {
     list.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
   }
 
-  const isSearching = !!searchQuery;
-  const visibleList = isSearching
+  const visible = searchQuery
     ? list
     : list.slice(0, visibleCount);
 
-  renderQuotes(visibleList);
+  renderQuotes(visible);
 
   if (loadMoreBtn) {
     loadMoreBtn.classList.toggle(
       "hidden",
-      isSearching || list.length <= visibleCount
+      searchQuery || list.length <= visibleCount
     );
   }
-}
-
-/* =====================
-   CONTROLS
-===================== */
-if (recentBtn) {
-  recentBtn.onclick = () => {
-    sortMode = "recent";
-    applyView();
-  };
 }
 
 /* =====================
@@ -183,7 +171,7 @@ searchInput.oninput = () => {
     searchQuery = searchInput.value.trim().toLowerCase();
     visibleCount = PAGE_SIZE;
     applyView();
-  }, 250);
+  }, 300);
 };
 
 /* =====================
@@ -199,7 +187,6 @@ function renderQuotes(list) {
           <button onclick="editQuoteFn('${q.id}')">✏️</button>
           <button onclick="askDelete('${q.id}')">🗑️</button>
         </div>
-
         <p class="quote-text">“${q.text}”</p>
         ${q.author ? `<p class="quote-author">— ${q.author}</p>` : ""}
       </div>
@@ -208,7 +195,7 @@ function renderQuotes(list) {
 }
 
 /* =====================
-   EDIT
+   EDIT / DELETE
 ===================== */
 window.editQuoteFn = id => {
   const q = quotes.find(x => x.id === id);
@@ -224,14 +211,9 @@ window.saveEdit = async () => {
     author: editAuthor.value.trim() || ""
   });
   editOverlay.classList.add("hidden");
+  loadQuotes();
 };
 
-window.closeEdit = () =>
-  editOverlay.classList.add("hidden");
-
-/* =====================
-   DELETE
-===================== */
 window.askDelete = id => {
   deleteId = id;
   document.getElementById("confirmBox").classList.remove("hidden");
@@ -239,160 +221,66 @@ window.askDelete = id => {
 
 window.confirmDelete = async () => {
   await deleteDoc(doc(db, "quotes", deleteId));
-  closeConfirm();
+  document.getElementById("confirmBox").classList.add("hidden");
+  loadQuotes();
 };
 
-window.closeConfirm = () =>
-  document.getElementById("confirmBox").classList.add("hidden");
-
 /* =====================
-   EXPORT JSON (IMPROVED STRUCTURE)
+   SHARE OVERLAY (FIXED)
 ===================== */
-if (exportJsonBtn) {
-  exportJsonBtn.onclick = () => {
-    const data = {
-      type: "quotes",
-      version: 1,
-      exportedAt: new Date().toISOString(),
-      count: quotes.length,
-      quotes: quotes.map(q => ({
-        id: q.id,
-        text: q.text,
-        author: (q.author || "").trim(),
-        createdAt: q.createdAt
-          ? new Date(q.createdAt).toISOString()
-          : null
-      }))
-    };
+shareOverlay.classList.add("hidden");
+shareResult.classList.add("hidden");
 
-    const blob = new Blob(
-      [JSON.stringify(data, null, 2)],
-      { type: "application/json" }
+shareBtn.onclick = () => {
+  shareResult.classList.add("hidden");
+  shareOverlay.classList.remove("hidden");
+};
+
+closeShareBtn.onclick = () =>
+  shareOverlay.classList.add("hidden");
+
+shareButtons.forEach(btn => {
+  btn.onclick = async () => {
+    const mode = btn.dataset.mode;
+
+    if (mode === "revoke") {
+      if (!activeSharePageId) return alert("No active link");
+      await updateDoc(
+        doc(db, "quotes_pages_public", activeSharePageId),
+        { revoked: true }
+      );
+      activeSharePageId = null;
+      shareResult.classList.add("hidden");
+      return alert("Link revoked");
+    }
+
+    const pageId = crypto.randomUUID();
+    activeSharePageId = pageId;
+
+    const expiresAt =
+      mode === "24h"
+        ? Timestamp.fromMillis(Date.now() + 86400000)
+        : null;
+
+    await setDoc(
+      doc(db, "quotes_pages_public", pageId),
+      {
+        ownerUid: currentUser.uid,
+        expiresAt,
+        revoked: false,
+        createdAt: serverTimestamp()
+      }
     );
 
-    const a = document.createElement("a");
-    a.href = URL.createObjectURL(blob);
-    a.download = "quotes-export.json";
-    a.click();
-    URL.revokeObjectURL(a.href);
-  };
-}
+    shareLinkInput.value =
+      `${location.origin}/viewonly/quotes-view.html?page=${pageId}`;
 
-/* =====================
-   EXPORT PDF (PRINT)
-===================== */
-if (exportPdfBtn) {
-  exportPdfBtn.onclick = () => {
-    const win = window.open("", "_blank");
-    win.document.write("<pre>");
-    quotes.forEach(q => {
-      win.document.write(`“${q.text}”\n`);
-      if (q.author) win.document.write(`— ${q.author}\n`);
-      win.document.write("\n\n");
-    });
-    win.document.write("</pre>");
-    win.document.close();
-    win.print();
-  };
-}
-/* =====================
-   PAGE SHARE (OVERLAY – FINAL)
-===================== */
-import {
-  setDoc,
-  serverTimestamp,
-  Timestamp
-} from "https://www.gstatic.com/firebasejs/12.7.0/firebase-firestore.js";
-
-document.addEventListener("DOMContentLoaded", () => {
-  const shareBtn = document.getElementById("sharePageBtn");
-  const overlay = document.getElementById("shareOverlay");
-  const closeBtn = document.getElementById("closeShare");
-
-  const resultBox = document.getElementById("shareResult");
-  const linkInput = document.getElementById("shareLink");
-  const copyBtn = document.getElementById("copyShareLink");
-
-  const actionButtons =
-    document.querySelectorAll(".share-actions button");
-
-  let activeSharePageId = null;
-
-  /* 🔒 HARD RESET */
-  overlay.classList.add("hidden");
-  resultBox.classList.add("hidden");
-
-  /* OPEN */
-shareBtn.onclick = () => {
-  resultBox.classList.add("hidden");
-  overlay.classList.add("active");
-};
-
-/* CLOSE */
-closeBtn.onclick = () => {
-  overlay.classList.remove("active");
-};
-
-
-  /* ACTIONS */
-  actionButtons.forEach(btn => {
-    btn.onclick = async () => {
-      const mode = btn.dataset.mode;
-
-      if (!currentUser) {
-        alert("Not authenticated");
-        return;
-      }
-
-      /* REVOKE */
-      if (mode === "revoke") {
-        if (!activeSharePageId) {
-          alert("No active share link");
-          return;
-        }
-
-        await updateDoc(
-          doc(db, "quotes_pages_public", activeSharePageId),
-          { revoked: true }
-        );
-
-        activeSharePageId = null;
-        resultBox.classList.add("hidden");
-        alert("Link revoked");
-        return;
-      }
-
-      /* CREATE */
-      const pageId = crypto.randomUUID();
-      activeSharePageId = pageId;
-
-      const expiresAt =
-        mode === "24h"
-          ? Timestamp.fromMillis(Date.now() + 86400000)
-          : null;
-
-      await setDoc(
-        doc(db, "quotes_pages_public", pageId),
-        {
-          ownerUid: currentUser.uid,
-          expiresAt,
-          revoked: false,
-          createdAt: serverTimestamp()
-        }
-      );
-
-      const link =
-        `${location.origin}/viewonly/quotes-view.html?page=${pageId}`;
-
-      linkInput.value = link;
-      resultBox.classList.remove("hidden");
-    };
-  });
-
-  /* COPY */
-  copyBtn.onclick = async () => {
-    await navigator.clipboard.writeText(linkInput.value);
-    copyBtn.textContent = "Copied!";
-    setTimeout(() => (copyBtn.textContent = "Copy"), 1000);
+    shareResult.classList.remove("hidden");
   };
 });
+
+copyShareBtn.onclick = () => {
+  navigator.clipboard.writeText(shareLinkInput.value);
+  copyShareBtn.textContent = "Copied!";
+  setTimeout(() => (copyShareBtn.textContent = "Copy"), 1000);
+};
