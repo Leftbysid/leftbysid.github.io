@@ -25,6 +25,11 @@ if (!pageId) {
 const bookList = document.getElementById("bookList");
 const searchInput = document.getElementById("search");
 
+/* ✅ COUNT ELEMENTS */
+const totalCountEl = document.getElementById("totalCount");
+const readCountEl = document.getElementById("readCount");
+const unreadCountEl = document.getElementById("unreadCount");
+
 let books = [];
 
 /* =====================
@@ -56,6 +61,7 @@ const q = query(
 const snap = await getDocs(q);
 books = snap.docs.map(d => d.data());
 
+updateStats(books);
 render(books);
 
 /* =====================
@@ -63,14 +69,27 @@ render(books);
 ===================== */
 searchInput.oninput = () => {
   const q = searchInput.value.toLowerCase();
-  render(
-    books.filter(b =>
-      b.title.toLowerCase().includes(q) ||
-      b.author.toLowerCase().includes(q) ||
-      (b.category || "").toLowerCase().includes(q)
-    )
+
+  const filtered = books.filter(b =>
+    b.title.toLowerCase().includes(q) ||
+    b.author.toLowerCase().includes(q) ||
+    (b.category || "").toLowerCase().includes(q)
   );
+
+  updateStats(filtered);
+  render(filtered);
 };
+
+/* =====================
+   STATS
+===================== */
+function updateStats(list) {
+  if (!totalCountEl) return;
+
+  totalCountEl.textContent = list.length;
+  readCountEl.textContent = list.filter(b => b.read).length;
+  unreadCountEl.textContent = list.filter(b => !b.read).length;
+}
 
 /* =====================
    RENDER (READ-ONLY)
