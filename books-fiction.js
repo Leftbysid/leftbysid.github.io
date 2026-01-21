@@ -7,16 +7,18 @@ import {
   addDoc,
   deleteDoc,
   updateDoc,
+  setDoc,
   doc,
   query,
   where,
   onSnapshot,
-  setDoc,
   serverTimestamp,
   Timestamp
 } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-firestore.js";
+
 import { onAuthStateChanged }
   from "https://www.gstatic.com/firebasejs/12.7.0/firebase-auth.js";
+
 import { requireAuth } from "./auth-guard.js";
 
 /* ===============================
@@ -37,10 +39,11 @@ let books = [];
 let currentUser = null;
 let editingId = null;
 let deleteId = null;
-let activeShareId = null;
 
 let currentFilter = "all";
 let sortMode = "recent";
+
+let activeShareId = null;
 
 /* ===============================
    ELEMENTS
@@ -66,17 +69,16 @@ const editAuthor = document.getElementById("editAuthor");
 const editCategory = document.getElementById("editCategory");
 const editDate = document.getElementById("editDate");
 
-/* EXPORT */
 const exportJsonBtn = document.getElementById("exportJsonBtn");
 const exportPdfBtn = document.getElementById("exportPdfBtn");
 
-/* SHARE */
+/* SHARE UI */
 const shareBtn = document.getElementById("sharePageBtn");
-const overlay = document.getElementById("shareOverlay");
-const closeBtn = document.getElementById("closeShare");
+const shareOverlay = document.getElementById("shareOverlay");
+const closeShareBtn = document.getElementById("closeShare");
 const shareResult = document.getElementById("shareResult");
 const shareLinkInput = document.getElementById("shareLink");
-const copyBtn = document.getElementById("copyShareLink");
+const copyShareBtn = document.getElementById("copyShareLink");
 const shareButtons = document.querySelectorAll(".share-actions button");
 
 /* ===============================
@@ -99,6 +101,19 @@ onAuthStateChanged(auth, user => {
 ================================ */
 window.addBook = async () => {
   if (!titleInput.value || !authorInput.value) return;
+
+  const newTitle = titleInput.value.trim().toLowerCase();
+  const newAuthor = authorInput.value.trim().toLowerCase();
+
+  const exists = books.some(b =>
+    b.title.toLowerCase() === newTitle &&
+    b.author.toLowerCase() === newAuthor
+  );
+
+  if (exists) {
+    alert("This book already exists.");
+    return;
+  }
 
   await addDoc(collection(db, COLLECTION_NAME), {
     uid: currentUser.uid,
@@ -134,10 +149,17 @@ function loadBooks() {
 }
 
 /* ===============================
-   VIEW
+   VIEW LOGIC
 ================================ */
 function applyView() {
   let list = [...books];
+
+  switch (currentFilter) {
+    case "owned": list = list.filter(b => b.owned); break;
+    case "not-owned": list = list.filter(b => !b.owned); break;
+    case "read": list = list.filter(b => b.read); break;
+    case "not-read": list = list.filter(b => !b.read); break;
+  }
 
   if (sortMode === "recent") {
     list.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
@@ -146,13 +168,70 @@ function applyView() {
   renderBooks(list);
 }
 
+/* ===============================
+   CONTROLS
+================================ */
+recentBtn.onclick = () => {
+  sortMode = "recent";
+  currentFilter = "all";
+  filterSelect.value = "all";
+  applyView();
+};
+
+filterSelect.onchange = () => {
+  currentFilter = filterSelect.value;
+  sortMode = "none";
+  applyView();
+};
+
+searchInput.oninput = () => {
+  const q = searchInput.value.toLowerCase();
+  renderBooks(
+    books.filter(b =>
+      b.title.toLowerCase().includes(q) ||
+      b.author.toLowerCase().includes(q) ||
+      (b.category || "").toLowerCase().includes(q)
+    )
+  );
+};
+
+/* ===============================
+   RENDER (FIXED — NOTHING REMOVED)
+================================ */
 function renderBooks(list) {
   bookList.innerHTML = "";
 
   list.forEach(b => {
     bookList.innerHTML += `
-      <div class="book-row">
-        <span>${b.title}</span> — ${b.author}
+      <div class="book-row-wrapper">
+
+        <span class="owned-icon ${b.owned ? "owned" : ""}">📘</span>
+
+        <div class="book-row ${b.read ? "read" : ""}">
+          <div>
+            <span class="book-title">${b.title}</span>
+            <span class="book-author">— ${b.author}</span>
+            <span class="status-badge ${b.read ? "read" : "unread"}">
+              ${b.read ? "READ" : "UNREAD"}
+            </span>
+          </div>
+          <div>
+            <span>${b.category || ""}</span><br>
+            <span>${b.date || ""}</span>
+          </div>
+        </div>
+
+        <div class="book-actions">
+          <input type="checkbox"
+            ${b.owned ? "checked" : ""}
+            onchange="toggleOwned('${b.id}', this.checked)">
+          <button onclick="toggleRead('${b.id}', ${b.read})">
+            ${b.read ? "✅" : "⬜"}
+          </button>
+          <button onclick="editBook('${b.id}')">✏️</button>
+          <button onclick="askDelete('${b.id}')">🗑️</button>
+        </div>
+
       </div>
     `;
   });
@@ -163,16 +242,91 @@ function renderBooks(list) {
 }
 
 /* ===============================
-   SHARE LOGIC (WORKING)
+   TOGGLES
+================================ */
+window.toggleRead = async (id, current) =>
+  updateDoc(doc(db, COLLECTION_NAME, id), { read: !current });
+
+window.toggleOwned = async (id, value) =>
+  updateDoc(doc(db, COLLECTION_NAME, id), { owned: value });
+
+/* ===============================
+   EDIT
+================================ */
+window.editBook = id => {
+  const b = books.find(x => x.id === id);
+  editingId = id;
+  editTitle.value = b.title;
+  editAuthor.value = b.author;
+  editCategory.value = b.category || "";
+  editDate.value = b.date || "";
+  editOverlay.classList.remove("hidden");
+};
+
+window.saveEdit = async () => {
+  await updateDoc(doc(db, COLLECTION_NAME, editingId), {
+    title: editTitle.value,
+    author: editAuthor.value,
+    category: editCategory.value,
+    date: editDate.value
+  });
+  editOverlay.classList.add("hidden");
+};
+
+window.closeEdit = () =>
+  editOverlay.classList.add("hidden");
+
+/* ===============================
+   DELETE
+================================ */
+window.askDelete = id => {
+  deleteId = id;
+  document.getElementById("confirmBox").classList.remove("hidden");
+};
+
+window.confirmDelete = async () => {
+  await deleteDoc(doc(db, COLLECTION_NAME, deleteId));
+  document.getElementById("confirmBox").classList.add("hidden");
+};
+
+/* ===============================
+   EXPORTS
+================================ */
+exportJsonBtn.onclick = () => {
+  const blob = new Blob(
+    [JSON.stringify(books, null, 2)],
+    { type: "application/json" }
+  );
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "fiction-books.json";
+  a.click();
+};
+
+exportPdfBtn.onclick = () => {
+  const { jsPDF } = window.jspdf;
+  const pdf = new jsPDF();
+  let y = 12;
+
+  books.forEach((b, i) => {
+    pdf.text(`${i + 1}. ${b.title} — ${b.author}`, 10, y);
+    y += 8;
+    if (y > 280) { pdf.addPage(); y = 12; }
+  });
+
+  pdf.save("fiction-books.pdf");
+};
+
+/* ===============================
+   SHARE LOGIC (FIXED)
 ================================ */
 shareBtn.onclick = () => {
-  overlay.classList.remove("hidden");
+  shareOverlay.classList.remove("hidden");
   shareResult.classList.add("hidden");
 };
 
-closeBtn.onclick = () => {
-  overlay.classList.add("hidden");
-};
+closeShareBtn.onclick = () =>
+  shareOverlay.classList.add("hidden");
 
 shareButtons.forEach(btn => {
   btn.onclick = async () => {
@@ -199,22 +353,26 @@ shareButtons.forEach(btn => {
         ? Timestamp.fromMillis(Date.now() + 86400000)
         : null;
 
-    await setDoc(doc(db, SHARE_COLLECTION, pageId), {
-      ownerUid: currentUser.uid,
-      expiresAt,
-      revoked: false,
-      createdAt: serverTimestamp()
-    });
+    await setDoc(
+      doc(db, SHARE_COLLECTION, pageId),
+      {
+        ownerUid: currentUser.uid,
+        expiresAt,
+        revoked: false,
+        createdAt: serverTimestamp()
+      }
+    );
 
-    shareLinkInput.value =
+    const link =
       `${location.origin}/viewonly/fiction-view.html?page=${pageId}`;
 
+    shareLinkInput.value = link;
     shareResult.classList.remove("hidden");
   };
 });
 
-copyBtn.onclick = () => {
+copyShareBtn.onclick = () => {
   navigator.clipboard.writeText(shareLinkInput.value);
-  copyBtn.textContent = "Copied!";
-  setTimeout(() => (copyBtn.textContent = "Copy"), 1000);
+  copyShareBtn.textContent = "Copied!";
+  setTimeout(() => (copyShareBtn.textContent = "Copy"), 1200);
 };
