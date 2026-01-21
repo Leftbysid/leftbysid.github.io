@@ -111,11 +111,11 @@ window.addQuote = async () => {
   quoteText.value = "";
   authorInput.value = "";
 
-  loadQuotes(); // refresh once
+  loadQuotes();
 };
 
 /* =====================
-   LOAD QUOTES (NO SNAPSHOT)
+   LOAD QUOTES (READ-SAFE)
 ===================== */
 async function loadQuotes() {
   const q = query(
@@ -137,23 +137,20 @@ function applyView() {
   let list = [...quotes];
 
   if (searchQuery) {
-  const isAuthorOnly = searchQuery.startsWith("@");
-  const term = isAuthorOnly
-    ? searchQuery.slice(1)
-    : searchQuery;
+    const isAuthorOnly = searchQuery.startsWith("@");
+    const term = isAuthorOnly
+      ? searchQuery.slice(1)
+      : searchQuery;
 
-  list = list.filter(q => {
-    const text = q.text.toLowerCase();
-    const author = (q.author || "").toLowerCase();
+    list = list.filter(q => {
+      const text = q.text.toLowerCase();
+      const author = (q.author || "").toLowerCase();
 
-    if (isAuthorOnly) {
-      return author.includes(term);
-    }
-
-    return text.includes(term) || author.includes(term);
-  });
-}
-
+      return isAuthorOnly
+        ? author.includes(term)
+        : text.includes(term) || author.includes(term);
+    });
+  }
 
   if (sortMode === "recent") {
     list.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
@@ -238,12 +235,47 @@ window.confirmDelete = async () => {
 };
 
 /* =====================
-   SHARE OVERLAY (FIXED)
+   EXPORTS (RESTORED)
+===================== */
+exportJsonBtn.onclick = () => {
+  const data = {
+    exportedAt: new Date().toISOString(),
+    count: quotes.length,
+    quotes
+  };
+
+  const blob = new Blob(
+    [JSON.stringify(data, null, 2)],
+    { type: "application/json" }
+  );
+
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "quotes.json";
+  a.click();
+};
+
+exportPdfBtn.onclick = () => {
+  const win = window.open("", "_blank");
+  win.document.write("<pre>");
+  quotes.forEach(q => {
+    win.document.write(`“${q.text}”\n`);
+    if (q.author) win.document.write(`— ${q.author}\n`);
+    win.document.write("\n\n");
+  });
+  win.document.write("</pre>");
+  win.document.close();
+  win.print();
+};
+
+/* =====================
+   SHARE OVERLAY (SAFE)
 ===================== */
 shareOverlay.classList.add("hidden");
 shareResult.classList.add("hidden");
 
 shareBtn.onclick = () => {
+  if (!currentUser) return alert("Not authenticated");
   shareResult.classList.add("hidden");
   shareOverlay.classList.remove("hidden");
 };
