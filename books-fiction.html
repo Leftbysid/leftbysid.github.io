@@ -50,16 +50,12 @@
 <div id="bookForm" class="book-form hidden">
   <input id="title" placeholder="Title">
 
-  <!-- AUTHOR -->
   <div style="position: relative;">
     <input id="author" placeholder="Author">
-    <div id="authorSuggestions" class="suggestions hidden"></div>
   </div>
 
-  <!-- CATEGORY -->
   <div style="position: relative;">
     <input id="category" placeholder="Category">
-    <div id="categorySuggestions" class="suggestions hidden"></div>
   </div>
 
   <input id="date" type="date">
@@ -94,12 +90,32 @@
   </div>
 </div>
 
+<!-- 🔗 SHARE PAGE MODAL (REQUIRED) -->
+<div id="shareOverlay" class="overlay hidden">
+  <div class="share-box">
+    <h3>🔗 Share Fiction Library</h3>
+
+    <div class="share-actions">
+      <button data-mode="permanent">Permanent</button>
+      <button data-mode="24h">24 Hours</button>
+      <button data-mode="revoke" class="danger">Revoke</button>
+    </div>
+
+    <div id="shareResult" class="share-result hidden">
+      <input id="shareLink" readonly>
+      <button id="copyShareLink">Copy</button>
+    </div>
+
+    <button class="close-btn" id="closeShare">✖ Close</button>
+  </div>
+</div>
+
 <!-- PDF LIB -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
 <script type="module" src="books-fiction.js"></script>
 
-<!-- 🔥 REQUIRED: HOVER-ONLY GIF LOGIC -->
+<!-- 🔥 GIF HOVER -->
 <script>
   document.addEventListener('DOMContentLoaded', () => {
     document.querySelectorAll('.home-gif img').forEach(img => {
