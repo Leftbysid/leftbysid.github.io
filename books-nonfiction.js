@@ -3,11 +3,22 @@
 ================================ */
 import { auth, db } from "./firebase.js";
 import {
-  collection, addDoc, deleteDoc, updateDoc,
-  doc, query, where, onSnapshot, getDocs
+  collection,
+  addDoc,
+  deleteDoc,
+  updateDoc,
+  setDoc,
+  doc,
+  query,
+  where,
+  onSnapshot,
+  serverTimestamp,
+  Timestamp
 } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-firestore.js";
+
 import { onAuthStateChanged }
   from "https://www.gstatic.com/firebasejs/12.7.0/firebase-auth.js";
+
 import { requireAuth } from "./auth-guard.js";
 
 /* ===============================
@@ -16,9 +27,10 @@ import { requireAuth } from "./auth-guard.js";
 requireAuth();
 
 /* ===============================
-   FIRESTORE COLLECTION
+   FIRESTORE COLLECTIONS
 ================================ */
 const COLLECTION_NAME = "books_nonfiction";
+const SHARE_COLLECTION = "books_nonfiction_pages_public";
 
 /* ===============================
    STATE
@@ -30,6 +42,8 @@ let deleteId = null;
 
 let currentFilter = "all";
 let sortMode = "recent";
+
+let activeShareId = null;
 
 /* ===============================
    ELEMENTS
@@ -55,19 +69,21 @@ const editAuthor = document.getElementById("editAuthor");
 const editCategory = document.getElementById("editCategory");
 const editDate = document.getElementById("editDate");
 
-/* EXPORT BUTTONS */
 const exportJsonBtn = document.getElementById("exportJsonBtn");
 const exportPdfBtn = document.getElementById("exportPdfBtn");
 
-/* 🔹 SUGGESTION BOXES */
-const authorSuggestions = document.getElementById("authorSuggestions");
-const categorySuggestions = document.getElementById("categorySuggestions");
+/* SHARE UI */
+const shareBtn = document.getElementById("sharePageBtn");
+const shareOverlay = document.getElementById("shareOverlay");
+const closeShareBtn = document.getElementById("closeShare");
+const shareResult = document.getElementById("shareResult");
+const shareLinkInput = document.getElementById("shareLink");
+const copyShareBtn = document.getElementById("copyShareLink");
+const shareButtons = document.querySelectorAll(".share-actions button");
 
 /* ===============================
    UI INIT
 ================================ */
-document.querySelector(".title").textContent = "📖 NON-FICTION ARCHIVE";
-
 document.getElementById("toggleForm").onclick =
   () => bookForm.classList.toggle("hidden");
 
@@ -90,12 +106,12 @@ window.addBook = async () => {
   const newAuthor = authorInput.value.trim().toLowerCase();
 
   const exists = books.some(b =>
-    (b.title || "").toLowerCase() === newTitle &&
-    (b.author || "").toLowerCase() === newAuthor
+    b.title.toLowerCase() === newTitle &&
+    b.author.toLowerCase() === newAuthor
   );
 
   if (exists) {
-    alert("This book already exists in your library.");
+    alert("This book already exists.");
     return;
   }
 
@@ -168,9 +184,6 @@ filterSelect.onchange = () => {
   applyView();
 };
 
-/* ===============================
-   SEARCH
-================================ */
 searchInput.oninput = () => {
   const q = searchInput.value.toLowerCase();
   renderBooks(
@@ -183,7 +196,7 @@ searchInput.oninput = () => {
 };
 
 /* ===============================
-   RENDER
+   RENDER (UNCHANGED)
 ================================ */
 function renderBooks(list) {
   bookList.innerHTML = "";
@@ -191,7 +204,8 @@ function renderBooks(list) {
   list.forEach(b => {
     bookList.innerHTML += `
       <div class="book-row-wrapper">
-        <span class="owned-icon ${b.owned ? "owned" : ""}">📕</span>
+
+        <span class="owned-icon ${b.owned ? "owned" : ""}">📘</span>
 
         <div class="book-row ${b.read ? "read" : ""}">
           <div>
@@ -217,6 +231,7 @@ function renderBooks(list) {
           <button onclick="editBook('${b.id}')">✏️</button>
           <button onclick="askDelete('${b.id}')">🗑️</button>
         </div>
+
       </div>
     `;
   });
@@ -271,51 +286,93 @@ window.askDelete = id => {
 
 window.confirmDelete = async () => {
   await deleteDoc(doc(db, COLLECTION_NAME, deleteId));
-  closeConfirm();
+  document.getElementById("confirmBox").classList.add("hidden");
 };
 
-window.closeConfirm = () =>
-  document.getElementById("confirmBox").classList.add("hidden");
-
 /* ===============================
-   EXPORT JSON
+   EXPORTS
 ================================ */
 exportJsonBtn.onclick = () => {
-  const data = {
-    exportedAt: new Date().toISOString(),
-    nonFiction: books.map(({ id, uid, ...rest }) => rest)
-  };
-
-  const blob = new Blob([JSON.stringify(data, null, 2)], {
-    type: "application/json"
-  });
-
+  const blob = new Blob(
+    [JSON.stringify(books, null, 2)],
+    { type: "application/json" }
+  );
   const a = document.createElement("a");
   a.href = URL.createObjectURL(blob);
-  a.download = "non-fiction-books.json";
+  a.download = "nonfiction-books.json";
   a.click();
 };
 
-/* ===============================
-   EXPORT PDF
-================================ */
 exportPdfBtn.onclick = () => {
   const { jsPDF } = window.jspdf;
   const pdf = new jsPDF();
   let y = 12;
 
-  pdf.text("NON-FICTION BOOKS", 10, y);
-  y += 10;
-
   books.forEach((b, i) => {
-    const line = `${i + 1}. ${b.title} — ${b.author}`;
-    pdf.text(line, 10, y);
+    pdf.text(`${i + 1}. ${b.title} — ${b.author}`, 10, y);
     y += 8;
-    if (y > 280) {
-      pdf.addPage();
-      y = 12;
-    }
+    if (y > 280) { pdf.addPage(); y = 12; }
   });
 
-  pdf.save("non-fiction-books.pdf");
+  pdf.save("nonfiction-books.pdf");
+};
+
+/* ===============================
+   SHARE LOGIC
+================================ */
+shareBtn.onclick = () => {
+  shareOverlay.classList.remove("hidden");
+  shareResult.classList.add("hidden");
+};
+
+closeShareBtn.onclick = () =>
+  shareOverlay.classList.add("hidden");
+
+shareButtons.forEach(btn => {
+  btn.onclick = async () => {
+    const mode = btn.dataset.mode;
+
+    if (mode === "revoke") {
+      if (!activeShareId) return alert("No active link");
+
+      await updateDoc(
+        doc(db, SHARE_COLLECTION, activeShareId),
+        { revoked: true }
+      );
+
+      shareResult.classList.add("hidden");
+      activeShareId = null;
+      return alert("Link revoked");
+    }
+
+    const pageId = crypto.randomUUID();
+    activeShareId = pageId;
+
+    const expiresAt =
+      mode === "24h"
+        ? Timestamp.fromMillis(Date.now() + 86400000)
+        : null;
+
+    await setDoc(
+      doc(db, SHARE_COLLECTION, pageId),
+      {
+        ownerUid: currentUser.uid,
+        expiresAt,
+        revoked: false,
+        createdAt: serverTimestamp()
+      }
+    );
+
+    const link =
+      `${location.origin}/viewonly/nonfiction-view.html?page=${pageId}`;
+
+    shareLinkInput.value = link;
+    shareResult.classList.remove("hidden");
+  };
+});
+
+copyShareBtn.onclick = () => {
+  navigator.clipboard.writeText(shareLinkInput.value);
+  copyShareBtn.textContent = "Copied!";
+  setTimeout(() => (copyShareBtn.textContent = "Copy"), 1200);
 };
