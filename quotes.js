@@ -180,7 +180,7 @@ searchInput.oninput = () => {
     searchQuery = searchInput.value.trim().toLowerCase();
     visibleCount = PAGE_SIZE;
     applyView();
-  }, 300);
+  }, 4000);
 };
 
 /* =====================
