@@ -119,7 +119,15 @@ window.addBook = async () => {
     uid: currentUser.uid,
     title: titleInput.value.trim(),
     author: authorInput.value.trim(),
-    category: categoryInput.value.trim(),
+
+    /* ✅ SORT GENRES ALPHABETICALLY */
+    category: categoryInput.value
+      .split(",")
+      .map(x => x.trim())
+      .filter(Boolean)
+      .sort((a, b) => a.localeCompare(b))
+      .join(", "),
+
     date: dateInput.value,
     read: false,
     owned: false,
@@ -196,16 +204,24 @@ searchInput.oninput = () => {
 };
 
 /* ===============================
-   RENDER (UNCHANGED)
+   RENDER (UNCHANGED STYLE)
 ================================ */
 function renderBooks(list) {
   bookList.innerHTML = "";
 
   list.forEach(b => {
+    /* ✅ SORT GENRES ALSO FOR DISPLAY */
+    const sortedCategory = (b.category || "")
+      .split(",")
+      .map(x => x.trim())
+      .filter(Boolean)
+      .sort((a, b) => a.localeCompare(b))
+      .join(", ");
+
     bookList.innerHTML += `
       <div class="book-row-wrapper">
 
-        <span class="owned-icon ${b.owned ? "owned" : ""}">📘</span>
+        <span class="owned-icon ${b.owned ? "owned" : ""}">📕</span>
 
         <div class="book-row ${b.read ? "read" : ""}">
           <div>
@@ -216,7 +232,7 @@ function renderBooks(list) {
             </span>
           </div>
           <div>
-            <span>${b.category || ""}</span><br>
+            <span>${sortedCategory}</span><br>
             <span>${b.date || ""}</span>
           </div>
         </div>
@@ -267,7 +283,15 @@ window.saveEdit = async () => {
   await updateDoc(doc(db, COLLECTION_NAME, editingId), {
     title: editTitle.value,
     author: editAuthor.value,
-    category: editCategory.value,
+
+    /* ✅ SORT GENRES WHEN EDIT SAVED TOO */
+    category: editCategory.value
+      .split(",")
+      .map(x => x.trim())
+      .filter(Boolean)
+      .sort((a, b) => a.localeCompare(b))
+      .join(", "),
+
     date: editDate.value
   });
   editOverlay.classList.add("hidden");
