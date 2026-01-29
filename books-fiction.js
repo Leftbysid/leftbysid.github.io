@@ -120,7 +120,15 @@ window.addBook = async () => {
     uid: currentUser.uid,
     title: titleInput.value.trim(),
     author: authorInput.value.trim(),
-    category: categoryInput.value.trim(),
+
+    // ✅ CHANGE 1: AUTO SORT CATEGORY BEFORE SAVING
+    category: categoryInput.value
+      .split(",")
+      .map(x => x.trim())
+      .filter(Boolean)
+      .sort((a, b) => a.localeCompare(b))
+      .join(", "),
+
     date: dateInput.value,
     read: false,
     owned: false,
@@ -221,6 +229,14 @@ function renderBooks(list) {
   bookList.innerHTML = "";
 
   list.forEach(b => {
+    // ✅ CHANGE 2: ALWAYS DISPLAY CATEGORY SORTED
+    const sortedCategory = (b.category || "")
+      .split(",")
+      .map(x => x.trim())
+      .filter(Boolean)
+      .sort((a, b) => a.localeCompare(b))
+      .join(", ");
+
     bookList.innerHTML += `
       <div class="book-row-wrapper">
         <span class="owned-icon ${b.owned ? "owned" : ""}">📘</span>
@@ -234,7 +250,7 @@ function renderBooks(list) {
             </span>
           </div>
           <div>
-            <span>${b.category || ""}</span><br>
+            <span>${sortedCategory}</span><br>
             <span>${b.date || ""}</span>
           </div>
         </div>
@@ -288,7 +304,15 @@ window.saveEdit = async () => {
   await updateDoc(doc(db, COLLECTION_NAME, editingId), {
     title: editTitle.value,
     author: editAuthor.value,
-    category: editCategory.value,
+
+    // ✅ OPTIONAL: keep edit also sorted when saving edit
+    category: editCategory.value
+      .split(",")
+      .map(x => x.trim())
+      .filter(Boolean)
+      .sort((a, b) => a.localeCompare(b))
+      .join(", "),
+
     date: editDate.value
   });
   editOverlay.classList.add("hidden");
