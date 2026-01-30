@@ -12,67 +12,166 @@ import {
   onSnapshot
 } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-firestore.js";
 
-import {
-  onAuthStateChanged
-} from "https://www.gstatic.com/firebasejs/12.7.0/firebase-auth.js";
+import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-auth.js";
 
 /* =========================
    ELEMENTS
 ========================= */
+const notesList = document.getElementById("notesList");
+const totalNotes = document.getElementById("totalNotes");
+
+const searchInput = document.getElementById("searchInput");
+const sortBtn = document.getElementById("sortBtn");
+
+/* ADD OVERLAY */
+const addOverlay = document.getElementById("addOverlay");
+const openAddOverlay = document.getElementById("openAddOverlay");
+const closeAddOverlay = document.getElementById("closeAddOverlay");
+
 const noteTitle = document.getElementById("noteTitle");
+const noteDate = document.getElementById("noteDate");
 const noteBody = document.getElementById("noteBody");
 const addNoteBtn = document.getElementById("addNoteBtn");
-const notesGrid = document.getElementById("notesGrid");
 const statusText = document.getElementById("statusText");
 
-/* OVERLAY */
+/* EDIT OVERLAY */
 const noteOverlay = document.getElementById("noteOverlay");
 const closeOverlay = document.getElementById("closeOverlay");
+
 const editTitle = document.getElementById("editTitle");
+const editDate = document.getElementById("editDate");
 const editBody = document.getElementById("editBody");
 const saveEditBtn = document.getElementById("saveEditBtn");
 const deleteBtn = document.getElementById("deleteBtn");
 const overlayMeta = document.getElementById("overlayMeta");
 
-/* CURRENT */
+/* =========================
+   STATE
+========================= */
 let currentUser = null;
 let currentNoteId = null;
+
+let allNotes = []; // local cache for search filter
+let sortMode = "recent"; // recent | old
 
 /* =========================
    HELPERS
 ========================= */
-function safeText(s) {
-  return (s ?? "").toString();
+function safeText(v) {
+  return (v ?? "").toString();
 }
 
-function shortPreview(text, max = 120) {
-  const t = safeText(text).trim();
-  if (!t) return "(empty note)";
-  return t.length > max ? t.slice(0, max) + "..." : t;
+function fmtDate(dateStr) {
+  if (!dateStr) return "";
+  return `📅 ${dateStr}`;
 }
 
-function openOverlay(noteDoc) {
-  const data = noteDoc.data();
+function openAdd() {
+  statusText.textContent = "";
+  noteTitle.value = "";
+  noteBody.value = "";
+  noteDate.value = "";
+  addOverlay.classList.remove("hidden");
+}
+
+function closeAdd() {
+  addOverlay.classList.add("hidden");
+}
+
+function openEdit(noteDoc) {
+  const d = noteDoc.data();
   currentNoteId = noteDoc.id;
 
-  editTitle.value = safeText(data.title);
-  editBody.value = safeText(data.body);
+  editTitle.value = safeText(d.title);
+  editBody.value = safeText(d.body);
+  editDate.value = safeText(d.noteDate); // optional
 
   overlayMeta.textContent = "Opened note";
   noteOverlay.classList.remove("hidden");
 }
 
-function closeOverlayUI() {
+function closeEdit() {
   noteOverlay.classList.add("hidden");
   currentNoteId = null;
 }
 
-function setStatus(msg) {
-  statusText.textContent = msg;
+function renderNotes() {
+  const search = safeText(searchInput.value).trim().toLowerCase();
+
+  let filtered = allNotes.filter(n => {
+    const title = safeText(n.data.title).toLowerCase();
+    const body = safeText(n.data.body).toLowerCase();
+    const d = safeText(n.data.noteDate).toLowerCase();
+    return title.includes(search) || body.includes(search) || d.includes(search);
+  });
+
+  // sort locally
+  filtered.sort((a, b) => {
+    const ta = a.data.createdAt?.seconds || 0;
+    const tb = b.data.createdAt?.seconds || 0;
+    return sortMode === "recent" ? (tb - ta) : (ta - tb);
+  });
+
+  totalNotes.textContent = `Total: ${filtered.length}`;
+
+  if (filtered.length === 0) {
+    notesList.innerHTML = `<p class="muted">No notes found.</p>`;
+    return;
+  }
+
+  notesList.innerHTML = "";
+
+  filtered.forEach(noteObj => {
+    const d = noteObj.data;
+
+    const row = document.createElement("div");
+    row.className = "note-row";
+
+    const text = document.createElement("p");
+    text.className = "note-text";
+    text.textContent = safeText(d.body) || "(empty note)";
+
+    const meta = document.createElement("div");
+    meta.className = "note-meta";
+
+    const title = safeText(d.title).trim();
+    const dateLine = fmtDate(safeText(d.noteDate));
+
+    meta.textContent = `${title ? "— " + title : ""}${dateLine ? "   " + dateLine : ""}`.trim();
+
+    const actions = document.createElement("div");
+    actions.className = "note-actions";
+
+    const editBtn = document.createElement("button");
+    editBtn.className = "icon-btn";
+    editBtn.title = "Edit";
+    editBtn.textContent = "✏️";
+
+    const delBtn = document.createElement("button");
+    delBtn.className = "icon-btn";
+    delBtn.title = "Delete";
+    delBtn.textContent = "🗑️";
+
+    editBtn.onclick = () => openEdit(noteObj.ref);
+    delBtn.onclick = async () => {
+      const ok = confirm("Delete this note?");
+      if (!ok) return;
+      await deleteDoc(doc(db, "notes", noteObj.id));
+    };
+
+    actions.appendChild(editBtn);
+    actions.appendChild(delBtn);
+
+    row.appendChild(text);
+    if (meta.textContent) row.appendChild(meta);
+    row.appendChild(actions);
+
+    notesList.appendChild(row);
+  });
 }
 
 /* =========================
-   LOAD + LIVE NOTES
+   LIVE LOAD NOTES
 ========================= */
 onAuthStateChanged(auth, user => {
   if (!user) return;
@@ -85,62 +184,53 @@ onAuthStateChanged(auth, user => {
   );
 
   onSnapshot(q, snap => {
-    if (snap.empty) {
-      notesGrid.innerHTML = `<p class="muted">No notes yet.</p>`;
-      return;
-    }
-
-    notesGrid.innerHTML = "";
-    snap.forEach(noteDoc => {
-      const d = noteDoc.data();
-
-      const card = document.createElement("div");
-      card.className = "note-card";
-      card.innerHTML = `
-        <h3 class="note-title">${safeText(d.title) || "UNTITLED"}</h3>
-        <p class="note-preview">${shortPreview(d.body)}</p>
-      `;
-
-      card.onclick = () => openOverlay(noteDoc);
-
-      notesGrid.appendChild(card);
+    allNotes = [];
+    snap.forEach(docSnap => {
+      allNotes.push({
+        id: docSnap.id,
+        data: docSnap.data(),
+        ref: docSnap
+      });
     });
+
+    renderNotes();
   });
 });
 
 /* =========================
-   CREATE NOTE
+   ADD NOTE
 ========================= */
 addNoteBtn.addEventListener("click", async () => {
   if (!currentUser) return;
 
   const title = safeText(noteTitle.value).trim();
   const body = safeText(noteBody.value).trim();
+  const dateStr = safeText(noteDate.value).trim(); // optional yyyy-mm-dd
 
   if (!title && !body) {
-    setStatus("Write something first.");
+    statusText.textContent = "Write something first.";
     return;
   }
 
   addNoteBtn.disabled = true;
-  setStatus("Saving...");
+  statusText.textContent = "Saving...";
 
   try {
     await addDoc(collection(db, "notes"), {
       uid: currentUser.uid,
       title,
       body,
+      noteDate: dateStr || null,
       createdAt: serverTimestamp(),
       updatedAt: serverTimestamp()
     });
 
-    noteTitle.value = "";
-    noteBody.value = "";
-    setStatus("Saved ✅");
+    statusText.textContent = "Saved ✅";
+    setTimeout(() => closeAdd(), 400);
 
   } catch (err) {
     console.error("Add note error:", err);
-    setStatus("Failed to save ❌");
+    statusText.textContent = "Failed to save ❌";
   }
 
   addNoteBtn.disabled = false;
@@ -152,19 +242,19 @@ addNoteBtn.addEventListener("click", async () => {
 saveEditBtn.addEventListener("click", async () => {
   if (!currentUser || !currentNoteId) return;
 
-  const title = safeText(editTitle.value).trim();
-  const body = safeText(editBody.value).trim();
-
   saveEditBtn.disabled = true;
 
   try {
     await updateDoc(doc(db, "notes", currentNoteId), {
-      title,
-      body,
+      title: safeText(editTitle.value).trim(),
+      body: safeText(editBody.value).trim(),
+      noteDate: safeText(editDate.value).trim() || null,
       updatedAt: serverTimestamp()
     });
 
-    overlayMeta.textContent = "Saved changes ✅";
+    overlayMeta.textContent = "Saved ✅";
+    setTimeout(() => closeEdit(), 300);
+
   } catch (err) {
     console.error("Update note error:", err);
     overlayMeta.textContent = "Save failed ❌";
@@ -174,7 +264,7 @@ saveEditBtn.addEventListener("click", async () => {
 });
 
 /* =========================
-   DELETE NOTE
+   DELETE NOTE (overlay)
 ========================= */
 deleteBtn.addEventListener("click", async () => {
   if (!currentUser || !currentNoteId) return;
@@ -186,7 +276,7 @@ deleteBtn.addEventListener("click", async () => {
 
   try {
     await deleteDoc(doc(db, "notes", currentNoteId));
-    closeOverlayUI();
+    closeEdit();
   } catch (err) {
     console.error("Delete note error:", err);
     overlayMeta.textContent = "Delete failed ❌";
@@ -196,14 +286,33 @@ deleteBtn.addEventListener("click", async () => {
 });
 
 /* =========================
+   SEARCH + SORT
+========================= */
+searchInput.addEventListener("input", renderNotes);
+
+sortBtn.addEventListener("click", () => {
+  sortMode = sortMode === "recent" ? "old" : "recent";
+  sortBtn.textContent = sortMode === "recent" ? "🕒 Recently Added" : "🕰 Oldest First";
+  renderNotes();
+});
+
+/* =========================
    OVERLAY EVENTS
 ========================= */
-closeOverlay.addEventListener("click", closeOverlayUI);
+openAddOverlay.addEventListener("click", openAdd);
+closeAddOverlay.addEventListener("click", closeAdd);
+addOverlay.addEventListener("click", (e) => {
+  if (e.target === addOverlay) closeAdd();
+});
 
+closeOverlay.addEventListener("click", closeEdit);
 noteOverlay.addEventListener("click", (e) => {
-  if (e.target === noteOverlay) closeOverlayUI();
+  if (e.target === noteOverlay) closeEdit();
 });
 
 document.addEventListener("keydown", (e) => {
-  if (e.key === "Escape") closeOverlayUI();
+  if (e.key === "Escape") {
+    closeAdd();
+    closeEdit();
+  }
 });
