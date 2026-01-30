@@ -20,49 +20,71 @@ onAuthStateChanged(auth, user => {
 });
 </script>
 
-<!-- MATRIX BACKGROUND -->
-<canvas id="matrix"></canvas>
+<div class="page">
 
-<div class="container">
-
-  <!-- TOP BAR -->
-  <div class="topbar">
-    <a href="dashboard.html" class="back-btn">⬅ BACK</a>
-    <h1 class="page-title">NOTES</h1>
+  <!-- TOP RIGHT BUTTONS -->
+  <div class="top-actions">
+    <a href="dashboard.html" class="action-btn">⬅ Back</a>
   </div>
 
-  <!-- ADD NOTE -->
-  <div class="panel">
-    <h2 class="panel-title">CREATE NOTE</h2>
+  <!-- HEADER CENTER -->
+  <header class="header">
+    <div class="title-row">
+      <span class="title-icon">🗒️</span>
+      <h1 class="title">NOTES VAULT</h1>
+    </div>
+
+    <p class="total" id="totalNotes">Total: 0</p>
+
+    <!-- CONTROLS -->
+    <div class="controls">
+      <input id="searchInput" class="search" type="text" placeholder="Search notes..." />
+      <button id="sortBtn" class="filter-btn">🕒 Recently Added</button>
+    </div>
+
+    <button class="add-btn" id="openAddOverlay">＋ Add Note</button>
+  </header>
+
+  <!-- LIST -->
+  <main class="list" id="notesList">
+    <p class="muted">Loading...</p>
+  </main>
+
+</div>
+
+<!-- ADD NOTE OVERLAY -->
+<div class="overlay hidden" id="addOverlay">
+  <div class="overlay-box">
+
+    <div class="overlay-head">
+      <h2 class="overlay-title">ADD NOTE</h2>
+      <button class="close-btn" id="closeAddOverlay">✖</button>
+    </div>
 
     <input id="noteTitle" class="input" type="text" placeholder="Title (optional)" />
+
+    <!-- ✅ OPTIONAL DATE -->
+    <input id="noteDate" class="input" type="date" />
+
     <textarea id="noteBody" class="textarea" placeholder="Write your note..."></textarea>
 
     <button class="btn" id="addNoteBtn">SAVE NOTE</button>
     <p class="status" id="statusText"></p>
+
   </div>
-
-  <!-- NOTES LIST -->
-  <div class="panel">
-    <h2 class="panel-title">YOUR NOTES</h2>
-
-    <div class="notes-grid" id="notesGrid">
-      <p class="muted">Loading...</p>
-    </div>
-  </div>
-
 </div>
 
-<!-- VIEW / EDIT OVERLAY -->
+<!-- VIEW/EDIT OVERLAY -->
 <div class="overlay hidden" id="noteOverlay">
   <div class="overlay-box">
 
     <div class="overlay-head">
-      <h2 id="overlayTitle">NOTE</h2>
+      <h2 class="overlay-title">EDIT NOTE</h2>
       <button class="close-btn" id="closeOverlay">✖</button>
     </div>
 
     <input id="editTitle" class="input" type="text" placeholder="Title" />
+    <input id="editDate" class="input" type="date" />
     <textarea id="editBody" class="textarea" placeholder="Note..."></textarea>
 
     <div class="overlay-actions">
@@ -75,11 +97,6 @@ onAuthStateChanged(auth, user => {
   </div>
 </div>
 
-<!-- LOGIC -->
 <script type="module" src="notes.js"></script>
-
-<!-- MATRIX EFFECT -->
-<script src="matrix.js"></script>
-
 </body>
 </html>
