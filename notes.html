@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Notes</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="notes.css" />
+</head>
+<body>
+
+<!-- AUTH GUARD -->
+<script type="module">
+import { auth } from "./firebase.js";
+import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-auth.js";
+
+onAuthStateChanged(auth, user => {
+  if (!user) window.location.href = "index.html";
+});
+</script>
+
+<!-- MATRIX BACKGROUND -->
+<canvas id="matrix"></canvas>
+
+<div class="container">
+
+  <!-- TOP BAR -->
+  <div class="topbar">
+    <a href="dashboard.html" class="back-btn">⬅ BACK</a>
+    <h1 class="page-title">NOTES</h1>
+  </div>
+
+  <!-- ADD NOTE -->
+  <div class="panel">
+    <h2 class="panel-title">CREATE NOTE</h2>
+
+    <input id="noteTitle" class="input" type="text" placeholder="Title (optional)" />
+    <textarea id="noteBody" class="textarea" placeholder="Write your note..."></textarea>
+
+    <button class="btn" id="addNoteBtn">SAVE NOTE</button>
+    <p class="status" id="statusText"></p>
+  </div>
+
+  <!-- NOTES LIST -->
+  <div class="panel">
+    <h2 class="panel-title">YOUR NOTES</h2>
+
+    <div class="notes-grid" id="notesGrid">
+      <p class="muted">Loading...</p>
+    </div>
+  </div>
+
+</div>
+
+<!-- VIEW / EDIT OVERLAY -->
+<div class="overlay hidden" id="noteOverlay">
+  <div class="overlay-box">
+
+    <div class="overlay-head">
+      <h2 id="overlayTitle">NOTE</h2>
+      <button class="close-btn" id="closeOverlay">✖</button>
+    </div>
+
+    <input id="editTitle" class="input" type="text" placeholder="Title" />
+    <textarea id="editBody" class="textarea" placeholder="Note..."></textarea>
+
+    <div class="overlay-actions">
+      <button class="btn" id="saveEditBtn">SAVE CHANGES</button>
+      <button class="btn danger" id="deleteBtn">DELETE</button>
+    </div>
+
+    <p class="overlay-meta" id="overlayMeta"></p>
+
+  </div>
+</div>
+
+<!-- LOGIC -->
+<script type="module" src="notes.js"></script>
+
+<!-- MATRIX EFFECT -->
+<script src="matrix.js"></script>
+
+</body>
+</html>
