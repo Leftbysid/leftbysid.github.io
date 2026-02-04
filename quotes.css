@@ -217,22 +217,23 @@ body {
 }
 
 /* =========================
-   SHARE MODAL (SAFE)
+   SHARE MODAL (WORKS WITH .hidden)
 ========================= */
 .overlay {
   position: fixed;
   inset: 0;
   background: rgba(0,0,0,.75);
-  z-index: 999;
-  display: none;           /* 🔒 NEVER visible by default */
+  z-index: 9999;
+
+  display: flex;                 /* ✅ default is visible */
   justify-content: center;
   align-items: center;
 }
 
-.overlay.active {
-  display: flex;
+/* ✅ HIDE when .hidden exists */
+.overlay.hidden {
+  display: none;
 }
-
 
 .share-box {
   background: #0b0f0d;
@@ -282,6 +283,10 @@ body {
   display: flex;
   gap: 6px;
   margin-bottom: 10px;
+}
+
+.share-result.hidden {
+  display: none;
 }
 
 .share-result input {
