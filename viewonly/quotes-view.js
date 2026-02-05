@@ -7,7 +7,10 @@ import {
   collection,
   query,
   where,
-  getDocs
+  getDocs,
+  orderBy,
+  limit,
+  startAfter
 } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-firestore.js";
 
 /* =========================
@@ -25,7 +28,9 @@ if (!pageId) {
   throw new Error("Missing page id");
 }
 
-/* Validate shared page */
+/* =========================
+   VALIDATE SHARE PAGE
+========================= */
 const pageSnap = await getDoc(
   doc(db, "quotes_pages_public", pageId)
 );
@@ -37,18 +42,79 @@ if (!pageSnap.exists()) {
 
 const { ownerUid } = pageSnap.data();
 
-/* Load ALL quotes for owner */
-const snap = await getDocs(
-  query(
+/* =========================
+   PAGINATION STATE
+========================= */
+const PAGE_SIZE = 30;
+let lastDoc = null;
+let allQuotes = [];
+let loading = false;
+let fullyLoaded = false;
+
+/* =========================
+   LOAD MORE BUTTON (JS)
+========================= */
+const loadMoreBtn = document.createElement("button");
+loadMoreBtn.textContent = "Load more";
+loadMoreBtn.style.margin = "20px auto";
+loadMoreBtn.style.display = "none";
+loadMoreBtn.onclick = loadNextPage;
+
+list.after(loadMoreBtn);
+
+/* =========================
+   FIRST LOAD
+========================= */
+await loadNextPage();
+
+/* =========================
+   LOAD NEXT PAGE
+========================= */
+async function loadNextPage() {
+  if (loading || fullyLoaded) return;
+  loading = true;
+
+  let q = query(
     collection(db, "quotes"),
-    where("uid", "==", ownerUid)
-  )
-);
+    where("uid", "==", ownerUid),
+    orderBy("createdAt", "desc"),
+    limit(PAGE_SIZE)
+  );
 
-let quotes = snap.docs.map(d => d.data());
+  if (lastDoc) {
+    q = query(
+      collection(db, "quotes"),
+      where("uid", "==", ownerUid),
+      orderBy("createdAt", "desc"),
+      startAfter(lastDoc),
+      limit(PAGE_SIZE)
+    );
+  }
 
-function render(arr) {
-  list.innerHTML = "";
+  const snap = await getDocs(q);
+
+  if (snap.empty) {
+    fullyLoaded = true;
+    loadMoreBtn.style.display = "none";
+    return;
+  }
+
+  lastDoc = snap.docs[snap.docs.length - 1];
+
+  const newQuotes = snap.docs.map(d => d.data());
+  allQuotes.push(...newQuotes);
+
+  render(newQuotes, true);
+
+  loadMoreBtn.style.display = "block";
+  loading = false;
+}
+
+/* =========================
+   RENDER
+========================= */
+function render(arr, append = false) {
+  if (!append) list.innerHTML = "";
 
   arr.forEach(q => {
     const div = document.createElement("div");
@@ -63,15 +129,24 @@ function render(arr) {
   });
 }
 
-render(quotes);
-
-/* Normal search */
+/* =========================
+   SEARCH (CLIENT SIDE)
+========================= */
 search.oninput = () => {
-  const v = search.value.toLowerCase();
-  render(
-    quotes.filter(q =>
-      q.text.toLowerCase().includes(v) ||
-      (q.author || "").toLowerCase().includes(v)
-    )
+  const v = search.value.toLowerCase().trim();
+
+  if (!v) {
+    list.innerHTML = "";
+    render(allQuotes);
+    loadMoreBtn.style.display = fullyLoaded ? "none" : "block";
+    return;
+  }
+
+  const filtered = allQuotes.filter(q =>
+    q.text.toLowerCase().includes(v) ||
+    (q.author || "").toLowerCase().includes(v)
   );
+
+  loadMoreBtn.style.display = "none";
+  render(filtered);
 };
