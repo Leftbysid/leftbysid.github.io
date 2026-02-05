@@ -33,6 +33,21 @@ const PAGE_SIZE = 20;
 let visibleCount = PAGE_SIZE;
 
 /* =========================
+   CREATE LOAD MORE BUTTON FIRST ✅
+========================= */
+const loadMoreBtn = document.createElement("button");
+loadMoreBtn.textContent = "Load more";
+loadMoreBtn.style.display = "block";
+loadMoreBtn.style.margin = "30px auto";
+loadMoreBtn.style.padding = "10px 24px";
+loadMoreBtn.style.background = "black";
+loadMoreBtn.style.border = "2px solid #00ff9c";
+loadMoreBtn.style.color = "#00ff9c";
+loadMoreBtn.style.cursor = "pointer";
+
+quoteList.after(loadMoreBtn);
+
+/* =========================
    VALIDATE SHARE PAGE
 ========================= */
 const pageSnap = await getDoc(
@@ -68,22 +83,29 @@ const snap = await getDocs(q);
 quotes = snap.docs.map(d => d.data());
 
 totalQuotesEl.textContent = quotes.length;
-applyView();
 
 /* =========================
-   SEARCH (GLOBAL + FAST)
+   RENDER
 ========================= */
-let searchTimer = null;
-searchInput.oninput = () => {
-  clearTimeout(searchTimer);
-  searchTimer = setTimeout(() => {
-    visibleCount = PAGE_SIZE;
-    applyView();
-  }, 300);
-};
+function render(list) {
+  quoteList.innerHTML = "";
+
+  list.forEach(q => {
+    quoteList.innerHTML += `
+      <div class="quote-row">
+        <p class="quote-text">“${q.text}”</p>
+        ${q.author ? `<p class="quote-author">— ${q.author}</p>` : ""}
+      </div>
+    `;
+  });
+
+  // Hide Load More if everything is visible
+  loadMoreBtn.style.display =
+    list.length < visibleCount ? "none" : "block";
+}
 
 /* =========================
-   APPLY VIEW (UI PAGINATION)
+   APPLY VIEW (SEARCH + PAGINATION)
 ========================= */
 function applyView() {
   const term = searchInput.value.trim().toLowerCase();
@@ -101,41 +123,26 @@ function applyView() {
 }
 
 /* =========================
-   LOAD MORE (UI ONLY)
+   EVENTS
 ========================= */
-const loadMoreBtn = document.createElement("button");
-loadMoreBtn.textContent = "Load more";
-loadMoreBtn.style.display = "block";
-loadMoreBtn.style.margin = "30px auto";
-loadMoreBtn.style.padding = "10px 24px";
-loadMoreBtn.style.background = "black";
-loadMoreBtn.style.border = "2px solid #00ff9c";
-loadMoreBtn.style.color = "#00ff9c";
-loadMoreBtn.style.cursor = "pointer";
 
+// Load More
 loadMoreBtn.onclick = () => {
   visibleCount += PAGE_SIZE;
   applyView();
 };
 
-quoteList.after(loadMoreBtn);
+// Search (debounced)
+let searchTimer = null;
+searchInput.oninput = () => {
+  clearTimeout(searchTimer);
+  searchTimer = setTimeout(() => {
+    visibleCount = PAGE_SIZE;
+    applyView();
+  }, 300);
+};
 
 /* =========================
-   RENDER
+   INITIAL VIEW
 ========================= */
-function render(list) {
-  quoteList.innerHTML = "";
-
-  list.forEach(q => {
-    quoteList.innerHTML += `
-      <div class="quote-row">
-        <p class="quote-text">“${q.text}”</p>
-        ${q.author ? `<p class="quote-author">— ${q.author}</p>` : ""}
-      </div>
-    `;
-  });
-
-  // Hide load more if everything visible
-  loadMoreBtn.style.display =
-    list.length < visibleCount ? "none" : "block";
-}
+applyView();
