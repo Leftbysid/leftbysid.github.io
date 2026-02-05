@@ -7,10 +7,7 @@ import {
   collection,
   query,
   where,
-  getDocs,
-  orderBy,
-  limit,
-  startAfter
+  getDocs
 } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-firestore.js";
 
 /* =========================
@@ -22,7 +19,6 @@ const pageId = params.get("page");
 const quoteList = document.getElementById("quoteList");
 const searchInput = document.getElementById("search");
 const totalQuotesEl = document.getElementById("totalQuotes");
-const loadMoreBtn = document.getElementById("loadMoreBtn");
 
 if (!pageId) {
   quoteList.textContent = "Invalid link";
@@ -30,12 +26,11 @@ if (!pageId) {
 }
 
 /* =========================
-   STATE
+   STATE (SAME AS PRIVATE)
 ========================= */
-const PAGE_SIZE = 30;
-let lastDoc = null;
-let allLoaded = false;
 let quotes = [];
+const PAGE_SIZE = 20;
+let visibleCount = PAGE_SIZE;
 
 /* =========================
    VALIDATE SHARE PAGE
@@ -62,41 +57,68 @@ if (expiresAt && Date.now() > expiresAt.toMillis()) {
 }
 
 /* =========================
-   FETCH NEXT PAGE
+   LOAD ALL QUOTES (LIKE PRIVATE PAGE)
 ========================= */
-async function loadNextPage() {
-  if (allLoaded) return;
+const q = query(
+  collection(db, "quotes"),
+  where("uid", "==", ownerUid)
+);
 
-  let q = query(
-    collection(db, "quotes"),
-    where("uid", "==", ownerUid),
-    orderBy("createdAt", "desc"),
-    limit(PAGE_SIZE)
-  );
+const snap = await getDocs(q);
+quotes = snap.docs.map(d => d.data());
 
-  if (lastDoc) {
-    q = query(
-      collection(db, "quotes"),
-      where("uid", "==", ownerUid),
-      orderBy("createdAt", "desc"),
-      startAfter(lastDoc),
-      limit(PAGE_SIZE)
+totalQuotesEl.textContent = quotes.length;
+applyView();
+
+/* =========================
+   SEARCH (GLOBAL + FAST)
+========================= */
+let searchTimer = null;
+searchInput.oninput = () => {
+  clearTimeout(searchTimer);
+  searchTimer = setTimeout(() => {
+    visibleCount = PAGE_SIZE;
+    applyView();
+  }, 300);
+};
+
+/* =========================
+   APPLY VIEW (UI PAGINATION)
+========================= */
+function applyView() {
+  const term = searchInput.value.trim().toLowerCase();
+
+  let list = quotes;
+
+  if (term) {
+    list = quotes.filter(q =>
+      q.text.toLowerCase().includes(term) ||
+      (q.author || "").toLowerCase().includes(term)
     );
   }
 
-  const snap = await getDocs(q);
-
-  if (snap.empty) {
-    allLoaded = true;
-    loadMoreBtn.style.display = "none";
-    return;
-  }
-
-  lastDoc = snap.docs[snap.docs.length - 1];
-  quotes.push(...snap.docs.map(d => d.data()));
-
-  totalQuotesEl.textContent = quotes.length;
+  render(list.slice(0, visibleCount));
 }
+
+/* =========================
+   LOAD MORE (UI ONLY)
+========================= */
+const loadMoreBtn = document.createElement("button");
+loadMoreBtn.textContent = "Load more";
+loadMoreBtn.style.display = "block";
+loadMoreBtn.style.margin = "30px auto";
+loadMoreBtn.style.padding = "10px 24px";
+loadMoreBtn.style.background = "black";
+loadMoreBtn.style.border = "2px solid #00ff9c";
+loadMoreBtn.style.color = "#00ff9c";
+loadMoreBtn.style.cursor = "pointer";
+
+loadMoreBtn.onclick = () => {
+  visibleCount += PAGE_SIZE;
+  applyView();
+};
+
+quoteList.after(loadMoreBtn);
 
 /* =========================
    RENDER
@@ -112,51 +134,8 @@ function render(list) {
       </div>
     `;
   });
+
+  // Hide load more if everything visible
+  loadMoreBtn.style.display =
+    list.length < visibleCount ? "none" : "block";
 }
-
-/* =========================
-   HYBRID SEARCH (KEY PART)
-========================= */
-async function performSearch(term) {
-  let filtered = quotes.filter(q =>
-    q.text.toLowerCase().includes(term) ||
-    (q.author || "").toLowerCase().includes(term)
-  );
-
-  while (!filtered.length && !allLoaded) {
-    await loadNextPage();
-    filtered = quotes.filter(q =>
-      q.text.toLowerCase().includes(term) ||
-      (q.author || "").toLowerCase().includes(term)
-    );
-  }
-
-  render(filtered);
-}
-
-/* =========================
-   EVENTS
-========================= */
-loadMoreBtn.onclick = async () => {
-  await loadNextPage();
-  render(quotes);
-};
-
-let searchTimer = null;
-searchInput.oninput = () => {
-  clearTimeout(searchTimer);
-  searchTimer = setTimeout(async () => {
-    const term = searchInput.value.trim().toLowerCase();
-    if (!term) {
-      render(quotes);
-      return;
-    }
-    await performSearch(term);
-  }, 300);
-};
-
-/* =========================
-   INITIAL LOAD
-========================= */
-await loadNextPage();
-render(quotes);
