@@ -17,7 +17,7 @@ import {
    READ-ONLY SHARED PAGE
 ========================= */
 
-const params = new URLSearchParams(window.location.search);
+const params = new URLSearchParams(location.search);
 const pageId = params.get("page");
 
 const list = document.getElementById("quoteList");
@@ -29,7 +29,15 @@ if (!pageId) {
 }
 
 /* =========================
-   VALIDATE SHARE PAGE
+   PAGINATION STATE
+========================= */
+const PAGE_SIZE = 30;
+let lastDoc = null;
+let allLoaded = false;
+let quotes = [];
+
+/* =========================
+   VALIDATE SHARE LINK
 ========================= */
 const pageSnap = await getDoc(
   doc(db, "quotes_pages_public", pageId)
@@ -43,36 +51,20 @@ if (!pageSnap.exists()) {
 const { ownerUid } = pageSnap.data();
 
 /* =========================
-   PAGINATION STATE
-========================= */
-const PAGE_SIZE = 30;
-let lastDoc = null;
-let allQuotes = [];
-let loading = false;
-let fullyLoaded = false;
-
-/* =========================
-   LOAD MORE BUTTON (JS)
+   LOAD MORE BUTTON (DYNAMIC)
 ========================= */
 const loadMoreBtn = document.createElement("button");
 loadMoreBtn.textContent = "Load more";
 loadMoreBtn.style.margin = "20px auto";
-loadMoreBtn.style.display = "none";
+loadMoreBtn.style.display = "block";
 loadMoreBtn.onclick = loadNextPage;
-
 list.after(loadMoreBtn);
 
 /* =========================
-   FIRST LOAD
-========================= */
-await loadNextPage();
-
-/* =========================
-   LOAD NEXT PAGE
+   FETCH NEXT PAGE
 ========================= */
 async function loadNextPage() {
-  if (loading || fullyLoaded) return;
-  loading = true;
+  if (allLoaded) return;
 
   let q = query(
     collection(db, "quotes"),
@@ -94,59 +86,52 @@ async function loadNextPage() {
   const snap = await getDocs(q);
 
   if (snap.empty) {
-    fullyLoaded = true;
-    loadMoreBtn.style.display = "none";
+    allLoaded = true;
+    loadMoreBtn.remove();
     return;
   }
 
   lastDoc = snap.docs[snap.docs.length - 1];
-
-  const newQuotes = snap.docs.map(d => d.data());
-  allQuotes.push(...newQuotes);
-
-  render(newQuotes, true);
-
-  loadMoreBtn.style.display = "block";
-  loading = false;
+  quotes.push(...snap.docs.map(d => d.data()));
+  render(quotes);
 }
 
 /* =========================
    RENDER
 ========================= */
-function render(arr, append = false) {
-  if (!append) list.innerHTML = "";
+function render(arr) {
+  list.innerHTML = "";
 
   arr.forEach(q => {
     const div = document.createElement("div");
     div.className = "quote-card";
-
     div.innerHTML = `
       <p>${q.text}</p>
       ${q.author ? `<span>— ${q.author}</span>` : ""}
     `;
-
     list.appendChild(div);
   });
 }
 
 /* =========================
-   SEARCH (CLIENT SIDE)
+   SEARCH (LOCAL + FAST)
 ========================= */
+let searchTimer = null;
 search.oninput = () => {
-  const v = search.value.toLowerCase().trim();
+  clearTimeout(searchTimer);
+  searchTimer = setTimeout(() => {
+    const v = search.value.toLowerCase();
 
-  if (!v) {
-    list.innerHTML = "";
-    render(allQuotes);
-    loadMoreBtn.style.display = fullyLoaded ? "none" : "block";
-    return;
-  }
-
-  const filtered = allQuotes.filter(q =>
-    q.text.toLowerCase().includes(v) ||
-    (q.author || "").toLowerCase().includes(v)
-  );
-
-  loadMoreBtn.style.display = "none";
-  render(filtered);
+    render(
+      quotes.filter(q =>
+        q.text.toLowerCase().includes(v) ||
+        (q.author || "").toLowerCase().includes(v)
+      )
+    );
+  }, 300);
 };
+
+/* =========================
+   INITIAL LOAD
+========================= */
+loadNextPage();
