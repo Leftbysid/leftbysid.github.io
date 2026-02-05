@@ -14,22 +14,23 @@ import {
 } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-firestore.js";
 
 /* =========================
-   READ-ONLY SHARED PAGE
+   SETUP
 ========================= */
-
 const params = new URLSearchParams(location.search);
 const pageId = params.get("page");
 
-const list = document.getElementById("quoteList");
-const search = document.getElementById("search");
+const quoteList = document.getElementById("quoteList");
+const searchInput = document.getElementById("search");
+const totalQuotesEl = document.getElementById("totalQuotes");
+const loadMoreBtn = document.getElementById("loadMoreBtn");
 
 if (!pageId) {
-  list.textContent = "Invalid link";
+  quoteList.textContent = "Invalid link";
   throw new Error("Missing page id");
 }
 
 /* =========================
-   PAGINATION STATE
+   STATE
 ========================= */
 const PAGE_SIZE = 30;
 let lastDoc = null;
@@ -37,28 +38,28 @@ let allLoaded = false;
 let quotes = [];
 
 /* =========================
-   VALIDATE SHARE LINK
+   VALIDATE SHARE PAGE
 ========================= */
 const pageSnap = await getDoc(
   doc(db, "quotes_pages_public", pageId)
 );
 
 if (!pageSnap.exists()) {
-  list.textContent = "Link expired or revoked";
-  throw new Error("Invalid or expired link");
+  quoteList.textContent = "Link expired or revoked";
+  throw new Error("Invalid link");
 }
 
-const { ownerUid } = pageSnap.data();
+const { ownerUid, revoked, expiresAt } = pageSnap.data();
 
-/* =========================
-   LOAD MORE BUTTON (DYNAMIC)
-========================= */
-const loadMoreBtn = document.createElement("button");
-loadMoreBtn.textContent = "Load more";
-loadMoreBtn.style.margin = "20px auto";
-loadMoreBtn.style.display = "block";
-loadMoreBtn.onclick = loadNextPage;
-list.after(loadMoreBtn);
+if (revoked) {
+  quoteList.textContent = "This link has been revoked.";
+  throw new Error("Revoked");
+}
+
+if (expiresAt && Date.now() > expiresAt.toMillis()) {
+  quoteList.textContent = "This link has expired.";
+  throw new Error("Expired");
+}
 
 /* =========================
    FETCH NEXT PAGE
@@ -87,51 +88,75 @@ async function loadNextPage() {
 
   if (snap.empty) {
     allLoaded = true;
-    loadMoreBtn.remove();
+    loadMoreBtn.style.display = "none";
     return;
   }
 
   lastDoc = snap.docs[snap.docs.length - 1];
   quotes.push(...snap.docs.map(d => d.data()));
-  render(quotes);
+
+  totalQuotesEl.textContent = quotes.length;
 }
 
 /* =========================
    RENDER
 ========================= */
-function render(arr) {
-  list.innerHTML = "";
+function render(list) {
+  quoteList.innerHTML = "";
 
-  arr.forEach(q => {
-    const div = document.createElement("div");
-    div.className = "quote-card";
-    div.innerHTML = `
-      <p>${q.text}</p>
-      ${q.author ? `<span>— ${q.author}</span>` : ""}
+  list.forEach(q => {
+    quoteList.innerHTML += `
+      <div class="quote-row">
+        <p class="quote-text">“${q.text}”</p>
+        ${q.author ? `<p class="quote-author">— ${q.author}</p>` : ""}
+      </div>
     `;
-    list.appendChild(div);
   });
 }
 
 /* =========================
-   SEARCH (LOCAL + FAST)
+   HYBRID SEARCH (KEY PART)
 ========================= */
-let searchTimer = null;
-search.oninput = () => {
-  clearTimeout(searchTimer);
-  searchTimer = setTimeout(() => {
-    const v = search.value.toLowerCase();
+async function performSearch(term) {
+  let filtered = quotes.filter(q =>
+    q.text.toLowerCase().includes(term) ||
+    (q.author || "").toLowerCase().includes(term)
+  );
 
-    render(
-      quotes.filter(q =>
-        q.text.toLowerCase().includes(v) ||
-        (q.author || "").toLowerCase().includes(v)
-      )
+  while (!filtered.length && !allLoaded) {
+    await loadNextPage();
+    filtered = quotes.filter(q =>
+      q.text.toLowerCase().includes(term) ||
+      (q.author || "").toLowerCase().includes(term)
     );
+  }
+
+  render(filtered);
+}
+
+/* =========================
+   EVENTS
+========================= */
+loadMoreBtn.onclick = async () => {
+  await loadNextPage();
+  render(quotes);
+};
+
+let searchTimer = null;
+searchInput.oninput = () => {
+  clearTimeout(searchTimer);
+  searchTimer = setTimeout(async () => {
+    const term = searchInput.value.trim().toLowerCase();
+    if (!term) {
+      render(quotes);
+      return;
+    }
+    await performSearch(term);
   }, 300);
 };
 
 /* =========================
    INITIAL LOAD
 ========================= */
-loadNextPage();
+await loadNextPage();
+render(quotes);
