@@ -52,17 +52,4 @@ body {
   opacity: .85;
 }
 
-.load-more {
-  display: block;
-  margin: 30px auto;
-  padding: 10px 24px;
-  background: black;
-  border: 2px solid #00ff9c;
-  color: #00ff9c;
-  cursor: pointer;
-}
 
-.load-more:hover {
-  background: #00ff9c;
-  color: black;
-}
