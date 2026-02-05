@@ -10,18 +10,11 @@ body {
   text-shadow: 0 0 15px #00ff9c;
 }
 
-/* STATS */
 .stats {
   text-align: center;
   margin: 10px 0 18px;
-  font-size: 16px;
 }
 
-.stats span {
-  text-shadow: 0 0 12px rgba(0,255,156,.9);
-}
-
-/* CONTROLS */
 .controls {
   display: flex;
   justify-content: center;
@@ -36,7 +29,6 @@ body {
   color: #00ff9c;
 }
 
-/* QUOTES */
 .quote-row {
   max-width: 700px;
   margin: 20px auto;
@@ -52,11 +44,25 @@ body {
 
 .quote-text {
   font-size: 18px;
-  margin-bottom: 6px;
   font-style: italic;
 }
 
 .quote-author {
   font-size: 14px;
   opacity: .85;
+}
+
+.load-more {
+  display: block;
+  margin: 30px auto;
+  padding: 10px 24px;
+  background: black;
+  border: 2px solid #00ff9c;
+  color: #00ff9c;
+  cursor: pointer;
+}
+
+.load-more:hover {
+  background: #00ff9c;
+  color: black;
 }
