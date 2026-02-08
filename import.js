@@ -5,10 +5,28 @@ import {
   writeBatch
 } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-firestore.js";
 
+import { onAuthStateChanged } from
+  "https://www.gstatic.com/firebasejs/12.7.0/firebase-auth.js";
+
+/* ======================
+   DOM
+====================== */
 const importBtn = document.getElementById("importBtn");
 const fileInput = document.getElementById("fileInput");
 const statusEl = document.getElementById("status");
 
+/* ======================
+   AUTH STATE (CRITICAL)
+====================== */
+let currentUser = null;
+
+onAuthStateChanged(auth, user => {
+  currentUser = user;
+});
+
+/* ======================
+   UI
+====================== */
 importBtn.onclick = () => fileInput.click();
 
 fileInput.onchange = async () => {
@@ -16,12 +34,20 @@ fileInput.onchange = async () => {
   if (!file) return;
 
   try {
+    if (!currentUser) {
+      throw new Error("Auth not ready");
+    }
+
     const text = await file.text();
     const data = JSON.parse(text);
+
     await routeImport(data);
+
+    // ✅ success ONLY after batch.commit()
+    showStatus("✅ Import completed successfully");
   } catch (e) {
     console.error(e);
-    showStatus("❌ Invalid or unsupported JSON file");
+    showStatus("❌ Import failed: " + e.message);
   } finally {
     fileInput.value = "";
   }
@@ -36,57 +62,54 @@ function showStatus(msg) {
    ROUTER
 ====================== */
 async function routeImport(data) {
-  const user = auth.currentUser;
-  if (!user) throw new Error("Not authenticated");
+  const uid = currentUser.uid;
 
-  // CASE 1: plain array
+  // Plain array
   if (Array.isArray(data)) {
-    if (data[0]?.title && data[0]?.author !== undefined) {
-      return batchInsert("books_fiction", data, user.uid);
+    if (data[0]?.title) {
+      return batchInsert("books-fiction", data, uid);
     }
-
     if (data[0]?.text) {
-      return batchInsert("quotes", data, user.uid);
+      return batchInsert("quotes", data, uid);
     }
-
     throw new Error("Unsupported array format");
   }
 
-  // CASE 2: wrapped formats
+  // Wrapped formats
   if (Array.isArray(data.quotes)) {
-    return batchInsert("quotes", data.quotes, user.uid);
+    return batchInsert("quotes", data.quotes, uid);
   }
 
   if (Array.isArray(data.fiction)) {
-    return batchInsert("books_fiction", data.fiction, user.uid);
+    return batchInsert("books-fiction", data.fiction, uid);
   }
 
   if (Array.isArray(data.nonFiction)) {
-    return batchInsert("books_nonfiction", data.nonFiction, user.uid);
+    return batchInsert("books-nonfiction", data.nonFiction, uid);
   }
 
   if (Array.isArray(data.links)) {
-    return batchInsert("links", data.links, user.uid);
+    return batchInsert("links", data.links, uid);
   }
 
   throw new Error("No supported data found");
 }
 
 /* ======================
-   BATCH INSERT (FIXED)
+   BATCH INSERT (REAL, SAFE)
 ====================== */
 async function batchInsert(collectionName, items, uid) {
+  if (!items.length) {
+    throw new Error("No items to import");
+  }
+
   const batch = writeBatch(db);
-  let imported = 0;
-  let skipped = 0;
+  let count = 0;
 
-  items.forEach(item => {
-    if (!item.id) {
-      skipped++;
-      return;
-    }
+  for (const item of items) {
+    if (!item.id) continue;
 
-    // ✅ deterministic document ID
+    // 🔒 deterministic doc id = real duplicate prevention
     const ref = doc(db, collectionName, item.id);
 
     batch.set(ref, {
@@ -95,15 +118,13 @@ async function batchInsert(collectionName, items, uid) {
       importedAt: Date.now()
     });
 
-    imported++;
-  });
-
-  if (imported === 0) {
-    showStatus("ℹ️ No valid items to import");
-    return;
+    count++;
   }
 
-  await batch.commit();
+  if (count === 0) {
+    throw new Error("No valid items found");
+  }
 
-  showStatus(`✅ Imported ${imported} item(s)`);
+  // 🚨 THIS IS THE POINT OF TRUTH
+  await batch.commit();
 }
