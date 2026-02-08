@@ -336,6 +336,11 @@ window.confirmDelete = async () => {
   await loadBooks();
 };
 
+window.closeConfirm = () => {
+  deleteId = null;
+  document.getElementById("confirmBox").classList.add("hidden");
+};
+
 /* ===============================
    SHARE LOGIC (UNCHANGED)
 ================================ */
@@ -395,3 +400,4 @@ copyShareBtn.onclick = () => {
   copyShareBtn.textContent = "Copied!";
   setTimeout(() => (copyShareBtn.textContent = "Copy"), 1200);
 };
+
