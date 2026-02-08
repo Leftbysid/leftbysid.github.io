@@ -2,10 +2,7 @@ import { auth, db } from "./firebase.js";
 import {
   collection,
   doc,
-  writeBatch,
-  getDocs,
-  query,
-  where
+  writeBatch
 } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-firestore.js";
 
 const importBtn = document.getElementById("importBtn");
@@ -22,8 +19,6 @@ fileInput.onchange = async () => {
     const text = await file.text();
     const data = JSON.parse(text);
     await routeImport(data);
-
-    showStatus("✅ Import completed successfully");
   } catch (e) {
     console.error(e);
     showStatus("❌ Invalid or unsupported JSON file");
@@ -44,9 +39,8 @@ async function routeImport(data) {
   const user = auth.currentUser;
   if (!user) throw new Error("Not authenticated");
 
-  // ✅ CASE 1: plain array (AUTO-DETECT TYPE)
+  // CASE 1: plain array
   if (Array.isArray(data)) {
-    // Heuristic: detect by fields
     if (data[0]?.title && data[0]?.author !== undefined) {
       return batchInsert("books_fiction", data, user.uid);
     }
@@ -58,7 +52,7 @@ async function routeImport(data) {
     throw new Error("Unsupported array format");
   }
 
-  // ✅ CASE 2: wrapped formats
+  // CASE 2: wrapped formats
   if (Array.isArray(data.quotes)) {
     return batchInsert("quotes", data.quotes, user.uid);
   }
@@ -78,55 +72,38 @@ async function routeImport(data) {
   throw new Error("No supported data found");
 }
 
-
 /* ======================
-   BATCH INSERT
+   BATCH INSERT (FIXED)
 ====================== */
 async function batchInsert(collectionName, items, uid) {
-  // 1️⃣ Fetch existing sourceIds
-  const existingSnap = await getDocs(
-    query(
-      collection(db, collectionName),
-      where("uid", "==", uid)
-    )
-  );
-
-  const existingIds = new Set(
-    existingSnap.docs
-      .map(d => d.data().sourceId)
-      .filter(Boolean)
-  );
-
-  // 2️⃣ Prepare batch
   const batch = writeBatch(db);
-  let added = 0;
+  let imported = 0;
   let skipped = 0;
 
   items.forEach(item => {
-    const sourceId = item.id;
-
-    if (sourceId && existingIds.has(sourceId)) {
+    if (!item.id) {
       skipped++;
       return;
     }
 
-    const ref = doc(collection(db, collectionName));
+    // ✅ deterministic document ID
+    const ref = doc(db, collectionName, item.id);
+
     batch.set(ref, {
       ...item,
       uid,
-      sourceId,              // 👈 store original id
       importedAt: Date.now()
     });
 
-    added++;
+    imported++;
   });
 
-  if (added === 0) {
-    throw new Error("All items already imported");
+  if (imported === 0) {
+    showStatus("ℹ️ No valid items to import");
+    return;
   }
 
   await batch.commit();
 
-  console.log(`Imported: ${added}, Skipped duplicates: ${skipped}`);
+  showStatus(`✅ Imported ${imported} item(s)`);
 }
-
