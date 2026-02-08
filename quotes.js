@@ -392,3 +392,8 @@ window.confirmDelete = async () => {
   document.getElementById("confirmBox").classList.add("hidden");
   loadQuotes();
 };
+
+window.closeConfirm = () => {
+  deleteId = null;
+  document.getElementById("confirmBox").classList.add("hidden");
+};
