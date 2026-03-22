@@ -252,6 +252,7 @@ function renderBooks(list) {
 
     bookList.innerHTML += `
       <div class="book-row-wrapper">
+
         <span class="owned-icon ${b.owned ? "owned" : ""}">📕</span>
 
         <div class="book-row ${b.read ? "read" : ""}">
@@ -262,6 +263,7 @@ function renderBooks(list) {
               ${b.read ? "READ" : "UNREAD"}
             </span>
           </div>
+
           <div>
             <span>${sortedCategory}</span><br>
             <span>${b.date || ""}</span>
@@ -272,12 +274,15 @@ function renderBooks(list) {
           <input type="checkbox"
             ${b.owned ? "checked" : ""}
             onchange="toggleOwned('${b.id}', this.checked)">
+
           <button onclick="toggleRead('${b.id}', ${b.read})">
             ${b.read ? "✅" : "⬜"}
           </button>
+
           <button onclick="editBook('${b.id}')">✏️</button>
           <button onclick="askDelete('${b.id}')">🗑️</button>
         </div>
+
       </div>
     `;
   });
