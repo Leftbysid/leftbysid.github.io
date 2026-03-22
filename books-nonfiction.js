@@ -45,9 +45,10 @@ let sortMode = "recent";
 
 let activeShareId = null;
 
-/* ✅ PAGINATION */
+/* ✅ PAGINATION + SEARCH */
 const PAGE_SIZE = 20;
 let visibleCount = PAGE_SIZE;
+let searchQuery = "";
 
 /* ===============================
    ELEMENTS
@@ -87,6 +88,7 @@ const shareButtons = document.querySelectorAll(".share-actions button");
 
 /* ✅ LOAD MORE BUTTON */
 const loadMoreBtn = document.getElementById("loadMoreBooks");
+
 if (loadMoreBtn) {
   loadMoreBtn.onclick = () => {
     visibleCount += PAGE_SIZE;
@@ -163,15 +165,14 @@ function loadBooks() {
   onSnapshot(q, snap => {
     books = snap.docs.map(d => ({ id: d.id, ...d.data() }));
 
-    /* ✅ RESET PAGINATION */
-    visibleCount = PAGE_SIZE;
+    visibleCount = PAGE_SIZE; // reset pagination
 
     applyView();
   });
 }
 
 /* ===============================
-   VIEW LOGIC (UPDATED)
+   VIEW LOGIC (FINAL)
 ================================ */
 function applyView() {
   let list = [...books];
@@ -187,34 +188,59 @@ function applyView() {
     list.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
   }
 
-  const q = searchInput.value.toLowerCase();
+  /* 🔍 EXACT QUOTES SEARCH */
+  if (searchQuery) {
+    const isAuthorOnly = searchQuery.startsWith("@");
+    const term = isAuthorOnly ? searchQuery.slice(1) : searchQuery;
 
-  if (q) {
-    list = list.filter(b =>
-      b.title.toLowerCase().includes(q) ||
-      b.author.toLowerCase().includes(q) ||
-      (b.category || "").toLowerCase().includes(q)
-    );
+    list = list.filter(b => {
+      const title = (b.title || "").toLowerCase();
+      const author = (b.author || "").toLowerCase();
+
+      return isAuthorOnly
+        ? author.includes(term)
+        : title.includes(term) || author.includes(term);
+    });
   }
 
-  /* ✅ PAGINATION */
-  const visible = q
+  const visible = searchQuery
     ? list
     : list.slice(0, visibleCount);
 
   renderBooks(visible);
 
-  /* ✅ SHOW/HIDE LOAD MORE */
   if (loadMoreBtn) {
     loadMoreBtn.classList.toggle(
       "hidden",
-      !!q || list.length <= visibleCount
+      !!searchQuery || list.length <= visibleCount
     );
   }
 }
 
 /* ===============================
-   RENDER (UNCHANGED STYLE)
+   CONTROLS
+================================ */
+recentBtn.onclick = () => {
+  sortMode = "recent";
+  currentFilter = "all";
+  filterSelect.value = "all";
+  applyView();
+};
+
+filterSelect.onchange = () => {
+  currentFilter = filterSelect.value;
+  sortMode = "none";
+  applyView();
+};
+
+searchInput.oninput = () => {
+  searchQuery = searchInput.value.trim().toLowerCase();
+  visibleCount = PAGE_SIZE;
+  applyView();
+};
+
+/* ===============================
+   RENDER
 ================================ */
 function renderBooks(list) {
   bookList.innerHTML = "";
@@ -267,5 +293,5 @@ function renderBooks(list) {
 }
 
 /* ===============================
-   REST UNCHANGED
+   TOGGLES / EDIT / DELETE / EXPORT / SHARE (UNCHANGED)
 ================================ */
