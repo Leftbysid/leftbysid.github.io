@@ -164,15 +164,13 @@ function loadBooks() {
 
   onSnapshot(q, snap => {
     books = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-
-    visibleCount = PAGE_SIZE; // reset pagination
-
+    visibleCount = PAGE_SIZE;
     applyView();
   });
 }
 
 /* ===============================
-   VIEW LOGIC (FINAL)
+   VIEW LOGIC
 ================================ */
 function applyView() {
   let list = [...books];
@@ -188,7 +186,6 @@ function applyView() {
     list.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
   }
 
-  /* 🔍 EXACT QUOTES SEARCH */
   if (searchQuery) {
     const isAuthorOnly = searchQuery.startsWith("@");
     const term = isAuthorOnly ? searchQuery.slice(1) : searchQuery;
@@ -255,7 +252,6 @@ function renderBooks(list) {
 
     bookList.innerHTML += `
       <div class="book-row-wrapper">
-
         <span class="owned-icon ${b.owned ? "owned" : ""}">📕</span>
 
         <div class="book-row ${b.read ? "read" : ""}">
@@ -282,7 +278,6 @@ function renderBooks(list) {
           <button onclick="editBook('${b.id}')">✏️</button>
           <button onclick="askDelete('${b.id}')">🗑️</button>
         </div>
-
       </div>
     `;
   });
@@ -293,5 +288,16 @@ function renderBooks(list) {
 }
 
 /* ===============================
-   TOGGLES / EDIT / DELETE / EXPORT / SHARE (UNCHANGED)
+   ✅ FIXED TOGGLES (ERROR FIX)
 ================================ */
+window.toggleRead = async (id, current) => {
+  await updateDoc(doc(db, COLLECTION_NAME, id), {
+    read: !current
+  });
+};
+
+window.toggleOwned = async (id, value) => {
+  await updateDoc(doc(db, COLLECTION_NAME, id), {
+    owned: value
+  });
+};
