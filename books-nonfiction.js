@@ -301,3 +301,52 @@ window.toggleOwned = async (id, value) => {
     owned: value
   });
 };
+
+/* ===============================
+   EDIT
+================================ */
+window.editBook = id => {
+  const b = books.find(x => x.id === id);
+  editingId = id;
+  editTitle.value = b.title;
+  editAuthor.value = b.author;
+  editCategory.value = b.category || "";
+  editDate.value = b.date || "";
+  editOverlay.classList.remove("hidden");
+};
+
+window.saveEdit = async () => {
+  await updateDoc(doc(db, COLLECTION_NAME, editingId), {
+    title: editTitle.value,
+    author: editAuthor.value,
+    category: editCategory.value
+      .split(",")
+      .map(x => x.trim())
+      .filter(Boolean)
+      .sort((a, b) => a.localeCompare(b))
+      .join(", "),
+    date: editDate.value
+  });
+  editOverlay.classList.add("hidden");
+};
+
+window.closeEdit = () =>
+  editOverlay.classList.add("hidden");
+
+/* ===============================
+   DELETE
+================================ */
+window.askDelete = id => {
+  deleteId = id;
+  document.getElementById("confirmBox").classList.remove("hidden");
+};
+
+window.confirmDelete = async () => {
+  await deleteDoc(doc(db, COLLECTION_NAME, deleteId));
+  document.getElementById("confirmBox").classList.add("hidden");
+};
+
+window.closeConfirm = () => {
+  deleteId = null;
+  document.getElementById("confirmBox").classList.add("hidden");
+};
