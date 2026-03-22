@@ -456,3 +456,42 @@ body {
   color: #888;
   cursor: pointer;
 }
+
+/* ===============================
+   LOAD MORE BUTTON (PAGINATION)
+================================ */
+#loadMoreBooks {
+  display: block;
+  margin: 30px auto;
+  padding: 10px 24px;
+
+  background: black;
+  border: 2px solid #00ff9c;
+  color: #00ff9c;
+
+  font-family: 'Share Tech Mono', monospace;
+  letter-spacing: 1px;
+
+  cursor: pointer;
+
+  box-shadow:
+    0 0 12px rgba(0,255,156,.5),
+    inset 0 0 10px rgba(0,255,156,.2);
+
+  transition:
+    background .2s ease,
+    color .2s ease,
+    box-shadow .2s ease,
+    transform .15s ease;
+}
+
+#loadMoreBooks:hover {
+  background: #00ff9c;
+  color: black;
+
+  box-shadow:
+    0 0 20px rgba(0,255,156,.9),
+    inset 0 0 10px rgba(0,0,0,.4);
+
+  transform: translateY(-2px);
+}
