@@ -1,19 +1,11 @@
 /* ===============================
-   IMPORTS (MUST BE FIRST)
+   IMPORTS
 ================================ */
 import { auth, db } from "./firebase.js";
 import {
-  collection,
-  addDoc,
-  deleteDoc,
-  updateDoc,
-  setDoc,
-  doc,
-  query,
-  where,
-  getDocs,
-  serverTimestamp,
-  Timestamp
+  collection, addDoc, deleteDoc, updateDoc, setDoc,
+  doc, query, where, getDocs,
+  serverTimestamp, Timestamp
 } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-firestore.js";
 
 import { onAuthStateChanged }
@@ -21,13 +13,21 @@ import { onAuthStateChanged }
 
 import { requireAuth } from "./auth-guard.js";
 
-/* ===============================
-   ROUTE GUARD
-================================ */
 requireAuth();
 
 /* ===============================
-   FIRESTORE COLLECTION
+   HELPERS
+================================ */
+function formatDateInput(value) {
+  value = value.trim();
+  if (!value) return "";
+  if (/^\d{4}$/.test(value)) return value;
+  if (/^\d{4}-\d{2}-\d{2}$/.test(value)) return value;
+  return value;
+}
+
+/* ===============================
+   CONFIG
 ================================ */
 const COLLECTION_NAME = "books_fiction";
 const SHARE_COLLECTION = "books_fiction_pages_public";
@@ -42,9 +42,10 @@ let deleteId = null;
 
 let currentFilter = "all";
 let sortMode = "recent";
-let searchQuery = "";
 
-let activeShareId = null;
+const PAGE_SIZE = 20;
+let visibleCount = PAGE_SIZE;
+let searchQuery = "";
 
 /* ===============================
    ELEMENTS
@@ -70,20 +71,20 @@ const editAuthor = document.getElementById("editAuthor");
 const editCategory = document.getElementById("editCategory");
 const editDate = document.getElementById("editDate");
 
-const exportJsonBtn = document.getElementById("exportJsonBtn");
-const exportPdfBtn = document.getElementById("exportPdfBtn");
-
-/* SHARE UI */
-const shareBtn = document.getElementById("sharePageBtn");
-const shareOverlay = document.getElementById("shareOverlay");
-const closeShareBtn = document.getElementById("closeShare");
-const shareResult = document.getElementById("shareResult");
-const shareLinkInput = document.getElementById("shareLink");
-const copyShareBtn = document.getElementById("copyShareLink");
-const shareButtons = document.querySelectorAll(".share-actions button");
+const loadMoreBtn = document.getElementById("loadMoreBooks");
 
 /* ===============================
-   UI INIT
+   LOAD MORE
+================================ */
+if (loadMoreBtn) {
+  loadMoreBtn.onclick = () => {
+    visibleCount += PAGE_SIZE;
+    applyView();
+  };
+}
+
+/* ===============================
+   UI
 ================================ */
 document.getElementById("toggleForm").onclick =
   () => bookForm.classList.toggle("hidden");
@@ -94,7 +95,7 @@ document.getElementById("toggleForm").onclick =
 onAuthStateChanged(auth, user => {
   if (!user) return;
   currentUser = user;
-  loadBooks(); // 🔥 one-time read
+  loadBooks();
 });
 
 /* ===============================
@@ -103,40 +104,20 @@ onAuthStateChanged(auth, user => {
 window.addBook = async () => {
   if (!titleInput.value || !authorInput.value) return;
 
-  const newTitle = titleInput.value.trim().toLowerCase();
-  const newAuthor = authorInput.value.trim().toLowerCase();
-
-  const exists = books.some(b =>
-    b.title.toLowerCase() === newTitle &&
-    b.author.toLowerCase() === newAuthor
-  );
-
-  if (exists) {
-    alert("This book already exists.");
-    return;
-  }
-
   await addDoc(collection(db, COLLECTION_NAME), {
     uid: currentUser.uid,
     title: titleInput.value.trim(),
     author: authorInput.value.trim(),
-
-    // ✅ CHANGE 1: AUTO SORT CATEGORY BEFORE SAVING
-    category: categoryInput.value
-      .split(",")
-      .map(x => x.trim())
-      .filter(Boolean)
-      .sort((a, b) => a.localeCompare(b))
-      .join(", "),
-
-    date: dateInput.value,
+    category: categoryInput.value,
+    date: formatDateInput(dateInput.value),
     read: false,
     owned: false,
     createdAt: Date.now()
   });
 
-  await loadBooks(); // 🔥 manual refresh
+  await loadBooks();
   bookForm.classList.add("hidden");
+
   titleInput.value = "";
   authorInput.value = "";
   categoryInput.value = "";
@@ -144,7 +125,7 @@ window.addBook = async () => {
 };
 
 /* ===============================
-   LOAD BOOKS (READ SAFE)
+   LOAD BOOKS
 ================================ */
 async function loadBooks() {
   const q = query(
@@ -154,6 +135,8 @@ async function loadBooks() {
 
   const snap = await getDocs(q);
   books = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+
+  visibleCount = PAGE_SIZE;
   applyView();
 }
 
@@ -163,23 +146,22 @@ async function loadBooks() {
 function applyView() {
   let list = [...books];
 
-  /* 🔍 SEARCH */
+  /* 🔍 EXACT QUOTES SEARCH */
   if (searchQuery) {
-    if (searchQuery.startsWith("@")) {
-      const authorOnly = searchQuery.slice(1);
-      list = list.filter(b =>
-        b.author.toLowerCase().includes(authorOnly)
-      );
-    } else {
-      list = list.filter(b =>
-        b.title.toLowerCase().includes(searchQuery) ||
-        b.author.toLowerCase().includes(searchQuery) ||
-        (b.category || "").toLowerCase().includes(searchQuery)
-      );
-    }
+    const isAuthorOnly = searchQuery.startsWith("@");
+    const term = isAuthorOnly ? searchQuery.slice(1) : searchQuery;
+
+    list = list.filter(b => {
+      const title = (b.title || "").toLowerCase();
+      const author = (b.author || "").toLowerCase();
+
+      return isAuthorOnly
+        ? author.includes(term)
+        : title.includes(term) || author.includes(term);
+    });
   }
 
-  /* FILTERS */
+  /* FILTER */
   switch (currentFilter) {
     case "owned": list = list.filter(b => b.owned); break;
     case "not-owned": list = list.filter(b => !b.owned); break;
@@ -191,7 +173,18 @@ function applyView() {
     list.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
   }
 
-  renderBooks(list);
+  const visible = searchQuery
+    ? list
+    : list.slice(0, visibleCount);
+
+  renderBooks(visible);
+
+  if (loadMoreBtn) {
+    loadMoreBtn.classList.toggle(
+      "hidden",
+      !!searchQuery || list.length <= visibleCount
+    );
+  }
 }
 
 /* ===============================
@@ -210,33 +203,19 @@ filterSelect.onchange = () => {
   applyView();
 };
 
-/* ===============================
-   SEARCH (DEBOUNCED + @AUTHOR)
-================================ */
-let searchTimer = null;
 searchInput.oninput = () => {
-  clearTimeout(searchTimer);
-  searchTimer = setTimeout(() => {
-    searchQuery = searchInput.value.trim().toLowerCase();
-    applyView();
-  }, 300);
+  searchQuery = searchInput.value.trim().toLowerCase();
+  visibleCount = PAGE_SIZE;
+  applyView();
 };
 
 /* ===============================
-   RENDER (UNCHANGED)
+   RENDER
 ================================ */
 function renderBooks(list) {
   bookList.innerHTML = "";
 
   list.forEach(b => {
-    // ✅ CHANGE 2: ALWAYS DISPLAY CATEGORY SORTED
-    const sortedCategory = (b.category || "")
-      .split(",")
-      .map(x => x.trim())
-      .filter(Boolean)
-      .sort((a, b) => a.localeCompare(b))
-      .join(", ");
-
     bookList.innerHTML += `
       <div class="book-row-wrapper">
         <span class="owned-icon ${b.owned ? "owned" : ""}">📘</span>
@@ -249,8 +228,9 @@ function renderBooks(list) {
               ${b.read ? "READ" : "UNREAD"}
             </span>
           </div>
+
           <div>
-            <span>${sortedCategory}</span><br>
+            <span>${b.category || ""}</span><br>
             <span>${b.date || ""}</span>
           </div>
         </div>
@@ -269,9 +249,9 @@ function renderBooks(list) {
     `;
   });
 
-  totalCount.textContent = list.length;
-  readCount.textContent = list.filter(b => b.read).length;
-  unreadCount.textContent = list.filter(b => !b.read).length;
+  totalCount.textContent = books.length;
+  readCount.textContent = books.filter(b => b.read).length;
+  unreadCount.textContent = books.filter(b => !b.read).length;
 }
 
 /* ===============================
@@ -293,10 +273,12 @@ window.toggleOwned = async (id, value) => {
 window.editBook = id => {
   const b = books.find(x => x.id === id);
   editingId = id;
+
   editTitle.value = b.title;
   editAuthor.value = b.author;
   editCategory.value = b.category || "";
   editDate.value = b.date || "";
+
   editOverlay.classList.remove("hidden");
 };
 
@@ -304,17 +286,10 @@ window.saveEdit = async () => {
   await updateDoc(doc(db, COLLECTION_NAME, editingId), {
     title: editTitle.value,
     author: editAuthor.value,
-
-    // ✅ OPTIONAL: keep edit also sorted when saving edit
-    category: editCategory.value
-      .split(",")
-      .map(x => x.trim())
-      .filter(Boolean)
-      .sort((a, b) => a.localeCompare(b))
-      .join(", "),
-
-    date: editDate.value
+    category: editCategory.value,
+    date: formatDateInput(editDate.value)
   });
+
   editOverlay.classList.add("hidden");
   await loadBooks();
 };
@@ -340,64 +315,3 @@ window.closeConfirm = () => {
   deleteId = null;
   document.getElementById("confirmBox").classList.add("hidden");
 };
-
-/* ===============================
-   SHARE LOGIC (UNCHANGED)
-================================ */
-shareBtn.onclick = () => {
-  shareOverlay.classList.remove("hidden");
-  shareResult.classList.add("hidden");
-};
-
-closeShareBtn.onclick = () =>
-  shareOverlay.classList.add("hidden");
-
-shareButtons.forEach(btn => {
-  btn.onclick = async () => {
-    const mode = btn.dataset.mode;
-
-    if (mode === "revoke") {
-      if (!activeShareId) return alert("No active link");
-
-      await updateDoc(
-        doc(db, SHARE_COLLECTION, activeShareId),
-        { revoked: true }
-      );
-
-      shareResult.classList.add("hidden");
-      activeShareId = null;
-      return alert("Link revoked");
-    }
-
-    const pageId = crypto.randomUUID();
-    activeShareId = pageId;
-
-    const expiresAt =
-      mode === "24h"
-        ? Timestamp.fromMillis(Date.now() + 86400000)
-        : null;
-
-    await setDoc(
-      doc(db, SHARE_COLLECTION, pageId),
-      {
-        ownerUid: currentUser.uid,
-        expiresAt,
-        revoked: false,
-        createdAt: serverTimestamp()
-      }
-    );
-
-    const link =
-      `${location.origin}/viewonly/fiction-view.html?page=${pageId}`;
-
-    shareLinkInput.value = link;
-    shareResult.classList.remove("hidden");
-  };
-});
-
-copyShareBtn.onclick = () => {
-  navigator.clipboard.writeText(shareLinkInput.value);
-  copyShareBtn.textContent = "Copied!";
-  setTimeout(() => (copyShareBtn.textContent = "Copy"), 1200);
-};
-
