@@ -515,3 +515,19 @@ body {
   color: #888;
   cursor: pointer;
 }
+
+#loadMoreBooks {
+  display: block;
+  margin: 30px auto;
+  padding: 10px 24px;
+  background: black;
+  border: 2px solid #00ff9c;
+  color: #00ff9c;
+  cursor: pointer;
+  box-shadow: 0 0 12px rgba(0,255,156,.5);
+}
+
+#loadMoreBooks:hover {
+  background: #00ff9c;
+  color: black;
+}
