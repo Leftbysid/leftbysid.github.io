@@ -306,3 +306,39 @@ window.saveEdit = async () => {
   });
   editOverlay.classList.add("hidden");
 };
+
+/* ===============================
+   EDIT
+================================ */
+window.editBook = id => {
+  const b = books.find(x => x.id === id);
+  editingId = id;
+
+  editTitle.value = b.title;
+  editAuthor.value = b.author;
+  editCategory.value = b.category || "";
+  editDate.value = b.date ? b.date.toString() : "";
+
+  editOverlay.classList.remove("hidden");
+};
+
+window.closeEdit = () =>
+  editOverlay.classList.add("hidden");
+
+/* ===============================
+   DELETE
+================================ */
+window.askDelete = id => {
+  deleteId = id;
+  document.getElementById("confirmBox").classList.remove("hidden");
+};
+
+window.confirmDelete = async () => {
+  await deleteDoc(doc(db, COLLECTION_NAME, deleteId));
+  document.getElementById("confirmBox").classList.add("hidden");
+};
+
+window.closeConfirm = () => {
+  deleteId = null;
+  document.getElementById("confirmBox").classList.add("hidden");
+};
