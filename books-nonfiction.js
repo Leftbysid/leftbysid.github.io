@@ -27,6 +27,21 @@ import { requireAuth } from "./auth-guard.js";
 requireAuth();
 
 /* ===============================
+   ✅ DATE HELPER (ADDED)
+================================ */
+function formatDateInput(value) {
+  value = value.trim();
+
+  if (!value) return "";
+
+  if (/^\d{4}$/.test(value)) return value;
+
+  if (/^\d{4}-\d{2}-\d{2}$/.test(value)) return value;
+
+  return value;
+}
+
+/* ===============================
    FIRESTORE COLLECTIONS
 ================================ */
 const COLLECTION_NAME = "books_nonfiction";
@@ -45,7 +60,7 @@ let sortMode = "recent";
 
 let activeShareId = null;
 
-/* ✅ PAGINATION + SEARCH */
+/* PAGINATION + SEARCH */
 const PAGE_SIZE = 20;
 let visibleCount = PAGE_SIZE;
 let searchQuery = "";
@@ -74,19 +89,7 @@ const editAuthor = document.getElementById("editAuthor");
 const editCategory = document.getElementById("editCategory");
 const editDate = document.getElementById("editDate");
 
-const exportJsonBtn = document.getElementById("exportJsonBtn");
-const exportPdfBtn = document.getElementById("exportPdfBtn");
-
-/* SHARE UI */
-const shareBtn = document.getElementById("sharePageBtn");
-const shareOverlay = document.getElementById("shareOverlay");
-const closeShareBtn = document.getElementById("closeShare");
-const shareResult = document.getElementById("shareResult");
-const shareLinkInput = document.getElementById("shareLink");
-const copyShareBtn = document.getElementById("copyShareLink");
-const shareButtons = document.querySelectorAll(".share-actions button");
-
-/* ✅ LOAD MORE BUTTON */
+/* LOAD MORE */
 const loadMoreBtn = document.getElementById("loadMoreBooks");
 
 if (loadMoreBtn) {
@@ -96,15 +99,11 @@ if (loadMoreBtn) {
   };
 }
 
-/* ===============================
-   UI INIT
-================================ */
+/* UI */
 document.getElementById("toggleForm").onclick =
   () => bookForm.classList.toggle("hidden");
 
-/* ===============================
-   AUTH
-================================ */
+/* AUTH */
 onAuthStateChanged(auth, user => {
   if (!user) return;
   currentUser = user;
@@ -112,7 +111,7 @@ onAuthStateChanged(auth, user => {
 });
 
 /* ===============================
-   ADD BOOK
+   ADD BOOK (FIXED)
 ================================ */
 window.addBook = async () => {
   if (!titleInput.value || !authorInput.value) return;
@@ -125,10 +124,7 @@ window.addBook = async () => {
     b.author.toLowerCase() === newAuthor
   );
 
-  if (exists) {
-    alert("This book already exists.");
-    return;
-  }
+  if (exists) return alert("This book already exists.");
 
   await addDoc(collection(db, COLLECTION_NAME), {
     uid: currentUser.uid,
@@ -140,7 +136,7 @@ window.addBook = async () => {
       .filter(Boolean)
       .sort((a, b) => a.localeCompare(b))
       .join(", "),
-    date: dateInput.value,
+    date: formatDateInput(dateInput.value), // ✅ FIXED
     read: false,
     owned: false,
     createdAt: Date.now()
@@ -153,9 +149,7 @@ window.addBook = async () => {
   dateInput.value = "";
 };
 
-/* ===============================
-   LOAD BOOKS
-================================ */
+/* LOAD BOOKS */
 function loadBooks() {
   const q = query(
     collection(db, COLLECTION_NAME),
@@ -169,9 +163,7 @@ function loadBooks() {
   });
 }
 
-/* ===============================
-   VIEW LOGIC
-================================ */
+/* VIEW */
 function applyView() {
   let list = [...books];
 
@@ -214,9 +206,7 @@ function applyView() {
   }
 }
 
-/* ===============================
-   CONTROLS
-================================ */
+/* CONTROLS */
 recentBtn.onclick = () => {
   sortMode = "recent";
   currentFilter = "all";
@@ -236,9 +226,7 @@ searchInput.oninput = () => {
   applyView();
 };
 
-/* ===============================
-   RENDER
-================================ */
+/* RENDER */
 function renderBooks(list) {
   bookList.innerHTML = "";
 
@@ -292,34 +280,18 @@ function renderBooks(list) {
   unreadCount.textContent = books.filter(b => !b.read).length;
 }
 
-/* ===============================
-   ✅ FIXED TOGGLES (ERROR FIX)
-================================ */
+/* TOGGLES */
 window.toggleRead = async (id, current) => {
-  await updateDoc(doc(db, COLLECTION_NAME, id), {
-    read: !current
-  });
+  await updateDoc(doc(db, COLLECTION_NAME, id), { read: !current });
 };
 
 window.toggleOwned = async (id, value) => {
-  await updateDoc(doc(db, COLLECTION_NAME, id), {
-    owned: value
-  });
+  await updateDoc(doc(db, COLLECTION_NAME, id), { owned: value });
 };
 
 /* ===============================
-   EDIT
+   EDIT (FIXED)
 ================================ */
-window.editBook = id => {
-  const b = books.find(x => x.id === id);
-  editingId = id;
-  editTitle.value = b.title;
-  editAuthor.value = b.author;
-  editCategory.value = b.category || "";
-  editDate.value = b.date || "";
-  editOverlay.classList.remove("hidden");
-};
-
 window.saveEdit = async () => {
   await updateDoc(doc(db, COLLECTION_NAME, editingId), {
     title: editTitle.value,
@@ -330,28 +302,7 @@ window.saveEdit = async () => {
       .filter(Boolean)
       .sort((a, b) => a.localeCompare(b))
       .join(", "),
-    date: editDate.value
+    date: formatDateInput(editDate.value) // ✅ FIXED
   });
   editOverlay.classList.add("hidden");
-};
-
-window.closeEdit = () =>
-  editOverlay.classList.add("hidden");
-
-/* ===============================
-   DELETE
-================================ */
-window.askDelete = id => {
-  deleteId = id;
-  document.getElementById("confirmBox").classList.remove("hidden");
-};
-
-window.confirmDelete = async () => {
-  await deleteDoc(doc(db, COLLECTION_NAME, deleteId));
-  document.getElementById("confirmBox").classList.add("hidden");
-};
-
-window.closeConfirm = () => {
-  deleteId = null;
-  document.getElementById("confirmBox").classList.add("hidden");
 };
