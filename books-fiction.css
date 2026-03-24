@@ -531,3 +531,23 @@ body {
   background: #00ff9c;
   color: black;
 }
+
+/* ======================
+   CATEGORY → YEAR SEPARATOR (CLEAN LINE)
+====================== */
+
+.book-row > div:last-child {
+  display: flex;
+  flex-direction: column;
+}
+
+/* CATEGORY (line under it) */
+.book-row > div:last-child span:first-child {
+  padding-bottom: 6px;
+  border-bottom: 1px solid rgba(0,255,156,.5);
+}
+
+/* YEAR spacing */
+.book-row > div:last-child span:last-child {
+  margin-top: 6px;
+}
