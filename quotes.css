@@ -309,3 +309,21 @@ body {
   color: #888;
   cursor: pointer;
 }
+
+/* ======================
+   CATEGORY → YEAR SEPARATOR
+====================== */
+
+/* right side column (category + date) */
+.book-row > div:last-child {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+/* the YEAR (second span) */
+.book-row > div:last-child span:last-child {
+  padding-top: 6px;
+  border-top: 1px solid rgba(0,255,156,.4);
+  box-shadow: 0 0 6px rgba(0,255,156,.25);
+}
