@@ -497,19 +497,21 @@ body {
 }
 
 /* ======================
-   CATEGORY → YEAR SEPARATOR
+   CATEGORY → YEAR SEPARATOR (CLEAN LINE)
 ====================== */
 
-/* right side column (category + date) */
 .book-row > div:last-child {
   display: flex;
   flex-direction: column;
-  gap: 6px;
 }
 
-/* the YEAR (second span) */
+/* CATEGORY (line under it) */
+.book-row > div:last-child span:first-child {
+  padding-bottom: 6px;
+  border-bottom: 1px solid rgba(0,255,156,.5);
+}
+
+/* YEAR spacing */
 .book-row > div:last-child span:last-child {
-  padding-top: 6px;
-  border-top: 1px solid rgba(0,255,156,.4);
-  box-shadow: 0 0 6px rgba(0,255,156,.25);
+  margin-top: 6px;
 }
