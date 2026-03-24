@@ -3,9 +3,8 @@
 ================================ */
 import { auth, db } from "./firebase.js";
 import {
-  collection, addDoc, deleteDoc, updateDoc, setDoc,
-  doc, query, where, getDocs,
-  serverTimestamp, Timestamp
+  collection, addDoc, deleteDoc, updateDoc,
+  doc, query, where, getDocs
 } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-firestore.js";
 
 import { onAuthStateChanged }
@@ -30,7 +29,6 @@ function formatDateInput(value) {
    CONFIG
 ================================ */
 const COLLECTION_NAME = "books_fiction";
-const SHARE_COLLECTION = "books_fiction_pages_public";
 
 /* ===============================
    STATE
@@ -70,18 +68,6 @@ const editTitle = document.getElementById("editTitle");
 const editAuthor = document.getElementById("editAuthor");
 const editCategory = document.getElementById("editCategory");
 const editDate = document.getElementById("editDate");
-
-const loadMoreBtn = document.getElementById("loadMoreBooks");
-
-/* ===============================
-   LOAD MORE
-================================ */
-if (loadMoreBtn) {
-  loadMoreBtn.onclick = () => {
-    visibleCount += PAGE_SIZE;
-    applyView();
-  };
-}
 
 /* ===============================
    UI
@@ -146,7 +132,7 @@ async function loadBooks() {
 function applyView() {
   let list = [...books];
 
-  /* 🔍 EXACT QUOTES SEARCH */
+  /* SEARCH */
   if (searchQuery) {
     const isAuthorOnly = searchQuery.startsWith("@");
     const term = isAuthorOnly ? searchQuery.slice(1) : searchQuery;
@@ -178,13 +164,6 @@ function applyView() {
     : list.slice(0, visibleCount);
 
   renderBooks(visible);
-
-  if (loadMoreBtn) {
-    loadMoreBtn.classList.toggle(
-      "hidden",
-      !!searchQuery || list.length <= visibleCount
-    );
-  }
 }
 
 /* ===============================
@@ -315,3 +294,28 @@ window.closeConfirm = () => {
   deleteId = null;
   document.getElementById("confirmBox").classList.add("hidden");
 };
+
+/* ===============================
+   🔥 INFINITE SCROLL
+================================ */
+let isLoadingMore = false;
+
+window.addEventListener("scroll", () => {
+  if (searchQuery || isLoadingMore) return;
+
+  const scrollPosition = window.innerHeight + window.scrollY;
+  const threshold = document.body.offsetHeight - 200;
+
+  if (scrollPosition >= threshold) {
+    if (visibleCount < books.length) {
+      isLoadingMore = true;
+
+      visibleCount += PAGE_SIZE;
+      applyView();
+
+      setTimeout(() => {
+        isLoadingMore = false;
+      }, 200);
+    }
+  }
+});
