@@ -1,3 +1,6 @@
+/* =====================
+   IMPORTS
+===================== */
 import { auth, db } from "./firebase.js";
 import {
   collection,
@@ -27,12 +30,11 @@ let currentUser = null;
 let sortMode = "recent";
 let searchQuery = "";
 
-/* LOAD MORE */
 const PAGE_SIZE = 20;
 let visibleCount = PAGE_SIZE;
 
 /* =====================
-   ELEMENTS (SAFE INIT)
+   ELEMENTS
 ===================== */
 let quoteText,
   authorInput,
@@ -41,14 +43,13 @@ let quoteText,
   quoteForm,
   recentBtn,
   totalQuotesEl,
-  loadMoreBtn,
   exportJsonBtn,
   exportPdfBtn,
   editOverlay,
   editQuote,
   editAuthor;
 
-/* SHARE UI */
+/* SHARE */
 let shareBtn,
   shareOverlay,
   closeShareBtn,
@@ -60,10 +61,9 @@ let shareBtn,
 let activeSharePageId = null;
 
 /* =====================
-   INIT AFTER DOM LOADED ✅ (FIX)
+   INIT
 ===================== */
 document.addEventListener("DOMContentLoaded", () => {
-  /* NORMAL UI ELEMENTS */
   quoteText = document.getElementById("quoteText");
   authorInput = document.getElementById("author");
   quoteList = document.getElementById("quoteList");
@@ -71,7 +71,6 @@ document.addEventListener("DOMContentLoaded", () => {
   quoteForm = document.getElementById("quoteForm");
   recentBtn = document.getElementById("recentBtn");
   totalQuotesEl = document.getElementById("totalQuotes");
-  loadMoreBtn = document.getElementById("loadMoreQuotes");
 
   exportJsonBtn = document.getElementById("exportJsonBtn");
   exportPdfBtn = document.getElementById("exportPdfBtn");
@@ -80,7 +79,6 @@ document.addEventListener("DOMContentLoaded", () => {
   editQuote = document.getElementById("editQuote");
   editAuthor = document.getElementById("editAuthor");
 
-  /* SHARE UI ELEMENTS ✅ */
   shareBtn = document.getElementById("sharePageBtn");
   shareOverlay = document.getElementById("shareOverlay");
   closeShareBtn = document.getElementById("closeShare");
@@ -89,22 +87,10 @@ document.addEventListener("DOMContentLoaded", () => {
   copyShareBtn = document.getElementById("copyShareLink");
   shareButtons = document.querySelectorAll(".share-actions button");
 
-  /* =====================
-     UI EVENTS
-  ===================== */
   document.getElementById("toggleForm").onclick =
     () => quoteForm.classList.toggle("hidden");
 
-  if (loadMoreBtn) {
-    loadMoreBtn.onclick = () => {
-      visibleCount += PAGE_SIZE;
-      applyView();
-    };
-  }
-
-  /* =====================
-     SEARCH (DEBOUNCED ✅)
-  ===================== */
+  /* SEARCH */
   let searchTimer = null;
   searchInput.oninput = () => {
     clearTimeout(searchTimer);
@@ -112,12 +98,10 @@ document.addEventListener("DOMContentLoaded", () => {
       searchQuery = searchInput.value.trim().toLowerCase();
       visibleCount = PAGE_SIZE;
       applyView();
-    }, 300); // ✅ fast + smooth
+    }, 300);
   };
 
-  /* =====================
-     EXPORTS ✅
-  ===================== */
+  /* EXPORT */
   exportJsonBtn.onclick = () => {
     const data = {
       exportedAt: new Date().toISOString(),
@@ -150,85 +134,62 @@ document.addEventListener("DOMContentLoaded", () => {
     win.print();
   };
 
-  /* =====================
-     SHARE OVERLAY ✅ (FIXED)
-  ===================== */
-  if (shareOverlay) {
-    shareOverlay.classList.add("hidden");
-  }
-  if (shareResult) {
-    shareResult.classList.add("hidden");
-  }
+  /* SHARE (unchanged) */
+  if (shareOverlay) shareOverlay.classList.add("hidden");
+  if (shareResult) shareResult.classList.add("hidden");
 
   if (shareBtn) {
     shareBtn.onclick = () => {
-      if (!currentUser) {
-        alert("Not authenticated");
-        return;
-      }
+      if (!currentUser) return alert("Not authenticated");
       shareResult.classList.add("hidden");
       shareOverlay.classList.remove("hidden");
     };
   }
 
   if (closeShareBtn) {
-    closeShareBtn.onclick = () => {
+    closeShareBtn.onclick = () =>
       shareOverlay.classList.add("hidden");
-    };
   }
 
-  if (shareButtons && shareButtons.length) {
+  if (shareButtons) {
     shareButtons.forEach(btn => {
       btn.onclick = async () => {
-        try {
-          const mode = btn.dataset.mode;
+        const mode = btn.dataset.mode;
 
-          // REVOKE
-          if (mode === "revoke") {
-            if (!activeSharePageId) {
-              alert("No active link");
-              return;
-            }
+        if (mode === "revoke") {
+          if (!activeSharePageId) return alert("No active link");
 
-            await updateDoc(
-              doc(db, "quotes_pages_public", activeSharePageId),
-              { revoked: true }
-            );
-
-            activeSharePageId = null;
-            shareResult.classList.add("hidden");
-            alert("Link revoked ✅");
-            return;
-          }
-
-          // CREATE
-          const pageId = crypto.randomUUID();
-          activeSharePageId = pageId;
-
-          const expiresAt =
-            mode === "24h"
-              ? Timestamp.fromMillis(Date.now() + 86400000)
-              : null;
-
-          await setDoc(
-            doc(db, "quotes_pages_public", pageId),
-            {
-              ownerUid: currentUser.uid,
-              expiresAt,
-              revoked: false,
-              createdAt: serverTimestamp()
-            }
+          await updateDoc(
+            doc(db, "quotes_pages_public", activeSharePageId),
+            { revoked: true }
           );
 
-          const link =
-            `${location.origin}/viewonly/quotes-view.html?page=${pageId}`;
-
-          shareLinkInput.value = link;
-          shareResult.classList.remove("hidden");
-        } catch (err) {
-          console.error("Share failed:", err);
-          alert("Share failed: " + err.message);
+          activeSharePageId = null;
+          shareResult.classList.add("hidden");
+          alert("Link revoked ✅");
+          return;
         }
+
+        const pageId = crypto.randomUUID();
+        activeSharePageId = pageId;
+
+        const expiresAt =
+          mode === "24h"
+            ? Timestamp.fromMillis(Date.now() + 86400000)
+            : null;
+
+        await setDoc(doc(db, "quotes_pages_public", pageId), {
+          ownerUid: currentUser.uid,
+          expiresAt,
+          revoked: false,
+          createdAt: serverTimestamp()
+        });
+
+        const link =
+          `${location.origin}/viewonly/quotes-view.html?page=${pageId}`;
+
+        shareLinkInput.value = link;
+        shareResult.classList.remove("hidden");
       };
     });
   }
@@ -252,7 +213,7 @@ onAuthStateChanged(auth, user => {
 });
 
 /* =====================
-   ADD QUOTE
+   ADD
 ===================== */
 window.addQuote = async () => {
   const rawText = quoteText.value.trim();
@@ -262,10 +223,7 @@ window.addQuote = async () => {
     q.text.toLowerCase() === rawText.toLowerCase()
   );
 
-  if (exists) {
-    alert("This quote already exists.");
-    return;
-  }
+  if (exists) return alert("This quote already exists.");
 
   await addDoc(collection(db, "quotes"), {
     uid: currentUser.uid,
@@ -282,7 +240,7 @@ window.addQuote = async () => {
 };
 
 /* =====================
-   LOAD QUOTES (READ-SAFE ✅)
+   LOAD
 ===================== */
 async function loadQuotes() {
   const q = query(
@@ -293,9 +251,7 @@ async function loadQuotes() {
   const snap = await getDocs(q);
   quotes = snap.docs.map(d => ({ id: d.id, ...d.data() }));
 
-  if (totalQuotesEl) {
-    totalQuotesEl.textContent = quotes.length;
-  }
+  if (totalQuotesEl) totalQuotesEl.textContent = quotes.length;
 
   applyView();
 }
@@ -304,8 +260,6 @@ async function loadQuotes() {
    VIEW
 ===================== */
 function applyView() {
-  if (!quoteList) return;
-
   let list = [...quotes];
 
   if (searchQuery) {
@@ -333,13 +287,6 @@ function applyView() {
     : list.slice(0, visibleCount);
 
   renderQuotes(visible);
-
-  if (loadMoreBtn) {
-    loadMoreBtn.classList.toggle(
-      "hidden",
-      !!searchQuery || list.length <= visibleCount
-    );
-  }
 }
 
 /* =====================
@@ -397,3 +344,28 @@ window.closeConfirm = () => {
   deleteId = null;
   document.getElementById("confirmBox").classList.add("hidden");
 };
+
+/* =====================
+   🔥 INFINITE SCROLL
+===================== */
+let isLoadingMore = false;
+
+window.addEventListener("scroll", () => {
+  if (searchQuery || isLoadingMore) return;
+
+  const scrollPosition = window.innerHeight + window.scrollY;
+  const threshold = document.body.offsetHeight - 200;
+
+  if (scrollPosition >= threshold) {
+    if (visibleCount < quotes.length) {
+      isLoadingMore = true;
+
+      visibleCount += PAGE_SIZE;
+      applyView();
+
+      setTimeout(() => {
+        isLoadingMore = false;
+      }, 200);
+    }
+  }
+});
