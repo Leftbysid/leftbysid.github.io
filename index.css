@@ -102,3 +102,37 @@ button:hover {
   margin-bottom: 20px;
   opacity: 0.8;
 }
+
+/* ======================
+   TOP RIGHT ALERT BUTTON
+====================== */
+
+.alert-btn {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+
+  background: transparent;
+  border: 1px solid rgba(0,255,156,0.15);
+  color: rgba(0,255,156,0.2);
+
+  font-size: 18px;
+  width: 28px;
+  height: 28px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  cursor: pointer;
+
+  transition: all 0.25s ease;
+}
+
+/* hover reveal */
+.alert-btn:hover {
+  color: #00ff9c;
+  border-color: #00ff9c;
+  box-shadow: 0 0 10px #00ff9c;
+  transform: scale(1.1);
+}
