@@ -103,10 +103,6 @@ button:hover {
   opacity: 0.8;
 }
 
-/* ======================
-   TOP RIGHT ALERT BUTTON
-====================== */
-
 .alert-btn {
   position: fixed;
   top: 20px;
@@ -126,13 +122,16 @@ button:hover {
 
   cursor: pointer;
 
+  box-shadow: none; /* 🔥 remove glow */
+  opacity: 0.3;
+
   transition: all 0.25s ease;
 }
 
-/* hover reveal */
 .alert-btn:hover {
+  opacity: 1;
   color: #00ff9c;
   border-color: #00ff9c;
-  box-shadow: 0 0 10px #00ff9c;
+  box-shadow: 0 0 10px #00ff9c; /* glow only on hover */
   transform: scale(1.1);
 }
