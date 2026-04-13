@@ -63,6 +63,8 @@ const totalCount = document.getElementById("totalCount");
 const readCount = document.getElementById("readCount");
 const unreadCount = document.getElementById("unreadCount");
 
+const resultCount = document.getElementById("resultCount");
+
 const editOverlay = document.getElementById("editOverlay");
 const editTitle = document.getElementById("editTitle");
 const editAuthor = document.getElementById("editAuthor");
@@ -159,11 +161,17 @@ function applyView() {
     list.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
   }
 
-  const visible = searchQuery
-    ? list
-    : list.slice(0, visibleCount);
+  /* 🔥 ALWAYS LIMIT */
+  const visible = list.slice(0, visibleCount);
 
   renderBooks(visible);
+
+  /* 🔥 RESULT COUNT */
+  if (resultCount) {
+    resultCount.innerText = searchQuery
+      ? `Showing ${visible.length} of ${list.length} results`
+      : "";
+  }
 }
 
 /* ===============================
@@ -182,20 +190,28 @@ filterSelect.onchange = () => {
   applyView();
 };
 
+/* 🔥 DEBOUNCE SEARCH */
+let searchTimer = null;
+
 searchInput.oninput = () => {
-  searchQuery = searchInput.value.trim().toLowerCase();
-  visibleCount = PAGE_SIZE;
-  applyView();
+  clearTimeout(searchTimer);
+
+  searchTimer = setTimeout(() => {
+    searchQuery = searchInput.value.trim().toLowerCase();
+    visibleCount = PAGE_SIZE;
+    window.scrollTo(0, 0);
+    applyView();
+  }, 250);
 };
 
 /* ===============================
    RENDER
 ================================ */
 function renderBooks(list) {
-  bookList.innerHTML = "";
+  let html = "";
 
   list.forEach(b => {
-    bookList.innerHTML += `
+    html += `
       <div class="book-row-wrapper">
         <span class="owned-icon ${b.owned ? "owned" : ""}">📘</span>
 
@@ -228,13 +244,15 @@ function renderBooks(list) {
     `;
   });
 
+  bookList.innerHTML = html;
+
   totalCount.textContent = books.length;
   readCount.textContent = books.filter(b => b.read).length;
   unreadCount.textContent = books.filter(b => !b.read).length;
 }
 
 /* ===============================
-   TOGGLES
+   TOGGLES / EDIT / DELETE
 ================================ */
 window.toggleRead = async (id, current) => {
   await updateDoc(doc(db, COLLECTION_NAME, id), { read: !current });
@@ -246,9 +264,6 @@ window.toggleOwned = async (id, value) => {
   await loadBooks();
 };
 
-/* ===============================
-   EDIT
-================================ */
 window.editBook = id => {
   const b = books.find(x => x.id === id);
   editingId = id;
@@ -276,9 +291,6 @@ window.saveEdit = async () => {
 window.closeEdit = () =>
   editOverlay.classList.add("hidden");
 
-/* ===============================
-   DELETE
-================================ */
 window.askDelete = id => {
   deleteId = id;
   document.getElementById("confirmBox").classList.remove("hidden");
@@ -296,12 +308,12 @@ window.closeConfirm = () => {
 };
 
 /* ===============================
-   🔥 INFINITE SCROLL
+   INFINITE SCROLL
 ================================ */
 let isLoadingMore = false;
 
 window.addEventListener("scroll", () => {
-  if (searchQuery || isLoadingMore) return;
+  if (isLoadingMore) return;
 
   const scrollPosition = window.innerHeight + window.scrollY;
   const threshold = document.body.offsetHeight - 200;
