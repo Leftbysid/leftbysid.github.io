@@ -43,6 +43,7 @@ let quoteText,
   quoteForm,
   recentBtn,
   totalQuotesEl,
+  resultCount,
   exportJsonBtn,
   exportPdfBtn,
   editOverlay,
@@ -71,6 +72,7 @@ document.addEventListener("DOMContentLoaded", () => {
   quoteForm = document.getElementById("quoteForm");
   recentBtn = document.getElementById("recentBtn");
   totalQuotesEl = document.getElementById("totalQuotes");
+  resultCount = document.getElementById("resultCount");
 
   exportJsonBtn = document.getElementById("exportJsonBtn");
   exportPdfBtn = document.getElementById("exportPdfBtn");
@@ -90,18 +92,20 @@ document.addEventListener("DOMContentLoaded", () => {
   document.getElementById("toggleForm").onclick =
     () => quoteForm.classList.toggle("hidden");
 
-  /* SEARCH */
+  /* 🔥 DEBOUNCED SEARCH */
   let searchTimer = null;
   searchInput.oninput = () => {
     clearTimeout(searchTimer);
+
     searchTimer = setTimeout(() => {
       searchQuery = searchInput.value.trim().toLowerCase();
       visibleCount = PAGE_SIZE;
+      window.scrollTo(0, 0);
       applyView();
-    }, 300);
+    }, 250);
   };
 
-  /* EXPORT */
+  /* EXPORT (unchanged) */
   exportJsonBtn.onclick = () => {
     const data = {
       exportedAt: new Date().toISOString(),
@@ -253,6 +257,7 @@ async function loadQuotes() {
 
   if (totalQuotesEl) totalQuotesEl.textContent = quotes.length;
 
+  visibleCount = PAGE_SIZE;
   applyView();
 }
 
@@ -282,21 +287,27 @@ function applyView() {
     list.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
   }
 
-  const visible = searchQuery
-    ? list
-    : list.slice(0, visibleCount);
+  /* 🔥 ALWAYS LIMIT */
+  const visible = list.slice(0, visibleCount);
 
   renderQuotes(visible);
+
+  /* 🔥 RESULT COUNT */
+  if (resultCount) {
+    resultCount.innerText = searchQuery
+      ? `Showing ${visible.length} of ${list.length} results`
+      : "";
+  }
 }
 
 /* =====================
    RENDER
 ===================== */
 function renderQuotes(list) {
-  quoteList.innerHTML = "";
+  let html = "";
 
   list.forEach(q => {
-    quoteList.innerHTML += `
+    html += `
       <div class="quote-row">
         <div class="quote-actions">
           <button onclick="editQuoteFn('${q.id}')">✏️</button>
@@ -307,6 +318,8 @@ function renderQuotes(list) {
       </div>
     `;
   });
+
+  quoteList.innerHTML = html;
 }
 
 /* =====================
@@ -346,12 +359,12 @@ window.closeConfirm = () => {
 };
 
 /* =====================
-   🔥 INFINITE SCROLL
+   INFINITE SCROLL
 ===================== */
 let isLoadingMore = false;
 
 window.addEventListener("scroll", () => {
-  if (searchQuery || isLoadingMore) return;
+  if (isLoadingMore) return;
 
   const scrollPosition = window.innerHeight + window.scrollY;
   const threshold = document.body.offsetHeight - 200;
