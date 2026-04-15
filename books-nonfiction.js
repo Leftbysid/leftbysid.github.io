@@ -65,6 +65,7 @@ const bookForm = document.getElementById("bookForm");
 
 const recentBtn = document.getElementById("recentBtn");
 const filterSelect = document.getElementById("filterSelect");
+const sortSelect = document.getElementById("sortSelect");
 
 const totalCount = document.getElementById("totalCount");
 const readCount = document.getElementById("readCount");
@@ -177,16 +178,40 @@ function applyView() {
     case "not-read": list = list.filter(b => !b.read); break;
   }
 
-  if (sortMode === "recent") {
-    list.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+  /* 🔥 SORT (NEW) */
+  switch (sortMode) {
+    case "recent":
+      list.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+      break;
+
+    case "title":
+      list.sort((a, b) =>
+        (a.title || "").localeCompare(b.title || "")
+      );
+      break;
+
+    case "author":
+      list.sort((a, b) =>
+        (a.author || "").localeCompare(b.author || "")
+      );
+      break;
+
+    case "category":
+      list.sort((a, b) =>
+        (a.category || "").localeCompare(b.category || "")
+      );
+      break;
+
+    case "year":
+      list.sort((a, b) =>
+        (a.date || "").localeCompare(b.date || "")
+      );
+      break;
   }
 
-  /* 🔥 ALWAYS LIMIT RENDER (FIX) */
   const visible = list.slice(0, visibleCount);
-
   renderBooks(visible);
 
-  /* 🔥 RESULT COUNT */
   if (resultCount) {
     resultCount.innerText = searchQuery
       ? `Showing ${visible.length} of ${list.length} results`
@@ -206,11 +231,18 @@ recentBtn.onclick = () => {
 
 filterSelect.onchange = () => {
   currentFilter = filterSelect.value;
-  sortMode = "none";
   applyView();
 };
 
-/* 🔥 DEBOUNCED SEARCH (FIX) */
+/* 🔥 SORT DROPDOWN */
+if (sortSelect) {
+  sortSelect.onchange = () => {
+    sortMode = sortSelect.value;
+    applyView();
+  };
+}
+
+/* 🔥 SEARCH */
 let searchTimer = null;
 
 searchInput.oninput = () => {
@@ -279,7 +311,7 @@ function renderBooks(list) {
 }
 
 /* ===============================
-   TOGGLES / EDIT / DELETE (UNCHANGED)
+   TOGGLES / EDIT / DELETE
 ================================ */
 window.toggleRead = async (id, current) =>
   await updateDoc(doc(db, COLLECTION_NAME, id), { read: !current });
@@ -328,7 +360,7 @@ window.closeConfirm = () => {
 };
 
 /* ===============================
-   INFINITE SCROLL (UPDATED)
+   INFINITE SCROLL
 ================================ */
 let isLoadingMore = false;
 
