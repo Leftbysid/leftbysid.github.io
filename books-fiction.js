@@ -231,6 +231,10 @@ function renderBooks(list) {
     html += `
   <div class="book-row-wrapper">
 
+    <!-- 🔥 OWNED ICON FIRST -->
+    <span class="owned-icon ${b.owned ? "owned" : ""}">📘</span>
+
+    <!-- COVER -->
     <div class="book-cover">
       ${
         b.image
@@ -239,8 +243,8 @@ function renderBooks(list) {
       }
     </div>
 
+    <!-- MAIN ROW -->
     <div class="book-row">
-
       <div class="book-main">
         <span class="book-title">${b.title}</span>
       </div>
@@ -254,7 +258,6 @@ function renderBooks(list) {
       <span class="status-badge ${b.read ? "read" : "unread"}">
         ${b.read ? "READ" : "UNREAD"}
       </span>
-
     </div>
 
     <div class="book-actions">
@@ -288,8 +291,14 @@ window.toggleRead = async (id, current) => {
 };
 
 window.toggleOwned = async (id, value) => {
-  await updateDoc(doc(db, COLLECTION_NAME, id), { owned: value });
-  await loadBooks();
+  await updateDoc(doc(db, COLLECTION_NAME, id), { owned: value
+  });
+
+  // 🔥 update locally without reload
+  const book = books.find(b => b.id === id);
+  if (book) book.owned = value;
+
+  applyView();
 };
 
 window.editBook = id => {
