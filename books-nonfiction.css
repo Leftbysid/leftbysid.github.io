@@ -500,57 +500,9 @@ body {
    CATEGORY → YEAR SEPARATOR (CLEAN LINE)
 ====================== */
 
-.book-row > div:last-child {
-  display: flex;
-  flex-direction: column;
-}
-
-/* CATEGORY (line under it) */
-.book-row > div:last-child span:first-child {
-  padding-bottom: 6px;
-  border-bottom: 1px solid rgba(0,255,156,.5);
-}
-
-/* YEAR spacing */
-.book-row > div:last-child span:last-child {
-  margin-top: 6px;
-}
-
 /* ======================
-   BOOK ROW LAYOUT
+   CLEAN BOOK LAYOUT (FINAL)
 ====================== */
-
-.book-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 20px;
-}
-
-/* left side (title + author) */
-.book-row > div:first-child {
-  flex: 2;
-}
-
-/* right side (genre + year) */
-.book-meta {
-  flex: 1;
-  display: flex;
-  justify-content: space-between;
-  gap: 15px;
-  font-size: 13px;
-  opacity: 0.8;
-}
-
-/* optional alignment */
-.book-genre {
-  text-align: left;
-}
-
-.book-year {
-  text-align: right;
-  min-width: 60px;
-}
 
 /* ROW */
 .book-row {
@@ -563,29 +515,70 @@ body {
 /* TITLE COLUMN */
 .book-main {
   flex: 2;
-  font-weight: bold;
 }
 
-/* META COLUMN */
+.book-title {
+  font-size: 18px;
+  font-weight: 600;
+}
+
+/* META COLUMN (AUTHOR + GENRE + YEAR) */
 .book-meta {
   flex: 3;
   display: flex;
   justify-content: space-between;
-  gap: 20px;
-  font-size: 13px;
-  opacity: 0.8;
+  gap: 25px;
+  align-items: center;
 }
 
-/* COLUMNS */
+/* AUTHOR */
 .book-author {
+  font-size: 15px;
+  font-weight: 500;
   min-width: 140px;
 }
 
+/* GENRE */
 .book-genre {
-  min-width: 140px;
+  font-size: 13px;
+  opacity: 0.7;
+  min-width: 160px;
 }
 
+/* YEAR */
 .book-year {
+  font-size: 15px;
+  font-weight: 500;
   min-width: 70px;
   text-align: right;
+}
+
+/* ======================
+   STATUS BADGE FIX
+====================== */
+
+.status-badge {
+  font-size: 11px;
+  padding: 3px 8px;
+  border-radius: 12px;
+  margin-left: 10px;
+
+  /* 🔥 REMOVE GREEN GLOW BUG */
+  box-shadow: none !important;
+  text-shadow: none !important;
+  filter: none !important;
+}
+
+/* READ */
+.status-badge.read {
+  border: 1px solid #00ff9c;
+  color: #00ff9c;
+  background: transparent;
+}
+
+/* UNREAD */
+.status-badge.unread {
+  border: 1px solid #ff5050;
+  color: #ff5050;
+  background: transparent;
 }
