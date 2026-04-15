@@ -536,18 +536,85 @@ body {
    CATEGORY → YEAR SEPARATOR (CLEAN LINE)
 ====================== */
 
-.book-row > div:last-child {
+/* ======================
+   CLEAN BOOK LAYOUT (FINAL)
+====================== */
+
+/* ROW */
+.book-row {
   display: flex;
-  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
 }
 
-/* CATEGORY (line under it) */
-.book-row > div:last-child span:first-child {
-  padding-bottom: 6px;
-  border-bottom: 1px solid rgba(0,255,156,.5);
+/* TITLE COLUMN */
+.book-main {
+  flex: 2;
 }
 
-/* YEAR spacing */
-.book-row > div:last-child span:last-child {
-  margin-top: 6px;
+.book-title {
+  font-size: 18px;
+  font-weight: 600;
+}
+
+/* META (AUTHOR + GENRE + YEAR) */
+.book-meta {
+  flex: 3;
+  display: flex;
+  justify-content: space-between;
+  gap: 25px;
+  align-items: center;
+}
+
+/* AUTHOR */
+.book-author {
+  font-size: 15px;
+  font-weight: 500;
+  min-width: 140px;
+}
+
+/* GENRE */
+.book-genre {
+  font-size: 13px;
+  opacity: 0.7;
+  min-width: 160px;
+}
+
+/* YEAR */
+.book-year {
+  font-size: 15px;
+  font-weight: 500;
+  min-width: 70px;
+  text-align: right;
+}
+
+/* ======================
+   STATUS BADGE FIX
+====================== */
+
+.status-badge {
+  font-size: 11px;
+  padding: 3px 8px;
+  border-radius: 12px;
+  margin-left: 10px;
+
+  /* 🔥 REMOVE GLOW BUG */
+  box-shadow: none !important;
+  text-shadow: none !important;
+  filter: none !important;
+}
+
+/* READ */
+.status-badge.read {
+  border: 1px solid #00ff9c;
+  color: #00ff9c;
+  background: transparent;
+}
+
+/* UNREAD */
+.status-badge.unread {
+  border: 1px solid #ff5050;
+  color: #ff5050;
+  background: transparent;
 }
