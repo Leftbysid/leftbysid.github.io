@@ -43,8 +43,20 @@
     <option value="read">Read</option>
     <option value="not-read">Not Read</option>
   </select>
+
+  <!-- 🔥 SORT DROPDOWN ADDED -->
+  <select id="sortSelect">
+    <option value="recent">Recent</option>
+    <option value="title">Title (A–Z)</option>
+    <option value="author">Author (A–Z)</option>
+    <option value="category">Genre (A–Z)</option>
+    <option value="year">Year</option>
+  </select>
 </div>
+
+<!-- RESULT COUNT -->
 <p id="resultCount" style="text-align:center; margin-top:10px;"></p>
+
 <button id="toggleForm">➕ Add Book</button>
 
 <div id="bookForm" class="book-form hidden">
@@ -63,7 +75,9 @@
 </div>
 
 <div id="bookList"></div>
+
 <button id="loadMoreBooks" class="hidden">Load More</button>
+
 <!-- DELETE CONFIRM -->
 <div id="confirmBox" class="confirm hidden">
   <div class="confirm-box">
@@ -90,7 +104,7 @@
   </div>
 </div>
 
-<!-- 🔗 SHARE PAGE MODAL (REQUIRED) -->
+<!-- 🔗 SHARE PAGE MODAL -->
 <div id="shareOverlay" class="overlay hidden">
   <div class="share-box">
     <h3>🔗 Share Fiction Library</h3>
