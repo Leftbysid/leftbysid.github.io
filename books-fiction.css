@@ -618,3 +618,63 @@ body {
   color: #ff5050;
   background: transparent;
 }
+
+/* ===============================
+   📘 BOOK COVER IMAGE (LEFT SIDE)
+================================ */
+
+.book-row-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  max-width: 1000px;
+  margin: 12px auto;
+}
+
+/* COVER CONTAINER */
+.book-cover {
+  width: 50px;
+  height: 70px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* IMAGE */
+.book-cover img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border: 1px solid #00ff9c;
+  box-shadow: 0 0 8px rgba(0,255,156,.5);
+}
+
+/* FALLBACK ICON */
+.no-cover {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #00ff9c;
+  background: rgba(0,0,0,.6);
+  font-size: 20px;
+}
+
+/* ===============================
+   FIX ROW ALIGNMENT WITH IMAGE
+================================ */
+
+.book-row {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+/* make sure actions stay right */
+.book-actions {
+  margin-left: auto;
+}
