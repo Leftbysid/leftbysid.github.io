@@ -283,9 +283,9 @@ function renderBooks(list) {
             </span>
           </div>
 
-          <div>
-            <span>${sortedCategory}</span><br>
-            <span>${b.date || ""}</span>
+          <div class="book-meta">
+           <span class="book-genre">${sortedCategory}</span>
+           <span class="book-year">${b.date || ""}</span>
           </div>
         </div>
 
