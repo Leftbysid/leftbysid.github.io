@@ -229,33 +229,47 @@ function renderBooks(list) {
       .join(", ");
 
     html += `
-      <div class="book-row-wrapper">
+  <div class="book-row-wrapper">
 
-        <div class="book-cover">
-          ${
-            b.image
-              ? `<img src="${b.image}">`
-              : `<div class="no-cover">📘</div>`
-          }
-        </div>
+    <div class="book-cover">
+      ${
+        b.image
+          ? `<img src="${b.image}">`
+          : `<div class="no-cover">📘</div>`
+      }
+    </div>
 
-        <div class="book-row">
-          <div class="book-main">
-            <span class="book-title">${b.title}</span>
-          </div>
+    <div class="book-row">
 
-          <div class="book-meta">
-            <span class="book-author">${b.author}</span>
-            <span class="book-genre">${sortedCategory}</span>
-            <span class="book-year">${b.date || ""}</span>
-          </div>
-
-          <span class="status-badge ${b.read ? "read" : "unread"}">
-            ${b.read ? "READ" : "UNREAD"}
-          </span>
-        </div>
+      <div class="book-main">
+        <span class="book-title">${b.title}</span>
       </div>
-    `;
+
+      <div class="book-meta">
+        <span class="book-author">${b.author}</span>
+        <span class="book-genre">${sortedCategory}</span>
+        <span class="book-year">${b.date || ""}</span>
+      </div>
+
+      <span class="status-badge ${b.read ? "read" : "unread"}">
+        ${b.read ? "READ" : "UNREAD"}
+      </span>
+
+    </div>
+
+    <div class="book-actions">
+      <input type="checkbox"
+        ${b.owned ? "checked" : ""}
+        onchange="toggleOwned('${b.id}', this.checked)">
+      <button onclick="toggleRead('${b.id}', ${b.read})">
+        ${b.read ? "✅" : "⬜"}
+      </button>
+      <button onclick="editBook('${b.id}')">✏️</button>
+      <button onclick="askDelete('${b.id}')">🗑️</button>
+    </div>
+
+  </div>
+`;
   });
 
   bookList.innerHTML = html;
