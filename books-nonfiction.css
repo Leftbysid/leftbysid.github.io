@@ -551,3 +551,41 @@ body {
   text-align: right;
   min-width: 60px;
 }
+
+/* ROW */
+.book-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+/* TITLE COLUMN */
+.book-main {
+  flex: 2;
+  font-weight: bold;
+}
+
+/* META COLUMN */
+.book-meta {
+  flex: 3;
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  font-size: 13px;
+  opacity: 0.8;
+}
+
+/* COLUMNS */
+.book-author {
+  min-width: 140px;
+}
+
+.book-genre {
+  min-width: 140px;
+}
+
+.book-year {
+  min-width: 70px;
+  text-align: right;
+}
