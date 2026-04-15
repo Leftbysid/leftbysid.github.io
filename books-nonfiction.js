@@ -275,18 +275,26 @@ function renderBooks(list) {
         <span class="owned-icon ${b.owned ? "owned" : ""}">📕</span>
 
         <div class="book-row ${b.read ? "read" : ""}">
-          <div>
+          
+          <!-- TITLE -->
+          <div class="book-main">
             <span class="book-title">${b.title}</span>
-            <span class="book-author">— ${b.author}</span>
+          </div>
+
+          <!-- META (AUTHOR + GENRE + YEAR) -->
+          <div class="book-meta">
+            <span class="book-author">${b.author}</span>
+            <span class="book-genre">${sortedCategory}</span>
+            <span class="book-year">${b.date || ""}</span>
+          </div>
+
+          <!-- STATUS -->
+          <div>
             <span class="status-badge ${b.read ? "read" : "unread"}">
               ${b.read ? "READ" : "UNREAD"}
             </span>
           </div>
 
-          <div class="book-meta">
-           <span class="book-genre">${sortedCategory}</span>
-           <span class="book-year">${b.date || ""}</span>
-          </div>
         </div>
 
         <div class="book-actions">
