@@ -211,23 +211,38 @@ function renderBooks(list) {
   let html = "";
 
   list.forEach(b => {
+    const sortedCategory = (b.category || "")
+      .split(",")
+      .map(x => x.trim())
+      .filter(Boolean)
+      .sort((a, b) => a.localeCompare(b))
+      .join(", ");
+
     html += `
       <div class="book-row-wrapper">
         <span class="owned-icon ${b.owned ? "owned" : ""}">📘</span>
 
         <div class="book-row ${b.read ? "read" : ""}">
-          <div>
+          
+          <!-- TITLE -->
+          <div class="book-main">
             <span class="book-title">${b.title}</span>
-            <span class="book-author">— ${b.author}</span>
+          </div>
+
+          <!-- META (AUTHOR + GENRE + YEAR) -->
+          <div class="book-meta">
+            <span class="book-author">${b.author}</span>
+            <span class="book-genre">${sortedCategory}</span>
+            <span class="book-year">${b.date || ""}</span>
+          </div>
+
+          <!-- STATUS -->
+          <div>
             <span class="status-badge ${b.read ? "read" : "unread"}">
               ${b.read ? "READ" : "UNREAD"}
             </span>
           </div>
 
-          <div>
-            <span>${b.category || ""}</span><br>
-            <span>${b.date || ""}</span>
-          </div>
         </div>
 
         <div class="book-actions">
