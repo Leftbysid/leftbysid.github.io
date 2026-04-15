@@ -283,18 +283,27 @@ function renderBooks(list) {
 }
 
 /* ===============================
-   TOGGLES / EDIT / DELETE
+   TOGGLES / EDIT / DELETE (FIXED)
 ================================ */
+
 window.toggleRead = async (id, current) => {
-  await updateDoc(doc(db, COLLECTION_NAME, id), { read: !current });
-  await loadBooks();
+  await updateDoc(doc(db, COLLECTION_NAME, id), {
+    read: !current
+  });
+
+  // 🔥 update locally (no reload lag)
+  const book = books.find(b => b.id === id);
+  if (book) book.read = !current;
+
+  applyView();
 };
 
 window.toggleOwned = async (id, value) => {
-  await updateDoc(doc(db, COLLECTION_NAME, id), { owned: value
+  await updateDoc(doc(db, COLLECTION_NAME, id), {
+    owned: value
   });
 
-  // 🔥 update locally without reload
+  // 🔥 instant UI update
   const book = books.find(b => b.id === id);
   if (book) book.owned = value;
 
@@ -310,23 +319,49 @@ window.editBook = id => {
   editCategory.value = b.category || "";
   editDate.value = b.date || "";
 
+  // 🔥 reset image input safely
+  const imgInput = document.getElementById("editImage");
+  if (imgInput) imgInput.value = "";
+
   editOverlay.classList.remove("hidden");
 };
 
 window.saveEdit = async () => {
-  await updateDoc(doc(db, COLLECTION_NAME, editingId), {
+  const file = document.getElementById("editImage")?.files[0];
+
+  let imageUrl = null;
+
+  // 🔥 upload new image if selected
+  if (file) {
+    try {
+      imageUrl = await uploadImage(file);
+    } catch (err) {
+      alert("Image upload failed");
+      return;
+    }
+  }
+
+  const updateData = {
     title: editTitle.value,
     author: editAuthor.value,
     category: editCategory.value,
     date: formatDateInput(editDate.value)
-  });
+  };
+
+  // 🔥 only update image if new one selected
+  if (imageUrl) {
+    updateData.image = imageUrl;
+  }
+
+  await updateDoc(doc(db, COLLECTION_NAME, editingId), updateData);
 
   editOverlay.classList.add("hidden");
   await loadBooks();
 };
 
-window.closeEdit = () =>
+window.closeEdit = () => {
   editOverlay.classList.add("hidden");
+};
 
 window.askDelete = id => {
   deleteId = id;
