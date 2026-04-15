@@ -26,6 +26,32 @@ function formatDateInput(value) {
 }
 
 /* ===============================
+   🔥 CLOUDINARY UPLOAD
+================================ */
+async function uploadImage(file) {
+  const formData = new FormData();
+  formData.append("file", file);
+  formData.append("upload_preset", "books_upload");
+
+  const res = await fetch(
+    "https://api.cloudinary.com/v1_1/dmkcoulcx/image/upload",
+    {
+      method: "POST",
+      body: formData
+    }
+  );
+
+  const data = await res.json();
+
+  if (!data.secure_url) {
+    console.error(data);
+    throw new Error("Upload failed");
+  }
+
+  return data.secure_url;
+}
+
+/* ===============================
    CONFIG
 ================================ */
 const COLLECTION_NAME = "books_fiction";
@@ -58,19 +84,13 @@ const bookForm = document.getElementById("bookForm");
 
 const recentBtn = document.getElementById("recentBtn");
 const filterSelect = document.getElementById("filterSelect");
-const sortSelect = document.getElementById("sortSelect"); // 🔥 NEW
+const sortSelect = document.getElementById("sortSelect");
 
 const totalCount = document.getElementById("totalCount");
 const readCount = document.getElementById("readCount");
 const unreadCount = document.getElementById("unreadCount");
 
 const resultCount = document.getElementById("resultCount");
-
-const editOverlay = document.getElementById("editOverlay");
-const editTitle = document.getElementById("editTitle");
-const editAuthor = document.getElementById("editAuthor");
-const editCategory = document.getElementById("editCategory");
-const editDate = document.getElementById("editDate");
 
 /* ===============================
    UI
@@ -88,10 +108,23 @@ onAuthStateChanged(auth, user => {
 });
 
 /* ===============================
-   ADD BOOK
+   ADD BOOK (UPDATED)
 ================================ */
 window.addBook = async () => {
   if (!titleInput.value || !authorInput.value) return;
+
+  const file = document.getElementById("imageInput")?.files[0];
+
+  let imageUrl = "";
+
+  if (file) {
+    try {
+      imageUrl = await uploadImage(file);
+    } catch (err) {
+      alert("Image upload failed");
+      return;
+    }
+  }
 
   await addDoc(collection(db, COLLECTION_NAME), {
     uid: currentUser.uid,
@@ -99,18 +132,22 @@ window.addBook = async () => {
     author: authorInput.value.trim(),
     category: categoryInput.value,
     date: formatDateInput(dateInput.value),
+    image: imageUrl, // 🔥 NEW
     read: false,
     owned: false,
     createdAt: Date.now()
   });
 
   await loadBooks();
+
   bookForm.classList.add("hidden");
 
   titleInput.value = "";
   authorInput.value = "";
   categoryInput.value = "";
   dateInput.value = "";
+  if (document.getElementById("imageInput"))
+    document.getElementById("imageInput").value = "";
 };
 
 /* ===============================
@@ -135,7 +172,6 @@ async function loadBooks() {
 function applyView() {
   let list = [...books];
 
-  /* SEARCH */
   if (searchQuery) {
     const isAuthorOnly = searchQuery.startsWith("@");
     const term = isAuthorOnly ? searchQuery.slice(1) : searchQuery;
@@ -150,7 +186,6 @@ function applyView() {
     });
   }
 
-  /* FILTER */
   switch (currentFilter) {
     case "owned": list = list.filter(b => b.owned); break;
     case "not-owned": list = list.filter(b => !b.owned); break;
@@ -158,87 +193,29 @@ function applyView() {
     case "not-read": list = list.filter(b => !b.read); break;
   }
 
-  /* 🔥 SORT (FULL SYSTEM) */
   switch (sortMode) {
     case "recent":
       list.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
       break;
-
     case "title":
-      list.sort((a, b) =>
-        (a.title || "").localeCompare(b.title || "")
-      );
+      list.sort((a, b) => (a.title || "").localeCompare(b.title || ""));
       break;
-
     case "author":
-      list.sort((a, b) =>
-        (a.author || "").localeCompare(b.author || "")
-      );
+      list.sort((a, b) => (a.author || "").localeCompare(b.author || ""));
       break;
-
     case "category":
-      list.sort((a, b) =>
-        (a.category || "").localeCompare(b.category || "")
-      );
+      list.sort((a, b) => (a.category || "").localeCompare(b.category || ""));
       break;
-
     case "year":
-      list.sort((a, b) =>
-        (a.date || "").localeCompare(b.date || "")
-      );
+      list.sort((a, b) => (a.date || "").localeCompare(b.date || ""));
       break;
   }
 
-  const visible = list.slice(0, visibleCount);
-
-  renderBooks(visible);
-
-  if (resultCount) {
-    resultCount.innerText = searchQuery
-      ? `Showing ${visible.length} of ${list.length} results`
-      : "";
-  }
+  renderBooks(list.slice(0, visibleCount));
 }
 
 /* ===============================
-   CONTROLS
-================================ */
-recentBtn.onclick = () => {
-  sortMode = "recent";
-  currentFilter = "all";
-  filterSelect.value = "all";
-  applyView();
-};
-
-filterSelect.onchange = () => {
-  currentFilter = filterSelect.value;
-  applyView();
-};
-
-/* 🔥 SORT HANDLER */
-if (sortSelect) {
-  sortSelect.onchange = () => {
-    sortMode = sortSelect.value;
-    applyView();
-  };
-}
-
-/* 🔥 SEARCH */
-let searchTimer = null;
-
-searchInput.oninput = () => {
-  clearTimeout(searchTimer);
-
-  searchTimer = setTimeout(() => {
-    searchQuery = searchInput.value.trim().toLowerCase();
-    visibleCount = PAGE_SIZE;
-    window.scrollTo(0, 0);
-    applyView();
-  }, 250);
-};
-
-/* ===============================
-   RENDER (UNCHANGED)
+   RENDER (UPDATED WITH IMAGE)
 ================================ */
 function renderBooks(list) {
   let html = "";
@@ -253,9 +230,16 @@ function renderBooks(list) {
 
     html += `
       <div class="book-row-wrapper">
-        <span class="owned-icon ${b.owned ? "owned" : ""}">📘</span>
 
-        <div class="book-row ${b.read ? "read" : ""}">
+        <div class="book-cover">
+          ${
+            b.image
+              ? `<img src="${b.image}">`
+              : `<div class="no-cover">📘</div>`
+          }
+        </div>
+
+        <div class="book-row">
           <div class="book-main">
             <span class="book-title">${b.title}</span>
           </div>
@@ -266,22 +250,9 @@ function renderBooks(list) {
             <span class="book-year">${b.date || ""}</span>
           </div>
 
-          <div>
-            <span class="status-badge ${b.read ? "read" : "unread"}">
-              ${b.read ? "READ" : "UNREAD"}
-            </span>
-          </div>
-        </div>
-
-        <div class="book-actions">
-          <input type="checkbox"
-            ${b.owned ? "checked" : ""}
-            onchange="toggleOwned('${b.id}', this.checked)">
-          <button onclick="toggleRead('${b.id}', ${b.read})">
-            ${b.read ? "✅" : "⬜"}
-          </button>
-          <button onclick="editBook('${b.id}')">✏️</button>
-          <button onclick="askDelete('${b.id}')">🗑️</button>
+          <span class="status-badge ${b.read ? "read" : "unread"}">
+            ${b.read ? "READ" : "UNREAD"}
+          </span>
         </div>
       </div>
     `;
