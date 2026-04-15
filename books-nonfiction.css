@@ -515,3 +515,39 @@ body {
 .book-row > div:last-child span:last-child {
   margin-top: 6px;
 }
+
+/* ======================
+   BOOK ROW LAYOUT
+====================== */
+
+.book-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+}
+
+/* left side (title + author) */
+.book-row > div:first-child {
+  flex: 2;
+}
+
+/* right side (genre + year) */
+.book-meta {
+  flex: 1;
+  display: flex;
+  justify-content: space-between;
+  gap: 15px;
+  font-size: 13px;
+  opacity: 0.8;
+}
+
+/* optional alignment */
+.book-genre {
+  text-align: left;
+}
+
+.book-year {
+  text-align: right;
+  min-width: 60px;
+}
