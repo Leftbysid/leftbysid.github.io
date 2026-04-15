@@ -126,29 +126,19 @@ body {
    LEFT OWNED ICON (OUTSIDE CARD)
 ================================ */
 .owned-icon {
-  font-size: 22px;
-  width: 26px;
+  width: 30px;
   text-align: center;
-
-  /* hidden by default */
   opacity: 0;
   transform: scale(0.6);
-  pointer-events: none;
-
-  color: #4cc9ff;
-  transition:
-    opacity .2s ease,
-    transform .2s ease,
-    text-shadow .2s ease;
+  transition: all .2s ease;
 }
 
-/* SHOW ONLY WHEN OWNED */
 .owned-icon.owned {
   opacity: 1;
   transform: scale(1);
+  color: #4cc9ff;
   text-shadow: 0 0 10px rgba(76,201,255,.8);
 }
-
 /* ===============================
    BOOK CARD
 ================================ */
