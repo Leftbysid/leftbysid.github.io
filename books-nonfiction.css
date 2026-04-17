@@ -671,3 +671,124 @@ body {
     gap: 5px;
   }
 }
+
+/* ===============================
+   🔥 FINAL BOOK ROW SYSTEM (COPY FROM FICTION)
+================================ */
+
+.book-row-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  max-width: 1000px;
+  margin: 14px auto;
+}
+
+/* COVER */
+.book-cover {
+  width: 70px;
+  height: 100px;
+  flex-shrink: 0;
+}
+
+.book-cover img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border: 1px solid #00ff9c;
+  box-shadow: 0 0 10px rgba(0,255,156,.5);
+}
+
+.no-cover {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  border: 1px solid #00ff9c;
+  font-size: 20px;
+}
+
+/* MAIN ROW */
+.book-row {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 30px;
+  padding: 12px;
+  border: 1px solid rgba(0,255,156,.4);
+  background: rgba(0,0,0,.6);
+}
+
+/* TITLE */
+.book-main {
+  flex: 2;
+}
+
+.book-title {
+  font-size: 18px;
+  font-weight: 600;
+}
+
+/* META */
+.book-meta {
+  flex: 3;
+  display: flex;
+  justify-content: space-between;
+  gap: 25px;
+  align-items: center;
+}
+
+.book-author {
+  font-size: 15px;
+  min-width: 140px;
+}
+
+.book-genre {
+  font-size: 13px;
+  opacity: 0.7;
+  min-width: 160px;
+}
+
+.book-year {
+  font-size: 15px;
+  min-width: 70px;
+  text-align: right;
+}
+
+/* STATUS */
+.status-badge {
+  font-size: 11px;
+  padding: 3px 8px;
+  border-radius: 12px;
+}
+
+.status-badge.read {
+  border: 1px solid #00ff9c;
+  color: #00ff9c;
+}
+
+.status-badge.unread {
+  border: 1px solid #ff5050;
+  color: #ff5050;
+}
+
+/* ACTIONS */
+.book-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.book-actions button {
+  background: none;
+  border: none;
+  color: #00ff9c;
+  font-size: 18px;
+  cursor: pointer;
+}
+
+/* OWNED ICON */
+.owned-icon {
+  width: 26px;
+  flex-shrink: 0;
+}
