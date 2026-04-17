@@ -71,7 +71,6 @@ const PAGE_SIZE = 20;
 let visibleCount = PAGE_SIZE;
 let searchQuery = "";
 
-/* ✅ NEW: remove image flag */
 let removeImage = false;
 
 /* ===============================
@@ -100,6 +99,37 @@ const resultCount = document.getElementById("resultCount");
 ================================ */
 document.getElementById("toggleForm").onclick =
   () => bookForm.classList.toggle("hidden");
+
+/* ===============================
+   ✅ RESTORED SEARCH / FILTER / SORT
+================================ */
+let searchTimeout;
+
+searchInput.addEventListener("input", e => {
+  clearTimeout(searchTimeout);
+
+  searchTimeout = setTimeout(() => {
+    searchQuery = e.target.value.toLowerCase();
+    visibleCount = PAGE_SIZE;
+    applyView();
+  }, 300);
+});
+
+filterSelect.addEventListener("change", e => {
+  currentFilter = e.target.value;
+  visibleCount = PAGE_SIZE;
+  applyView();
+});
+
+sortSelect.addEventListener("change", e => {
+  sortMode = e.target.value;
+  applyView();
+});
+
+recentBtn?.addEventListener("click", () => {
+  sortMode = "recent";
+  applyView();
+});
 
 /* ===============================
    AUTH
@@ -312,7 +342,7 @@ window.editBook = id => {
   const b = books.find(x => x.id === id);
   editingId = id;
 
-  removeImage = false; // ✅ reset flag
+  removeImage = false;
 
   editTitle.value = b.title;
   editAuthor.value = b.author;
@@ -325,14 +355,10 @@ window.editBook = id => {
   editOverlay.classList.remove("hidden");
 };
 
-/* ✅ NEW FUNCTION */
 window.removeEditImage = () => {
   removeImage = true;
-
   const imgInput = document.getElementById("editImage");
   if (imgInput) imgInput.value = "";
-
-  alert("Image will be removed when you save.");
 };
 
 window.saveEdit = async () => {
@@ -356,7 +382,6 @@ window.saveEdit = async () => {
     date: formatDateInput(editDate.value)
   };
 
-  /* ✅ UPDATED LOGIC */
   if (removeImage) {
     updateData.image = "";
   } else if (imageUrl) {
