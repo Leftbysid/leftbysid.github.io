@@ -582,3 +582,90 @@ body {
   color: #ff5050;
   background: transparent;
 }
+
+/* ===============================
+   BOOK COVER (NEW - MATCH FICTION UI)
+================================ */
+.book-cover {
+  width: 50px;
+  height: 70px;
+  flex-shrink: 0;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 6px;
+  overflow: hidden;
+
+  background: rgba(0,0,0,.6);
+  border: 1px solid rgba(0,255,156,.4);
+}
+
+/* IMAGE */
+.book-cover img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* FALLBACK (NO IMAGE) */
+.no-cover {
+  font-size: 20px;
+  opacity: 0.5;
+}
+
+/* ===============================
+   ROW WRAPPER ALIGNMENT FIX
+================================ */
+.book-row-wrapper {
+  align-items: center;
+}
+
+/* ===============================
+   ACTIONS FIX (NO OVERLAP)
+================================ */
+.book-actions {
+  flex-shrink: 0;
+}
+
+/* ===============================
+   REMOVE IMAGE BUTTON
+================================ */
+.remove-image-btn {
+  background: transparent;
+  border: 1px solid #ff4d4d;
+  color: #ff4d4d;
+  padding: 6px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  margin-top: 8px;
+
+  transition: all 0.2s ease;
+}
+
+.remove-image-btn:hover {
+  background: #ff4d4d;
+  color: black;
+}
+
+/* ===============================
+   MOBILE FIX
+================================ */
+@media (max-width: 600px) {
+  .book-row-wrapper {
+    gap: 8px;
+  }
+
+  .book-cover {
+    width: 45px;
+    height: 65px;
+  }
+
+  .book-meta {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 5px;
+  }
+}
