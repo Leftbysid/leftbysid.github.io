@@ -327,6 +327,9 @@ function renderBooks(list) {
   });
 
   bookList.innerHTML = html;
+  totalCount.textContent = books.length;
+  readCount.textContent = books.filter(b => b.read).length;
+  unreadCount.textContent = books.filter(b => !b.read).length; 
 }
 
 /* ===============================
