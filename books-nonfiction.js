@@ -179,24 +179,61 @@ function loadBooks() {
 function applyView() {
   let list = [...books];
 
+  /* SEARCH */
   if (searchQuery) {
-    const term = searchQuery;
-    list = list.filter(b =>
-      (b.title || "").toLowerCase().includes(term) ||
-      (b.author || "").toLowerCase().includes(term)
-    );
+    const isAuthorOnly = searchQuery.startsWith("@");
+    const term = isAuthorOnly ? searchQuery.slice(1) : searchQuery;
+
+    list = list.filter(b => {
+      const title = (b.title || "").toLowerCase();
+      const author = (b.author || "").toLowerCase();
+
+      return isAuthorOnly
+        ? author.includes(term)
+        : title.includes(term) || author.includes(term);
+    });
   }
 
+  /* FILTER */
   switch (currentFilter) {
     case "owned": list = list.filter(b => b.owned); break;
+    case "not-owned": list = list.filter(b => !b.owned); break;
     case "read": list = list.filter(b => b.read); break;
+    case "not-read": list = list.filter(b => !b.read); break;
   }
 
-  list.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+  /* SORT */
+  switch (sortMode) {
+    case "recent":
+      list.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+      break;
 
-  renderBooks(list.slice(0, visibleCount));
+    case "title":
+      list.sort((a, b) => (a.title || "").localeCompare(b.title || ""));
+      break;
+
+    case "author":
+      list.sort((a, b) => (a.author || "").localeCompare(b.author || ""));
+      break;
+
+    case "category":
+      list.sort((a, b) => (a.category || "").localeCompare(b.category || ""));
+      break;
+
+    case "year":
+      list.sort((a, b) => (a.date || "").localeCompare(b.date || ""));
+      break;
+  }
+
+  const visible = list.slice(0, visibleCount);
+  renderBooks(visible);
+
+  if (resultCount) {
+    resultCount.innerText = searchQuery
+      ? `Showing ${visible.length} of ${list.length} results`
+      : "";
+  }
 }
-
 /* ===============================
    RENDER (SAME UI AS FICTION)
 ================================ */
