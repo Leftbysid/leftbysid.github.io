@@ -289,11 +289,35 @@ function renderBooks(list) {
 }
 
 /* ===============================
-   EDIT + REMOVE IMAGE
+   TOGGLES / EDIT / DELETE
 ================================ */
+
+window.toggleRead = async (id, current) => {
+  await updateDoc(doc(db, COLLECTION_NAME, id), {
+    read: !current
+  });
+
+  const book = books.find(b => b.id === id);
+  if (book) book.read = !current;
+
+  applyView();
+};
+
+window.toggleOwned = async (id, value) => {
+  await updateDoc(doc(db, COLLECTION_NAME, id), {
+    owned: value
+  });
+
+  const book = books.find(b => b.id === id);
+  if (book) book.owned = value;
+
+  applyView();
+};
+
 window.editBook = id => {
   const b = books.find(x => x.id === id);
   editingId = id;
+
   removeImage = false;
 
   editTitle.value = b.title;
@@ -301,20 +325,31 @@ window.editBook = id => {
   editCategory.value = b.category || "";
   editDate.value = b.date || "";
 
-  document.getElementById("editImage").value = "";
+  const imgInput = document.getElementById("editImage");
+  if (imgInput) imgInput.value = "";
+
   editOverlay.classList.remove("hidden");
 };
 
 window.removeEditImage = () => {
   removeImage = true;
-  document.getElementById("editImage").value = "";
+  const imgInput = document.getElementById("editImage");
+  if (imgInput) imgInput.value = "";
 };
 
 window.saveEdit = async () => {
   const file = document.getElementById("editImage")?.files[0];
+
   let imageUrl = null;
 
-  if (file) imageUrl = await uploadImage(file);
+  if (file) {
+    try {
+      imageUrl = await uploadImage(file);
+    } catch (err) {
+      alert("Image upload failed");
+      return;
+    }
+  }
 
   const updateData = {
     title: editTitle.value,
@@ -323,21 +358,21 @@ window.saveEdit = async () => {
     date: formatDateInput(editDate.value)
   };
 
-  if (removeImage) updateData.image = "";
-  else if (imageUrl) updateData.image = imageUrl;
+  if (removeImage) {
+    updateData.image = "";
+  } else if (imageUrl) {
+    updateData.image = imageUrl;
+  }
 
   await updateDoc(doc(db, COLLECTION_NAME, editingId), updateData);
+
   editOverlay.classList.add("hidden");
+  await loadBooks();
 };
 
-/* ===============================
-   DELETE + TOGGLES (UNCHANGED)
-================================ */
-window.toggleRead = (id, current) =>
-  updateDoc(doc(db, COLLECTION_NAME, id), { read: !current });
-
-window.toggleOwned = (id, value) =>
-  updateDoc(doc(db, COLLECTION_NAME, id), { owned: value });
+window.closeEdit = () => {
+  editOverlay.classList.add("hidden");
+};
 
 window.askDelete = id => {
   deleteId = id;
@@ -347,7 +382,14 @@ window.askDelete = id => {
 window.confirmDelete = async () => {
   await deleteDoc(doc(db, COLLECTION_NAME, deleteId));
   document.getElementById("confirmBox").classList.add("hidden");
+  await loadBooks();
 };
+
+window.closeConfirm = () => {
+  deleteId = null;
+  document.getElementById("confirmBox").classList.add("hidden");
+};
+
 
 /* ===============================
    INFINITE SCROLL
