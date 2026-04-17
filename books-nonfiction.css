@@ -155,16 +155,16 @@ body {
    BOOK CARD
 ================================ */
 .book-row {
-  flex: 1;
-  display: grid;
-  grid-template-columns: 2fr 1.2fr;
-  gap: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
   padding: 12px;
+
   border: 1px solid rgba(0,255,156,.4);
   background: rgba(0,0,0,.6);
+
   transition: transform .15s ease, box-shadow .15s ease;
 }
-
 .book-row:hover {
   transform: translateY(-2px);
   box-shadow:
@@ -518,17 +518,16 @@ body {
 }
 
 .book-title {
-  font-size: 18px;
+  font-size: 16px;
   font-weight: 600;
 }
-
 /* META COLUMN (AUTHOR + GENRE + YEAR) */
 .book-meta {
-  flex: 3;
   display: flex;
-  justify-content: space-between;
-  gap: 25px;
-  align-items: center;
+  gap: 20px;
+  flex-wrap: wrap;
+  font-size: 13px;
+  opacity: 0.8;
 }
 
 /* AUTHOR */
@@ -627,7 +626,10 @@ body {
    ACTIONS FIX (NO OVERLAP)
 ================================ */
 .book-actions {
-  flex-shrink: 0;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  justify-content: flex-end;
 }
 
 /* ===============================
