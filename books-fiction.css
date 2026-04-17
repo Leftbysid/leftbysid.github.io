@@ -649,3 +649,16 @@ body {
   width: 26px;
   flex-shrink: 0;
 }
+
+.remove-image-btn {
+  background: #ff4d4d;
+  color: white;
+  border: none;
+  padding: 6px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.remove-image-btn:hover {
+  background: #e60000;
+}
