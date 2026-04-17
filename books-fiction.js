@@ -71,6 +71,9 @@ const PAGE_SIZE = 20;
 let visibleCount = PAGE_SIZE;
 let searchQuery = "";
 
+/* ✅ NEW: remove image flag */
+let removeImage = false;
+
 /* ===============================
    ELEMENTS
 ================================ */
@@ -108,7 +111,7 @@ onAuthStateChanged(auth, user => {
 });
 
 /* ===============================
-   ADD BOOK (UPDATED)
+   ADD BOOK
 ================================ */
 window.addBook = async () => {
   if (!titleInput.value || !authorInput.value) return;
@@ -132,7 +135,7 @@ window.addBook = async () => {
     author: authorInput.value.trim(),
     category: categoryInput.value,
     date: formatDateInput(dateInput.value),
-    image: imageUrl, // 🔥 NEW
+    image: imageUrl,
     read: false,
     owned: false,
     createdAt: Date.now()
@@ -215,7 +218,7 @@ function applyView() {
 }
 
 /* ===============================
-   RENDER (UPDATED WITH IMAGE)
+   RENDER
 ================================ */
 function renderBooks(list) {
   let html = "";
@@ -231,19 +234,16 @@ function renderBooks(list) {
     html += `
   <div class="book-row-wrapper">
 
-    <!-- 🔥 OWNED ICON FIRST -->
     <span class="owned-icon ${b.owned ? "owned" : ""}">📘</span>
 
-    <!-- COVER -->
     <div class="book-cover">
       ${
         b.image
-          ? `<img src="${b.image}">`
+          ? `<img src="${b.image}" loading="lazy">`
           : `<div class="no-cover">🖕</div>`
       }
     </div>
 
-    <!-- MAIN ROW -->
     <div class="book-row">
       <div class="book-main">
         <span class="book-title">${b.title}</span>
@@ -283,7 +283,7 @@ function renderBooks(list) {
 }
 
 /* ===============================
-   TOGGLES / EDIT / DELETE (FIXED)
+   TOGGLES / EDIT / DELETE
 ================================ */
 
 window.toggleRead = async (id, current) => {
@@ -291,7 +291,6 @@ window.toggleRead = async (id, current) => {
     read: !current
   });
 
-  // 🔥 update locally (no reload lag)
   const book = books.find(b => b.id === id);
   if (book) book.read = !current;
 
@@ -303,7 +302,6 @@ window.toggleOwned = async (id, value) => {
     owned: value
   });
 
-  // 🔥 instant UI update
   const book = books.find(b => b.id === id);
   if (book) book.owned = value;
 
@@ -314,16 +312,27 @@ window.editBook = id => {
   const b = books.find(x => x.id === id);
   editingId = id;
 
+  removeImage = false; // ✅ reset flag
+
   editTitle.value = b.title;
   editAuthor.value = b.author;
   editCategory.value = b.category || "";
   editDate.value = b.date || "";
 
-  // 🔥 reset image input safely
   const imgInput = document.getElementById("editImage");
   if (imgInput) imgInput.value = "";
 
   editOverlay.classList.remove("hidden");
+};
+
+/* ✅ NEW FUNCTION */
+window.removeEditImage = () => {
+  removeImage = true;
+
+  const imgInput = document.getElementById("editImage");
+  if (imgInput) imgInput.value = "";
+
+  alert("Image will be removed when you save.");
 };
 
 window.saveEdit = async () => {
@@ -331,7 +340,6 @@ window.saveEdit = async () => {
 
   let imageUrl = null;
 
-  // 🔥 upload new image if selected
   if (file) {
     try {
       imageUrl = await uploadImage(file);
@@ -348,8 +356,10 @@ window.saveEdit = async () => {
     date: formatDateInput(editDate.value)
   };
 
-  // 🔥 only update image if new one selected
-  if (imageUrl) {
+  /* ✅ UPDATED LOGIC */
+  if (removeImage) {
+    updateData.image = "";
+  } else if (imageUrl) {
     updateData.image = imageUrl;
   }
 
