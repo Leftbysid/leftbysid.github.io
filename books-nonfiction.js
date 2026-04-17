@@ -368,3 +368,8 @@ window.addEventListener("scroll", () => {
       applyView();
 
       setTimeout(() => {
+        isLoadingMore = false;
+      }, 200);
+    }
+  }
+});
