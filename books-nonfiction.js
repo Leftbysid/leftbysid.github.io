@@ -107,6 +107,47 @@ document.getElementById("toggleForm").onclick =
   () => bookForm.classList.toggle("hidden");
 
 /* ===============================
+   CONTROLS (RESTORED)
+================================ */
+
+// RECENT BUTTON
+recentBtn.onclick = () => {
+  sortMode = "recent";
+  currentFilter = "all";
+  filterSelect.value = "all";
+  applyView();
+};
+
+// FILTER
+filterSelect.onchange = () => {
+  currentFilter = filterSelect.value;
+  visibleCount = PAGE_SIZE;
+  applyView();
+};
+
+// SORT
+if (sortSelect) {
+  sortSelect.onchange = () => {
+    sortMode = sortSelect.value;
+    applyView();
+  };
+}
+
+// SEARCH (DEBOUNCED)
+let searchTimer = null;
+
+searchInput.oninput = () => {
+  clearTimeout(searchTimer);
+
+  searchTimer = setTimeout(() => {
+    searchQuery = searchInput.value.trim().toLowerCase();
+    visibleCount = PAGE_SIZE;
+    window.scrollTo(0, 0);
+    applyView();
+  }, 250);
+};
+
+/* ===============================
    AUTH
 ================================ */
 onAuthStateChanged(auth, user => {
