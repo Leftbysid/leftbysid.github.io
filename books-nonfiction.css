@@ -107,13 +107,13 @@ body {
    ROW WRAPPER (ICON | CARD | ACTIONS)
 ================================ */
 .book-row-wrapper {
-  display: flex;
+  display: grid;
+  grid-template-columns: 30px 60px 1fr auto;
   align-items: center;
-  gap: 14px;
-  max-width: 980px;
+  gap: 12px;
+  max-width: 1000px;
   margin: 10px auto;
 }
-
 /* ===============================
    LEFT OWNED ICON (OUTSIDE CARD)
 ================================ */
