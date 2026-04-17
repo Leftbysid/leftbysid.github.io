@@ -341,6 +341,9 @@ window.saveEdit = async () => {
   editOverlay.classList.add("hidden");
   loadQuotes();
 };
+window.closeEdit = () => {
+  editOverlay.classList.add("hidden");
+};
 
 window.askDelete = id => {
   deleteId = id;
