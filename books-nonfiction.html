@@ -44,7 +44,6 @@
     <option value="not-read">Not Read</option>
   </select>
 
-  <!-- 🔥 ADD THIS HERE -->
   <select id="sortSelect">
     <option value="recent">Recent</option>
     <option value="title">Title (A–Z)</option>
@@ -52,11 +51,13 @@
     <option value="category">Genre (A–Z)</option>
     <option value="year">Year</option>
   </select>
-
 </div>
+
 <p id="resultCount" style="text-align:center; margin-top:10px;"></p>
+
 <button id="toggleForm">➕ Add Book</button>
 
+<!-- ADD FORM -->
 <div id="bookForm" class="book-form hidden">
   <input id="title" placeholder="Title">
 
@@ -69,12 +70,16 @@
   </div>
 
   <input id="date" placeholder="Year or full date (e.g. 2024 or 2024-05-12)">
+
+  <!-- ✅ IMAGE INPUT -->
+  <input type="file" id="imageInput" accept="image/*">
+
   <button onclick="addBook()">Save</button>
 </div>
 
 <div id="bookList"></div>
 
-<!-- ✅ LOAD MORE (PAGINATION) -->
+<!-- LOAD MORE -->
 <button id="loadMoreBooks" class="hidden">
   Load More
 </button>
@@ -94,10 +99,20 @@
 <div id="editOverlay" class="edit-overlay hidden">
   <div class="edit-box">
     <h3>Edit Book</h3>
+
     <input id="editTitle">
     <input id="editAuthor">
     <input id="editCategory">
     <input id="editDate" placeholder="Year or full date">
+
+    <!-- ✅ EDIT IMAGE INPUT -->
+    <input type="file" id="editImage" accept="image/*">
+
+    <!-- ✅ REMOVE IMAGE BUTTON -->
+    <button onclick="removeEditImage()" class="remove-image-btn">
+      Remove Image
+    </button>
+
     <div class="edit-actions">
       <button onclick="saveEdit()">💾 Save</button>
       <button class="cancel" onclick="closeEdit()">✖ Cancel</button>
@@ -105,7 +120,7 @@
   </div>
 </div>
 
-<!-- 🔗 SHARE PAGE MODAL -->
+<!-- SHARE PAGE MODAL -->
 <div id="shareOverlay" class="overlay hidden">
   <div class="share-box">
     <h3>🔗 Share Non-Fiction Library</h3>
@@ -131,7 +146,7 @@
 <!-- PAGE LOGIC -->
 <script type="module" src="books-nonfiction.js"></script>
 
-<!-- 🔥 GIF HOVER -->
+<!-- GIF HOVER -->
 <script>
   document.addEventListener('DOMContentLoaded', () => {
     document.querySelectorAll('.home-gif img').forEach(img => {
