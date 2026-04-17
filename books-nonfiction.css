@@ -1,6 +1,4 @@
-/* ===============================
-   BASE
-================================ */
+
 body {
   background: black;
   color: #00ff9c;
@@ -107,13 +105,13 @@ body {
    ROW WRAPPER (ICON | CARD | ACTIONS)
 ================================ */
 .book-row-wrapper {
-  display: grid;
-  grid-template-columns: 30px 60px 1fr auto;
+  display: flex;
   align-items: center;
-  gap: 12px;
-  max-width: 1000px;
+  gap: 14px;
+  max-width: 980px;
   margin: 10px auto;
 }
+
 /* ===============================
    LEFT OWNED ICON (OUTSIDE CARD)
 ================================ */
@@ -128,43 +126,33 @@ body {
    LEFT OWNED ICON (OUTSIDE CARD)
 ================================ */
 .owned-icon {
-  font-size: 22px;
-  width: 26px;
+  width: 30px;
   text-align: center;
-
-  /* hidden by default */
   opacity: 0;
   transform: scale(0.6);
-  pointer-events: none;
-
-  color: #4cc9ff;
-  transition:
-    opacity .2s ease,
-    transform .2s ease,
-    text-shadow .2s ease;
+  transition: all .2s ease;
 }
 
-/* SHOW ONLY WHEN OWNED */
 .owned-icon.owned {
   opacity: 1;
   transform: scale(1);
+  color: #4cc9ff;
   text-shadow: 0 0 10px rgba(76,201,255,.8);
 }
-
 /* ===============================
    BOOK CARD
 ================================ */
 .book-row {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
+  flex: 1;
+  display: grid;
+  grid-template-columns: 2fr 1.2fr;
+  gap: 10px;
   padding: 12px;
-
   border: 1px solid rgba(0,255,156,.4);
   background: rgba(0,0,0,.6);
-
   transition: transform .15s ease, box-shadow .15s ease;
 }
+
 .book-row:hover {
   transform: translateY(-2px);
   box-shadow:
@@ -288,7 +276,6 @@ body {
 
   display: flex;
   gap: 12px;
-
   z-index: 10000;
 }
 
@@ -322,7 +309,7 @@ body {
   transform: translateY(-1px);
 }
 
-/* MOBILE: STACK BUTTONS */
+/* MOBILE */
 @media (max-width: 700px) {
   .export-controls {
     flex-direction: column;
@@ -335,6 +322,67 @@ body {
   }
 }
 
+/* =========================
+   GLOBAL MATRIX HOME LOGO
+========================= */
+.home-logo {
+  position: fixed;
+  buttom: 18px;
+  left: 20px;
+
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 22px;
+  letter-spacing: 1px;
+
+  color: #00ff9c; /* MATRIX GREEN */
+  text-decoration: none;
+
+  opacity: 0.75;
+  z-index: 1000;
+
+  transition:
+    opacity .2s ease,
+    text-shadow .2s ease,
+    transform .2s ease;
+}
+
+/* hover glow */
+.home-logo:hover {
+  opacity: 1;
+  text-shadow:
+    0 0 6px rgba(0,255,156,.6),
+    0 0 14px rgba(0,255,156,.35);
+  transform: translateY(-1px);
+}
+
+/* blinking cursor */
+.home-logo .cursor {
+  display: inline-block;
+  animation: cursorBlink 1.2s steps(1) infinite;
+}
+
+/* cursor animation */
+@keyframes cursorBlink {
+  50% { opacity: 0; }
+}
+
+/* =========================
+   TOOLTIP
+========================= */
+.home-logo::after {
+  content: " really??";
+  font-size: 12px;
+  margin-left: 6px;
+  opacity: 0;
+  color: #00ff9c;
+  white-space: nowrap;
+
+  transition: opacity .2s ease;
+}
+
+.home-logo:hover::after {
+  opacity: 0.6;
+}
 
 /* =========================
    GIF DASHBOARD BUTTON
@@ -365,13 +413,14 @@ body {
 }
 
 /* =========================
-   SHARE OVERLAY (NON-FICTION FIX)
+   SHARE MODAL (FIXED)
 ========================= */
+
 .overlay {
   position: fixed;
   inset: 0;
   background: rgba(0, 0, 0, 0.75);
-  z-index: 99999;
+  z-index: 9999;
 
   display: flex;
   justify-content: center;
@@ -379,7 +428,7 @@ body {
 }
 
 .overlay.hidden {
-  display: none !important;
+  display: none;
 }
 
 .share-box {
@@ -457,43 +506,20 @@ body {
   cursor: pointer;
 }
 
-/* ===============================
-   LOAD MORE BUTTON (PAGINATION)
-================================ */
 #loadMoreBooks {
   display: block;
   margin: 30px auto;
   padding: 10px 24px;
-
   background: black;
   border: 2px solid #00ff9c;
   color: #00ff9c;
-
-  font-family: 'Share Tech Mono', monospace;
-  letter-spacing: 1px;
-
   cursor: pointer;
-
-  box-shadow:
-    0 0 12px rgba(0,255,156,.5),
-    inset 0 0 10px rgba(0,255,156,.2);
-
-  transition:
-    background .2s ease,
-    color .2s ease,
-    box-shadow .2s ease,
-    transform .15s ease;
+  box-shadow: 0 0 12px rgba(0,255,156,.5);
 }
 
 #loadMoreBooks:hover {
   background: #00ff9c;
   color: black;
-
-  box-shadow:
-    0 0 20px rgba(0,255,156,.9),
-    inset 0 0 10px rgba(0,0,0,.4);
-
-  transform: translateY(-2px);
 }
 
 /* ======================
@@ -503,177 +529,8 @@ body {
 /* ======================
    CLEAN BOOK LAYOUT (FINAL)
 ====================== */
-
-/* ROW */
-.book-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 20px;
-}
-
-/* TITLE COLUMN */
-.book-main {
-  flex: 2;
-}
-
-.book-title {
-  font-size: 16px;
-  font-weight: 600;
-}
-/* META COLUMN (AUTHOR + GENRE + YEAR) */
-.book-meta {
-  display: flex;
-  gap: 20px;
-  flex-wrap: wrap;
-  font-size: 13px;
-  opacity: 0.8;
-}
-
-/* AUTHOR */
-.book-author {
-  font-size: 15px;
-  font-weight: 500;
-  min-width: 140px;
-}
-
-/* GENRE */
-.book-genre {
-  font-size: 13px;
-  opacity: 0.7;
-  min-width: 160px;
-}
-
-/* YEAR */
-.book-year {
-  font-size: 15px;
-  font-weight: 500;
-  min-width: 70px;
-  text-align: right;
-}
-
-/* ======================
-   STATUS BADGE FIX
-====================== */
-
-.status-badge {
-  font-size: 11px;
-  padding: 3px 8px;
-  border-radius: 12px;
-  margin-left: 10px;
-
-  /* 🔥 REMOVE GREEN GLOW BUG */
-  box-shadow: none !important;
-  text-shadow: none !important;
-  filter: none !important;
-}
-
-/* READ */
-.status-badge.read {
-  border: 1px solid #00ff9c;
-  color: #00ff9c;
-  background: transparent;
-}
-
-/* UNREAD */
-.status-badge.unread {
-  border: 1px solid #ff5050;
-  color: #ff5050;
-  background: transparent;
-}
-
 /* ===============================
-   BOOK COVER (NEW - MATCH FICTION UI)
-================================ */
-.book-cover {
-  width: 50px;
-  height: 70px;
-  flex-shrink: 0;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  border-radius: 6px;
-  overflow: hidden;
-
-  background: rgba(0,0,0,.6);
-  border: 1px solid rgba(0,255,156,.4);
-}
-
-/* IMAGE */
-.book-cover img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
-}
-
-/* FALLBACK (NO IMAGE) */
-.no-cover {
-  font-size: 20px;
-  opacity: 0.5;
-}
-
-/* ===============================
-   ROW WRAPPER ALIGNMENT FIX
-================================ */
-.book-row-wrapper {
-  align-items: center;
-}
-
-/* ===============================
-   ACTIONS FIX (NO OVERLAP)
-================================ */
-.book-actions {
-  display: flex;
-  gap: 8px;
-  align-items: center;
-  justify-content: flex-end;
-}
-
-/* ===============================
-   REMOVE IMAGE BUTTON
-================================ */
-.remove-image-btn {
-  background: transparent;
-  border: 1px solid #ff4d4d;
-  color: #ff4d4d;
-  padding: 6px 10px;
-  border-radius: 6px;
-  cursor: pointer;
-  margin-top: 8px;
-
-  transition: all 0.2s ease;
-}
-
-.remove-image-btn:hover {
-  background: #ff4d4d;
-  color: black;
-}
-
-/* ===============================
-   MOBILE FIX
-================================ */
-@media (max-width: 600px) {
-  .book-row-wrapper {
-    gap: 8px;
-  }
-
-  .book-cover {
-    width: 45px;
-    height: 65px;
-  }
-
-  .book-meta {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 5px;
-  }
-}
-
-/* ===============================
-   🔥 FINAL BOOK ROW SYSTEM (COPY FROM FICTION)
+   🔥 FINAL BOOK ROW SYSTEM (CLEAN)
 ================================ */
 
 .book-row-wrapper {
@@ -684,7 +541,7 @@ body {
   margin: 14px auto;
 }
 
-/* COVER */
+/* 📘 COVER */
 .book-cover {
   width: 70px;
   height: 100px;
@@ -708,7 +565,7 @@ body {
   font-size: 20px;
 }
 
-/* MAIN ROW */
+/* 🧾 MAIN ROW */
 .book-row {
   flex: 1;
   display: flex;
@@ -787,8 +644,21 @@ body {
   cursor: pointer;
 }
 
-/* OWNED ICON */
+/* OWNED ICON FIX */
 .owned-icon {
   width: 26px;
   flex-shrink: 0;
+}
+
+.remove-image-btn {
+  background: #ff4d4d;
+  color: white;
+  border: none;
+  padding: 6px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.remove-image-btn:hover {
+  background: #e60000;
 }
