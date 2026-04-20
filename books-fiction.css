@@ -710,3 +710,13 @@ body {
   padding-top: 4px;
   margin-top: 4px;
 }
+
+.book-year {
+  min-width: 60px;
+  text-align: right;
+}
+
+.meta-right {
+  width: 60px;
+  align-items: flex-end;
+}
