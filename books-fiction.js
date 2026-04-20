@@ -274,10 +274,7 @@ function renderBooks(list) {
       }
     </div>
 
-    <div class="book-row">
-      <div class="book-main">
-        <span class="book-title">${b.title}</span>
-      </div>
+   
 
       <div class="book-main">
   <div class="book-title">${b.title}</div>
