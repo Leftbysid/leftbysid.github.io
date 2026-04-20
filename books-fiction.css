@@ -1,4 +1,3 @@
-
 body {
   background: black;
   color: #00ff9c;
@@ -719,4 +718,12 @@ body {
 .meta-right {
   width: 60px;
   align-items: flex-end;
+
+.book-meta {
+  display: block;
+}
+
+.meta-grid {
+  display: grid;
+  grid-template-columns: 1fr 70px;
 }
