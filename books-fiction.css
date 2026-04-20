@@ -1,4 +1,3 @@
-
 body {
   background: black;
   color: #00ff9c;
@@ -34,11 +33,14 @@ body {
 }
 
 .controls input,
-.controls button {
+.controls button,
+.controls select {
   padding: 10px;
   background: black;
   border: 2px solid #00ff9c;
   color: #00ff9c;
+  font-family: 'Share Tech Mono', monospace;
+  cursor: pointer;
 }
 
 #toggleForm {
@@ -50,15 +52,6 @@ body {
   color: #00ff9c;
   cursor: pointer;
 }
-.controls button,
-.controls select {
-  padding: 10px;
-  background: black;
-  border: 2px solid #00ff9c;
-  color: #00ff9c;
-  font-family: 'Share Tech Mono', monospace;
-  cursor: pointer;
-}
 
 #recentBtn {
   text-shadow: 0 0 8px rgba(0,255,156,.6);
@@ -68,7 +61,6 @@ body {
   background: #00ff9c;
   color: black;
 }
-
 
 /* ===============================
    ADD FORM
@@ -102,32 +94,22 @@ body {
 }
 
 /* ===============================
-   ROW WRAPPER (ICON | CARD | ACTIONS)
+   ROW WRAPPER
 ================================ */
 .book-row-wrapper {
   display: flex;
   align-items: center;
-  gap: 14px;
-  max-width: 980px;
-  margin: 10px auto;
+  gap: 16px;
+  max-width: 1000px;
+  margin: 14px auto;
 }
 
 /* ===============================
-   LEFT OWNED ICON (OUTSIDE CARD)
+   OWNED ICON
 ================================ */
 .owned-icon {
-  font-size: 22px;
   width: 26px;
-  text-align: center;
-  transition: color .2s ease, text-shadow .2s ease;
-}
-
-/* ===============================
-   LEFT OWNED ICON (OUTSIDE CARD)
-================================ */
-.owned-icon {
-  width: 30px;
-  text-align: center;
+  flex-shrink: 0;
   opacity: 0;
   transform: scale(0.6);
   transition: all .2s ease;
@@ -139,14 +121,41 @@ body {
   color: #4cc9ff;
   text-shadow: 0 0 10px rgba(76,201,255,.8);
 }
+
+/* ===============================
+   BOOK COVER
+================================ */
+.book-cover {
+  width: 70px;
+  height: 100px;
+  flex-shrink: 0;
+}
+
+.book-cover img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border: 1px solid #00ff9c;
+  box-shadow: 0 0 10px rgba(0,255,156,.5);
+}
+
+.no-cover {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  border: 1px solid #00ff9c;
+  font-size: 20px;
+}
+
 /* ===============================
    BOOK CARD
 ================================ */
 .book-row {
   flex: 1;
-  display: grid;
-  grid-template-columns: 2fr 1.2fr;
-  gap: 10px;
+  display: flex;
+  align-items: center;
+  gap: 30px;
   padding: 12px;
   border: 1px solid rgba(0,255,156,.4);
   background: rgba(0,0,0,.6);
@@ -165,17 +174,81 @@ body {
 }
 
 /* ===============================
-   BADGES
+   BOOK MAIN (TITLE + AUTHOR)
+================================ */
+.book-main {
+  flex: 2;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.book-title {
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.book-author {
+  font-size: 13px;
+  opacity: 0.7;
+  border-top: 1px solid rgba(0,255,156,0.3);
+  padding-top: 4px;
+  margin-top: 4px;
+}
+
+/* ===============================
+   BOOK META (GENRE + YEAR + CODE)
+================================ */
+.book-meta {
+  flex: 3;
+  display: flex;
+  align-items: center;
+  gap: 25px;
+}
+
+.meta-grid {
+  display: grid;
+  grid-template-columns: auto auto;
+  column-gap: 20px;
+  align-items: start;
+}
+
+.book-genre {
+  font-size: 13px;
+  opacity: 0.7;
+  min-width: 160px;
+}
+
+.meta-right {
+  width: 60px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.book-year {
+  font-size: 15px;
+  min-width: 60px;
+  text-align: right;
+}
+
+.book-code {
+  font-size: 12px;
+  opacity: 0.6;
+}
+
+/* ===============================
+   STATUS BADGE
 ================================ */
 .status-badge {
   font-size: 11px;
   padding: 3px 8px;
   border-radius: 12px;
-  margin-left: 10px;
 }
 
 .status-badge.read {
   border: 1px solid #00ff9c;
+  color: #00ff9c;
 }
 
 .status-badge.unread {
@@ -184,12 +257,12 @@ body {
 }
 
 /* ===============================
-   ACTIONS (RIGHT SIDE)
+   ACTIONS
 ================================ */
 .book-actions {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
 }
 
 .book-actions button {
@@ -203,6 +276,19 @@ body {
 .book-actions input[type="checkbox"] {
   cursor: pointer;
   accent-color: #4cc9ff;
+}
+
+.remove-image-btn {
+  background: #ff4d4d;
+  color: white;
+  border: none;
+  padding: 6px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.remove-image-btn:hover {
+  background: #e60000;
 }
 
 /* ===============================
@@ -227,14 +313,7 @@ body {
 }
 
 /* ===============================
-   UTIL
-================================ */
-.hidden {
-  display: none;
-}
-
-/* ===============================
-   INPUT SUGGESTIONS (AUTHOR / CATEGORY)
+   SUGGESTIONS / AUTOCOMPLETE
 ================================ */
 .suggestions {
   position: absolute;
@@ -248,7 +327,6 @@ body {
   margin-top: 2px;
 }
 
-/* individual suggestion */
 .suggestions div {
   padding: 8px 10px;
   cursor: pointer;
@@ -256,24 +334,24 @@ body {
   border-bottom: 1px solid rgba(0,255,156,.15);
 }
 
-/* hover effect */
 .suggestions div:hover {
   background: rgba(0,255,156,.15);
 }
 
-/* hide helper */
+/* ===============================
+   UTILITY CLASSES
+================================ */
 .hidden {
   display: none !important;
 }
 
 /* ===============================
-   EXPORT CONTROLS (TOP RIGHT)
+   EXPORT CONTROLS
 ================================ */
 .export-controls {
   position: fixed;
   top: 20px;
   right: 20px;
-
   display: flex;
   gap: 12px;
   z-index: 10000;
@@ -288,11 +366,9 @@ body {
   font-size: 13px;
   letter-spacing: 1px;
   cursor: pointer;
-
   box-shadow:
     inset 0 0 12px rgba(0,255,156,.25),
     0 0 18px rgba(0,255,156,.45);
-
   transition:
     box-shadow .25s ease,
     transform .2s ease,
@@ -309,7 +385,6 @@ body {
   transform: translateY(-1px);
 }
 
-/* MOBILE */
 @media (max-width: 700px) {
   .export-controls {
     flex-direction: column;
@@ -322,31 +397,26 @@ body {
   }
 }
 
-/* =========================
-   GLOBAL MATRIX HOME LOGO
-========================= */
+/* ===============================
+   HOME LOGO
+================================ */
 .home-logo {
   position: fixed;
-  buttom: 18px;
+  bottom: 18px;
   left: 20px;
-
   font-family: 'Share Tech Mono', monospace;
   font-size: 22px;
   letter-spacing: 1px;
-
-  color: #00ff9c; /* MATRIX GREEN */
+  color: #00ff9c;
   text-decoration: none;
-
   opacity: 0.75;
   z-index: 1000;
-
   transition:
     opacity .2s ease,
     text-shadow .2s ease,
     transform .2s ease;
 }
 
-/* hover glow */
 .home-logo:hover {
   opacity: 1;
   text-shadow:
@@ -355,20 +425,15 @@ body {
   transform: translateY(-1px);
 }
 
-/* blinking cursor */
 .home-logo .cursor {
   display: inline-block;
   animation: cursorBlink 1.2s steps(1) infinite;
 }
 
-/* cursor animation */
 @keyframes cursorBlink {
   50% { opacity: 0; }
 }
 
-/* =========================
-   TOOLTIP
-========================= */
 .home-logo::after {
   content: " really??";
   font-size: 12px;
@@ -376,7 +441,6 @@ body {
   opacity: 0;
   color: #00ff9c;
   white-space: nowrap;
-
   transition: opacity .2s ease;
 }
 
@@ -384,44 +448,39 @@ body {
   opacity: 0.6;
 }
 
-/* =========================
+/* ===============================
    GIF DASHBOARD BUTTON
-========================= */
+================================ */
 .home-gif {
   position: fixed;
   bottom: 18px;
   left: 20px;
-
-  z-index: 9999;          /* 🔥 above all canvases */
-  pointer-events: auto;  /* 🔥 force hover to work */
-
+  z-index: 9999;
+  pointer-events: auto;
   opacity: 0.85;
   transition: opacity .2s ease, transform .2s ease;
 }
 
 .home-gif img {
-  width: 50px;            /* scales 200x200 → 50x50 */
+  width: 50px;
   height: auto;
   display: block;
-  pointer-events: auto;  /* 🔥 required for hover swap */
+  pointer-events: auto;
 }
 
-/* hover feedback */
 .home-gif:hover {
   opacity: 1;
   transform: scale(1.08);
 }
 
-/* =========================
-   SHARE MODAL (FIXED)
-========================= */
-
+/* ===============================
+   SHARE MODAL
+================================ */
 .overlay {
   position: fixed;
   inset: 0;
   background: rgba(0, 0, 0, 0.75);
   z-index: 9999;
-
   display: flex;
   justify-content: center;
   align-items: center;
@@ -520,203 +579,4 @@ body {
 #loadMoreBooks:hover {
   background: #00ff9c;
   color: black;
-}
-
-/* ======================
-   CATEGORY → YEAR SEPARATOR (CLEAN LINE)
-====================== */
-
-/* ======================
-   CLEAN BOOK LAYOUT (FINAL)
-====================== */
-/* ===============================
-   🔥 FINAL BOOK ROW SYSTEM (CLEAN)
-================================ */
-
-.book-row-wrapper {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  max-width: 1000px;
-  margin: 14px auto;
-}
-
-/* 📘 COVER */
-.book-cover {
-  width: 70px;
-  height: 100px;
-  flex-shrink: 0;
-}
-
-.book-cover img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  border: 1px solid #00ff9c;
-  box-shadow: 0 0 10px rgba(0,255,156,.5);
-}
-
-.no-cover {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: 100%;
-  border: 1px solid #00ff9c;
-  font-size: 20px;
-}
-
-/* 🧾 MAIN ROW */
-.book-row {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  gap: 30px;
-  padding: 12px;
-  border: 1px solid rgba(0,255,156,.4);
-  background: rgba(0,0,0,.6);
-}
-
-/* TITLE */
-.book-main {
-  flex: 2;
-}
-
-.book-title {
-  font-size: 18px;
-  font-weight: 600;
-}
-
-/* META */
-.book-meta {
-  flex: 3;
-  display: flex;
-  justify-content: space-between;
-  gap: 25px;
-  align-items: center;
-}
-
-.book-author {
-  font-size: 15px;
-  min-width: 140px;
-}
-
-.book-genre {
-  font-size: 13px;
-  opacity: 0.7;
-  min-width: 160px;
-}
-
-.book-year {
-  font-size: 15px;
-  min-width: 70px;
-  text-align: right;
-}
-
-/* STATUS */
-.status-badge {
-  font-size: 11px;
-  padding: 3px 8px;
-  border-radius: 12px;
-}
-
-.status-badge.read {
-  border: 1px solid #00ff9c;
-  color: #00ff9c;
-}
-
-.status-badge.unread {
-  border: 1px solid #ff5050;
-  color: #ff5050;
-}
-
-/* ACTIONS */
-.book-actions {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.book-actions button {
-  background: none;
-  border: none;
-  color: #00ff9c;
-  font-size: 18px;
-  cursor: pointer;
-}
-
-/* OWNED ICON FIX */
-.owned-icon {
-  width: 26px;
-  flex-shrink: 0;
-}
-
-.remove-image-btn {
-  background: #ff4d4d;
-  color: white;
-  border: none;
-  padding: 6px 10px;
-  border-radius: 6px;
-  cursor: pointer;
-}
-
-.remove-image-btn:hover {
-  background: #e60000;
-}
-
-/* LEFT: title + author */
-.book-main {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.book-author {
-  font-size: 13px;
-  opacity: 0.7;
-}
-
-/* RIGHT: 2-column system */
-.book-meta {
-  display: flex;
-  align-items: center;
-}
-
-/* grid: genre | year+code */
-.meta-grid {
-  display: grid;
-  grid-template-columns: auto auto;
-  column-gap: 20px;
-  align-items: start;
-}
-
-/* right column (year + code stacked) */
-.meta-right {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-}
-
-/* code under year */
-.book-code {
-  font-size: 12px;
-  opacity: 0.6;
-}
-
-.book-author {
-  font-size: 13px;
-  opacity: 0.7;
-
-  border-top: 1px solid rgba(0,255,156,0.3);
-  padding-top: 4px;
-  margin-top: 4px;
-}
-
-.book-year {
-  min-width: 60px;
-  text-align: right;
-}
-
-.meta-right {
-  width: 60px;
-  align-items: flex-end;
 }
