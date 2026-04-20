@@ -279,11 +279,21 @@ function renderBooks(list) {
         <span class="book-title">${b.title}</span>
       </div>
 
-      <div class="book-meta">
-        <span class="book-author">${b.author}</span>
-        <span class="book-genre">${sortedCategory}</span>
-        <span class="book-year">${b.date || ""}</span>
-      </div>
+      <div class="book-main">
+  <div class="book-title">${b.title}</div>
+  <div class="book-author">${b.author}</div>
+</div>
+
+<div class="book-meta">
+  <div class="meta-grid">
+    <span class="book-genre">${b.category || ""}</span>
+
+    <div class="meta-right">
+      <span class="book-year">${b.date || ""}</span>
+      <span class="book-code">${b.code || ""}</span>
+    </div>
+  </div>
+</div>
 
       <span class="status-badge ${b.read ? "read" : "unread"}">
         ${b.read ? "READ" : "UNREAD"}
