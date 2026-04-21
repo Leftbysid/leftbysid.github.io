@@ -261,7 +261,7 @@ function renderBooks(list) {
       .sort((a, b) => a.localeCompare(b))
       .join(", ");
 
-    html += `
+html += `
   <div class="book-row-wrapper">
 
     <span class="owned-icon ${b.owned ? "owned" : ""}">📘</span>
@@ -273,7 +273,8 @@ function renderBooks(list) {
           : `<div class="no-cover">💀</div>`
       }
     </div>
-   <div class="book-row">
+
+    <div class="book-row">
 
       <div class="book-main">
         <div class="book-title">${b.title}</div>
@@ -294,6 +295,7 @@ function renderBooks(list) {
       <span class="status-badge ${b.read ? "read" : "unread"}">
         ${b.read ? "READ" : "UNREAD"}
       </span>
+
     </div>
 
     <div class="book-actions">
