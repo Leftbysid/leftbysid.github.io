@@ -270,7 +270,7 @@ function renderBooks(list) {
       ${
         b.image
           ? `<img src="${b.image}" loading="lazy">`
-          : `<div class="no-cover">🖕</div>`
+          : `<div class="no-cover">💀</div>`
       }
     </div>
    <div class="book-row">
