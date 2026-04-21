@@ -282,19 +282,27 @@ function renderBooks(list) {
   let html = "";
 
   list.forEach(b => {
-    html += `
-      <div class="book-row-wrapper">
+    const sortedCategory = (b.category || "")
+      .split(",")
+      .map(x => x.trim())
+      .filter(Boolean)
+      .sort((a, b) => a.localeCompare(b))
+      .join(", ");
 
-        <span class="owned-icon ${b.owned ? "owned" : ""}">📕</span>
+html += `
+  <div class="book-row-wrapper">
 
-         <div class="book-cover">
+    <span class="owned-icon ${b.owned ? "owned" : ""}">📕</span>
+
+    <div class="book-cover">
       ${
         b.image
           ? `<img src="${b.image}" loading="lazy">`
           : `<div class="no-cover">💀</div>`
       }
     </div>
-   <div class="book-row">
+
+    <div class="book-row">
 
       <div class="book-main">
         <div class="book-title">${b.title}</div>
@@ -312,25 +320,25 @@ function renderBooks(list) {
         </div>
       </div>
 
+      <span class="status-badge ${b.read ? "read" : "unread"}">
+        ${b.read ? "READ" : "UNREAD"}
+      </span>
 
-          <span class="status-badge ${b.read ? "read" : "unread"}">
-            ${b.read ? "READ" : "UNREAD"}
-          </span>
-        </div>
+    </div>
 
-        <div class="book-actions">
-          <input type="checkbox"
-            ${b.owned ? "checked" : ""}
-            onchange="toggleOwned('${b.id}', this.checked)">
-          <button onclick="toggleRead('${b.id}', ${b.read})">
-            ${b.read ? "✅" : "⬜"}
-          </button>
-          <button onclick="editBook('${b.id}')">✏️</button>
-          <button onclick="askDelete('${b.id}')">🗑️</button>
-        </div>
+    <div class="book-actions">
+      <input type="checkbox"
+        ${b.owned ? "checked" : ""}
+        onchange="toggleOwned('${b.id}', this.checked)">
+      <button onclick="toggleRead('${b.id}', ${b.read})">
+        ${b.read ? "✅" : "⬜"}
+      </button>
+      <button onclick="editBook('${b.id}')">✏️</button>
+      <button onclick="askDelete('${b.id}')">🗑️</button>
+    </div>
 
-      </div>
-    `;
+  </div>
+`;
   });
 
   bookList.innerHTML = html;
