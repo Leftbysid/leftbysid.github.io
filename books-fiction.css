@@ -727,3 +727,34 @@ body {
   display: grid;
   grid-template-columns: 1fr 70px;
 }
+
+/* LEFT CODE COLUMN */
+.book-code-left {
+  width: 60px;
+  flex-shrink: 0;
+
+  font-size: 13px;
+  font-weight: 600;
+
+  text-align: center;
+  letter-spacing: 1px;
+
+  color: #00ff9c;
+
+  /* subtle glow */
+  text-shadow:
+    0 0 6px rgba(0,255,156,.7),
+    0 0 12px rgba(0,255,156,.4);
+
+  opacity: 0.9;
+
+  transition: transform 0.2s ease, text-shadow 0.2s ease;
+}
+
+/* hover effect (optional but nice) */
+.book-row-wrapper:hover .book-code-left {
+  transform: scale(1.05);
+  text-shadow:
+    0 0 10px rgba(0,255,156,1),
+    0 0 18px rgba(0,255,156,.7);
+}
