@@ -162,7 +162,6 @@ window.addBook = async () => {
 // ===== GENERATE CODE =====
 const prefix = "F";
 
-// extract numbers
 let numbers = books
   .map(b => {
     if (!b.code) return null;
@@ -170,24 +169,30 @@ let numbers = books
   })
   .filter(n => !isNaN(n));
 
-// sort numbers
+// sort
 numbers.sort((a, b) => a - b);
 
 let max = numbers.length ? numbers[numbers.length - 1] : 0;
 
-// check if there is any gap
+// check if last number is missing
+const lastExists = numbers.includes(max);
+
+// check for gaps
 const hasGap = numbers.some((num, i) => num !== i + 1);
 
 let nextNumber;
 
-// edge case: no books
 if (max === 0) {
   nextNumber = 1;
 }
+else if (!lastExists) {
+  nextNumber = max; // reuse last if deleted
+}
 else if (hasGap) {
-  nextNumber = max + 1;   // gap → continue forward
-} else {
-  nextNumber = max;       // no gap → reuse last
+  nextNumber = max + 1; // gap exists → skip forward
+}
+else {
+  nextNumber = max + 1; // normal case
 }
 
 const bookCode = prefix + nextNumber;
