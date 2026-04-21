@@ -159,10 +159,10 @@ window.addBook = async () => {
     }
   }
 
-  // ===== GENERATE CODE =====
+// ===== GENERATE CODE =====
 const prefix = "F";
 
-// extract numbers from existing codes
+// extract numbers
 let numbers = books
   .map(b => {
     if (!b.code) return null;
@@ -170,17 +170,28 @@ let numbers = books
   })
   .filter(n => !isNaN(n));
 
-// find max
-let max = numbers.length ? Math.max(...numbers) : 0;
+// sort numbers
+numbers.sort((a, b) => a - b);
 
-// check if sequence is continuous
-const isContinuous = numbers.length === max;
+let max = numbers.length ? numbers[numbers.length - 1] : 0;
 
-// decide next number
-let nextNumber = isContinuous ? max : max + 1;
+// check if there is any gap
+const hasGap = numbers.some((num, i) => num !== i + 1);
+
+let nextNumber;
+
+// edge case: no books
+if (max === 0) {
+  nextNumber = 1;
+}
+else if (hasGap) {
+  nextNumber = max + 1;   // gap → continue forward
+} else {
+  nextNumber = max;       // no gap → reuse last
+}
 
 const bookCode = prefix + nextNumber;
-
+   
 // ===== SAVE BOOK =====
 await addDoc(collection(db, COLLECTION_NAME), {
   uid: currentUser.uid,
