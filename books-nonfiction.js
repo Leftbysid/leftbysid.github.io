@@ -184,7 +184,7 @@ window.addBook = async () => {
   }
 
 // ===== GENERATE CODE =====
-const prefix = "F";
+const prefix = "NF";
 
 let numbers = books
   .map(b => {
