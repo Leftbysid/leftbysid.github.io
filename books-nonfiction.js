@@ -287,7 +287,14 @@ function renderBooks(list) {
 
         <span class="owned-icon ${b.owned ? "owned" : ""}">📕</span>
 
-        <div class="book-row">
+         <div class="book-cover">
+      ${
+        b.image
+          ? `<img src="${b.image}" loading="lazy">`
+          : `<div class="no-cover">💀</div>`
+      }
+    </div>
+   <div class="book-row">
 
       <div class="book-main">
         <div class="book-title">${b.title}</div>
