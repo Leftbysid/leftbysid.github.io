@@ -159,17 +159,42 @@ window.addBook = async () => {
     }
   }
 
-  await addDoc(collection(db, COLLECTION_NAME), {
-    uid: currentUser.uid,
-    title: titleInput.value.trim(),
-    author: authorInput.value.trim(),
-    category: categoryInput.value,
-    date: formatDateInput(dateInput.value),
-    image: imageUrl,
-    read: false,
-    owned: false,
-    createdAt: Date.now()
-  });
+  // ===== GENERATE CODE =====
+const prefix = "F";
+
+// extract numbers from existing codes
+let numbers = books
+  .map(b => {
+    if (!b.code) return null;
+    return parseInt(b.code.replace(prefix, ""));
+  })
+  .filter(n => !isNaN(n));
+
+// find max
+let max = numbers.length ? Math.max(...numbers) : 0;
+
+// check if sequence is continuous
+const isContinuous = numbers.length === max;
+
+// decide next number
+let nextNumber = isContinuous ? max : max + 1;
+
+const bookCode = prefix + nextNumber;
+
+// ===== SAVE BOOK =====
+await addDoc(collection(db, COLLECTION_NAME), {
+  uid: currentUser.uid,
+  title: titleInput.value.trim(),
+  author: authorInput.value.trim(),
+  category: categoryInput.value,
+  date: formatDateInput(dateInput.value),
+  image: imageUrl,
+  read: false,
+  owned: false,
+  createdAt: Date.now(),
+
+  code: bookCode // 🔥 THIS WAS MISSING
+});
 
   await loadBooks();
 
