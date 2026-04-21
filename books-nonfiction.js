@@ -183,17 +183,42 @@ window.addBook = async () => {
     }
   }
 
-  await addDoc(collection(db, COLLECTION_NAME), {
-    uid: currentUser.uid,
-    title: titleInput.value.trim(),
-    author: authorInput.value.trim(),
-    category: categoryInput.value,
-    date: formatDateInput(dateInput.value),
-    image: imageUrl,
-    read: false,
-    owned: false,
-    createdAt: Date.now()
-  });
+  // ===== GENERATE CODE =====
+const prefix = "NF";
+
+// extract numbers from existing codes
+let numbers = books
+  .map(b => {
+    if (!b.code) return null;
+    return parseInt(b.code.replace(prefix, ""));
+  })
+  .filter(n => !isNaN(n));
+
+// find max
+let max = numbers.length ? Math.max(...numbers) : 0;
+
+// check if sequence is continuous
+const isContinuous = numbers.length === max;
+
+// decide next number
+let nextNumber = isContinuous ? max : max + 1;
+
+const bookCode = prefix + nextNumber;
+
+// ===== SAVE BOOK =====
+await addDoc(collection(db, COLLECTION_NAME), {
+  uid: currentUser.uid,
+  title: titleInput.value.trim(),
+  author: authorInput.value.trim(),
+  category: categoryInput.value,
+  date: formatDateInput(dateInput.value),
+  image: imageUrl,
+  read: false,
+  owned: false,
+  createdAt: Date.now(),
+
+  code: bookCode // 🔥 THIS WAS MISSING
+});
 
   bookForm.classList.add("hidden");
 };
@@ -474,3 +499,44 @@ window.addEventListener("scroll", () => {
     }
   }
 });
+
+window.backfillCodes = async () => {
+  if (!currentUser) {
+    console.log("No user");
+    return;
+  }
+
+  const q = query(
+    collection(db, COLLECTION_NAME),
+    where("uid", "==", currentUser.uid)
+  );
+
+  const snap = await getDocs(q);
+
+  let docs = snap.docs.map(d => ({
+    id: d.id,
+    ...d.data()
+  }));
+
+  // sort by createdAt (oldest first)
+  docs.sort((a, b) => (a.createdAt || 0) - (b.createdAt || 0));
+
+  let counter = 1;
+
+  for (const b of docs) {
+    // skip if already has code
+    if (b.code) continue;
+
+    const code = "NF" + counter;
+
+    console.log("Assigning:", b.title, "→", code);
+
+    await updateDoc(doc(db, COLLECTION_NAME, b.id), {
+      code: code
+    });
+
+    counter++;
+  }
+
+  console.log("Backfill complete");
+};
