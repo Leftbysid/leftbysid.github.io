@@ -446,3 +446,45 @@ window.addEventListener("scroll", () => {
     }
   }
 });
+
+
+window.backfillCodes = async () => {
+  if (!currentUser) {
+    console.log("No user");
+    return;
+  }
+
+  const q = query(
+    collection(db, COLLECTION_NAME),
+    where("uid", "==", currentUser.uid)
+  );
+
+  const snap = await getDocs(q);
+
+  let docs = snap.docs.map(d => ({
+    id: d.id,
+    ...d.data()
+  }));
+
+  // sort by createdAt (oldest first)
+  docs.sort((a, b) => (a.createdAt || 0) - (b.createdAt || 0));
+
+  let counter = 1;
+
+  for (const b of docs) {
+    // skip if already has code
+    if (b.code) continue;
+
+    const code = "F" + counter;
+
+    console.log("Assigning:", b.title, "→", code);
+
+    await updateDoc(doc(db, COLLECTION_NAME, b.id), {
+      code: code
+    });
+
+    counter++;
+  }
+
+  console.log("Backfill complete");
+};
