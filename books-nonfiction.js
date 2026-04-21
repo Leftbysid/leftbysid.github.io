@@ -287,24 +287,24 @@ function renderBooks(list) {
 
         <span class="owned-icon ${b.owned ? "owned" : ""}">📕</span>
 
-        <div class="book-cover">
-          ${
-            b.image
-              ? `<img src="${b.image}" loading="lazy">`
-              : `<div class="no-cover">🗿</div>`
-          }
-        </div>
-
         <div class="book-row">
-          <div class="book-main">
-            <span class="book-title">${b.title}</span>
-          </div>
 
-          <div class="book-meta">
-            <span class="book-author">${b.author}</span>
-            <span class="book-genre">${b.category || ""}</span>
+      <div class="book-main">
+        <div class="book-title">${b.title}</div>
+        <div class="book-author">${b.author}</div>
+      </div>
+
+      <div class="book-meta">
+        <div class="meta-grid">
+          <span class="book-genre">${sortedCategory}</span>
+
+          <div class="meta-right">
             <span class="book-year">${b.date || ""}</span>
+            <span class="book-code">${b.code || ""}</span>
           </div>
+        </div>
+      </div>
+
 
           <span class="status-badge ${b.read ? "read" : "unread"}">
             ${b.read ? "READ" : "UNREAD"}
