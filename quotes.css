@@ -310,4 +310,33 @@ body {
   cursor: pointer;
 }
 
+.quote-row {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+}
 
+/* CODE */
+.quote-code {
+  width: 60px;
+  flex-shrink: 0;
+
+  display: flex;
+  justify-content: flex-end;
+
+  font-family: 'Share Tech Mono', monospace;
+  font-variant-numeric: tabular-nums;
+
+  font-size: 13px;
+  font-weight: 600;
+  color: #00ff9c;
+
+  text-shadow:
+    0 0 6px rgba(0,255,156,.7),
+    0 0 12px rgba(0,255,156,.4);
+}
+
+/* content block */
+.quote-content {
+  flex: 1;
+}
