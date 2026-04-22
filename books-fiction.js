@@ -326,7 +326,7 @@ html += `
       }
     </div>
 
-    <div class="book-row">
+    <div class="book-row" data-code="${b.code}">
 
       <div class="book-main">
         <div class="book-title">${b.title}</div>
@@ -365,6 +365,21 @@ html += `
   });
 
   bookList.innerHTML = html;
+
+  const code = new URLSearchParams(location.search).get("code");
+
+if (code) {
+  setTimeout(() => {
+    const el = document.querySelector(`[data-code="${code}"]`);
+    if (el) {
+      el.scrollIntoView({ behavior: "smooth", block: "center" });
+
+      // optional glow
+      el.style.boxShadow = "0 0 25px rgba(0,255,156,0.8)";
+      setTimeout(() => el.style.boxShadow = "", 2000);
+    }
+  }, 200);
+} 
 
   totalCount.textContent = books.length;
   readCount.textContent = books.filter(b => b.read).length;
@@ -537,11 +552,4 @@ window.reapplyCodes = async () => {
 };
 
 
-const code = new URLSearchParams(location.search).get("code");
 
-if (code) {
-  setTimeout(() => {
-    const el = document.querySelector(`[data-code="${code}"]`);
-    if (el) el.scrollIntoView({ behavior: "smooth", block: "center" });
-  }, 600);
-}
