@@ -160,7 +160,9 @@ searchInput.oninput = async () => {
     if (category !== "All" && category !== c.name) continue;
 
     try {
-      const snap = await getDocs(collection(db, c.col));
+      const snap = await getDocs(
+  query(collection(db, c.col), where("uid", "==", auth.currentUser.uid))
+);
 
       snap.forEach(doc => {
         const data = doc.data();
