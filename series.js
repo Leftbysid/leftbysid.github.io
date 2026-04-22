@@ -204,12 +204,22 @@ function applyFilters() {
   }
 
   const q = searchInput.value.toLowerCase();
-  if (q) {
+
+if (q) {
+  // 🔥 detect code pattern (S12)
+  const isCodeSearch = /^[a-z]+[0-9]+$/i.test(q);
+
+  if (isCodeSearch) {
+    list = list.filter(s =>
+      (s.code || "").toLowerCase() === q
+    );
+  } else {
     list = list.filter(s =>
       s.name.toLowerCase().includes(q) ||
       (s.genres || []).some(g => g.toLowerCase().includes(q))
     );
   }
+}
 
   /* RECENTLY ADDED SORT */
   list.sort((a, b) =>
