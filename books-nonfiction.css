@@ -521,13 +521,7 @@ body {
   color: black;
 }
 
-/* ======================
-   CATEGORY → YEAR SEPARATOR (CLEAN LINE)
-====================== */
 
-/* ======================
-   CLEAN BOOK LAYOUT (FINAL)
-====================== */
 /* ===============================
    🔥 FINAL BOOK ROW SYSTEM (CLEAN)
 ================================ */
@@ -726,4 +720,28 @@ body {
 .meta-grid {
   display: grid;
   grid-template-columns: 1fr 70px;
+}
+
+.book-code-left {
+  width: 70px;              /* fixed width → no shifting */
+  flex-shrink: 0;
+
+  display: flex;
+  align-items: center;
+  justify-content: flex-end; /* align to same vertical line */
+
+  font-family: 'Share Tech Mono', monospace; /* 🔥 fixes number alignment */
+  font-variant-numeric: tabular-nums;        /* 🔥 equal digit spacing */
+
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 1px;
+
+  color: #00ff9c;
+
+  text-shadow:
+    0 0 6px rgba(0,255,156,.7),
+    0 0 12px rgba(0,255,156,.4);
+
+  opacity: 0.9;
 }
