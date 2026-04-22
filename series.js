@@ -111,10 +111,41 @@ saveSeriesBtn.onclick = async () => {
   name,
   genres,
   seen: false,
-  createdAt: serverTimestamp()
+  createdAt: serverTimestamp(),
+
+  code: seriesCode // 🔥 ADD THIS
 };
 
 if (year) data.year = year;
+
+// ===== GENERATE CODE =====
+const prefix = "S";
+
+let numbers = series
+  .map(s => {
+    if (!s.code) return null;
+    return parseInt(s.code.replace(prefix, ""));
+  })
+  .filter(n => !isNaN(n));
+
+numbers.sort((a, b) => a - b);
+
+let max = numbers.length ? numbers[numbers.length - 1] : 0;
+
+// check gap
+const hasGap = numbers.some((num, i) => num !== i + 1);
+
+let nextNumber;
+
+if (max === 0) {
+  nextNumber = 1;
+} else if (hasGap) {
+  nextNumber = max + 1;
+} else {
+  nextNumber = max + 1;
+}
+
+const seriesCode = prefix + nextNumber;
 
 await addDoc(seriesCol, data);
 
@@ -201,6 +232,7 @@ function render(list) {
     row.innerHTML = `
       <div class="series-text">
         <strong>
+          <span class="series-code">${s.code || ""}</span>
           ${s.name}
           <span class="status ${s.seen ? "seen" : "unseen"}">
             ${s.seen ? "SEEN" : "UNSEEN"}
@@ -281,4 +313,41 @@ window.fixSeriesUid = async () => {
   }
 
   console.log("Series UID fix complete ✅");
+};
+
+window.backfillSeriesCodes = async () => {
+  if (!user) {
+    console.log("No user");
+    return;
+  }
+
+  const snap = await getDocs(seriesCol);
+
+  let docs = snap.docs.map(d => ({
+    id: d.id,
+    ...d.data()
+  }));
+
+  // sort by createdAt (oldest first)
+  docs.sort((a, b) => {
+    const aTime = a.createdAt?.seconds || 0;
+    const bTime = b.createdAt?.seconds || 0;
+    return aTime - bTime;
+  });
+
+  let counter = 1;
+
+  for (const s of docs) {
+    const code = "S" + counter;
+
+    console.log("Assigning:", s.name, "→", code);
+
+    await updateDoc(doc(db, "series", s.id), {
+      code: code
+    });
+
+    counter++;
+  }
+
+  console.log("Series backfill complete ✅");
 };
