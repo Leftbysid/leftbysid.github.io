@@ -224,6 +224,9 @@ body {
   left: 50%;
   transform: translateX(-50%);
   z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 /* 🔍 BUTTON */
@@ -297,10 +300,7 @@ body {
 
 /* 🔽 RESULTS */
 .search-results {
-  position: fixed;
-  top: 95px;
-  left: 50%;
-  transform: translateX(-50%);
+  margin-top: 8px; /* 🔥 sits right under search bar */
 
   width: 520px;
   max-height: 400px;
