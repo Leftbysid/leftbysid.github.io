@@ -146,8 +146,8 @@ searchInput.oninput = async () => {
   let resultsHTML = "";
 
   const collections = [
-    { name: "Books", col: "books_fiction", page: "fnf.html" },
-    { name: "Books", col: "books_nonfiction", page: "fnf.html" },
+    { name: "Books", col: "books_fiction", page: "books-fiction.html" },
+    { name: "Books", col: "books_nonfiction", page: "books-nonfiction.html" },
     { name: "Quotes", col: "quotes", page: "quotes.html" },
     { name: "Series", col: "series", page: "stuffs.html" },
     { name: "Movies", col: "movies", page: "stuffs.html" },
