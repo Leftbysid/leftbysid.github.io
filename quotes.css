@@ -340,3 +340,29 @@ body {
 .quote-content {
   flex: 1;
 }
+
+/* QUOTE ROW SEPARATOR */
+.quote-row {
+  position: relative;
+  padding-bottom: 18px;
+  margin-bottom: 18px;
+}
+
+.quote-row::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 80px; /* 🔥 aligns after code column */
+  right: 0;
+
+  height: 1px;
+
+  background: linear-gradient(
+    to right,
+    transparent,
+    rgba(0,255,156,0.6),
+    transparent
+  );
+
+  opacity: 0.6;
+}
