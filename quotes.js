@@ -229,13 +229,44 @@ window.addQuote = async () => {
 
   if (exists) return alert("This quote already exists.");
 
-  await addDoc(collection(db, "quotes"), {
-    uid: currentUser.uid,
-    text: rawText,
-    author: authorInput.value.trim() || "",
-    createdAt: Date.now()
-  });
+  // ===== GENERATE CODE =====
+const prefix = "Q";
 
+let numbers = quotes
+  .map(q => {
+    if (!q.code) return null;
+    return parseInt(q.code.replace(prefix, ""));
+  })
+  .filter(n => !isNaN(n));
+
+numbers.sort((a, b) => a - b);
+
+let max = numbers.length ? numbers[numbers.length - 1] : 0;
+
+// check gap
+const hasGap = numbers.some((num, i) => num !== i + 1);
+
+let nextNumber;
+
+if (max === 0) {
+  nextNumber = 1;
+} else if (hasGap) {
+  nextNumber = max + 1;
+} else {
+  nextNumber = max + 1;
+}
+
+const quoteCode = prefix + nextNumber;
+
+// ===== SAVE =====
+await addDoc(collection(db, "quotes"), {
+  uid: currentUser.uid,
+  text: rawText,
+  author: authorInput.value.trim() || "",
+  createdAt: Date.now(),
+
+  code: quoteCode
+});
   quoteForm.classList.add("hidden");
   quoteText.value = "";
   authorInput.value = "";
@@ -268,20 +299,28 @@ function applyView() {
   let list = [...quotes];
 
   if (searchQuery) {
-    const isAuthorOnly = searchQuery.startsWith("@");
-    const term = isAuthorOnly
-      ? searchQuery.slice(1)
-      : searchQuery;
+  const term = searchQuery.toLowerCase();
+
+  const isCodeSearch = /^[a-z]+[0-9]+$/i.test(term);
+
+  if (isCodeSearch) {
+    list = list.filter(q =>
+      (q.code || "").toLowerCase() === term
+    );
+  } else {
+    const isAuthorOnly = term.startsWith("@");
+    const cleanTerm = isAuthorOnly ? term.slice(1) : term;
 
     list = list.filter(q => {
       const text = (q.text || "").toLowerCase();
       const author = (q.author || "").toLowerCase();
 
       return isAuthorOnly
-        ? author.includes(term)
-        : text.includes(term) || author.includes(term);
+        ? author.includes(cleanTerm)
+        : text.includes(cleanTerm) || author.includes(cleanTerm);
     });
   }
+}
 
   if (sortMode === "recent") {
     list.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
@@ -308,15 +347,22 @@ function renderQuotes(list) {
 
   list.forEach(q => {
     html += `
-      <div class="quote-row">
-        <div class="quote-actions">
-          <button onclick="editQuoteFn('${q.id}')">✏️</button>
-          <button onclick="askDelete('${q.id}')">🗑️</button>
-        </div>
-        <p class="quote-text">“${q.text}”</p>
-        ${q.author ? `<p class="quote-author">— ${q.author}</p>` : ""}
+  <div class="quote-row">
+
+    <span class="quote-code">${q.code || ""}</span>
+
+    <div class="quote-content">
+      <div class="quote-actions">
+        <button onclick="editQuoteFn('${q.id}')">✏️</button>
+        <button onclick="askDelete('${q.id}')">🗑️</button>
       </div>
-    `;
+
+      <p class="quote-text">“${q.text}”</p>
+      ${q.author ? `<p class="quote-author">— ${q.author}</p>` : ""}
+    </div>
+
+  </div>
+`;
   });
 
   quoteList.innerHTML = html;
@@ -385,3 +431,43 @@ window.addEventListener("scroll", () => {
     }
   }
 });
+
+
+
+window.backfillQuoteCodes = async () => {
+  if (!currentUser) {
+    console.log("No user");
+    return;
+  }
+
+  const q = query(
+    collection(db, "quotes"),
+    where("uid", "==", currentUser.uid)
+  );
+
+  const snap = await getDocs(q);
+
+  let docs = snap.docs.map(d => ({
+    id: d.id,
+    ...d.data()
+  }));
+
+  // sort by createdAt (oldest first)
+  docs.sort((a, b) => (a.createdAt || 0) - (b.createdAt || 0));
+
+  let counter = 1;
+
+  for (const q of docs) {
+    const code = "Q" + counter;
+
+    console.log("Assigning:", q.text.slice(0, 30), "→", code);
+
+    await updateDoc(doc(db, "quotes", q.id), {
+      code: code
+    });
+
+    counter++;
+  }
+
+  console.log("Quote backfill complete ✅");
+};
