@@ -264,18 +264,29 @@ function applyView() {
 
   /* SEARCH */
   if (searchQuery) {
-    const isAuthorOnly = searchQuery.startsWith("@");
-    const term = isAuthorOnly ? searchQuery.slice(1) : searchQuery;
+  const term = searchQuery.toLowerCase();
+
+  // 🔥 detect code pattern (F12 / NF12)
+  const isCodeSearch = /^[a-z]+[0-9]+$/i.test(term);
+
+  if (isCodeSearch) {
+    list = list.filter(b =>
+      (b.code || "").toLowerCase() === term
+    );
+  } else {
+    const isAuthorOnly = term.startsWith("@");
+    const cleanTerm = isAuthorOnly ? term.slice(1) : term;
 
     list = list.filter(b => {
       const title = (b.title || "").toLowerCase();
       const author = (b.author || "").toLowerCase();
 
       return isAuthorOnly
-        ? author.includes(term)
-        : title.includes(term) || author.includes(term);
+        ? author.includes(cleanTerm)
+        : title.includes(cleanTerm) || author.includes(cleanTerm);
     });
   }
+}
 
   /* FILTER */
   switch (currentFilter) {
