@@ -333,7 +333,7 @@ function renderBooks(list) {
 
 html += `
   <div class="book-row-wrapper">
-
+    <span class="book-code-left">${b.code || ""}</span>
     <span class="owned-icon ${b.owned ? "owned" : ""}">📕</span>
 
     <div class="book-cover">
@@ -357,7 +357,7 @@ html += `
 
           <div class="meta-right">
             <span class="book-year">${b.date || ""}</span>
-            <span class="book-code">${b.code || ""}</span>
+            
           </div>
         </div>
       </div>
