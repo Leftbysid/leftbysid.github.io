@@ -106,15 +106,7 @@ saveSeriesBtn.onclick = async () => {
     return;
   }
 
-  const data = {
-  uid: user.uid,
-  name,
-  genres,
-  seen: false,
-  createdAt: serverTimestamp(),
-
-  code: seriesCode // 🔥 ADD THIS
-};
+  
 
 if (year) data.year = year;
 
@@ -147,6 +139,16 @@ if (max === 0) {
 
 const seriesCode = prefix + nextNumber;
 
+const data = {
+  uid: user.uid,
+  name,
+  genres,
+  seen: false,
+  createdAt: serverTimestamp(),
+
+  code: seriesCode // 🔥 ADD THIS
+};
+  
 await addDoc(seriesCol, data);
 
   seriesForm.classList.add("hidden");
