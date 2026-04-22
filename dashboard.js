@@ -120,3 +120,40 @@ prevBtn.onclick = prevTrack;
 
 /* INIT */
 loadTrack(currentIndex);
+
+/* =====================
+   GLOBAL SEARCH TOGGLE
+===================== */
+const searchToggle = document.getElementById("searchToggle");
+const searchBar = document.getElementById("searchBar");
+const searchInput = document.getElementById("globalSearchInput");
+const searchResults = document.getElementById("searchResults");
+
+searchToggle.onclick = () => {
+  searchBar.classList.toggle("hidden");
+  if (!searchBar.classList.contains("hidden")) {
+    searchInput.focus();
+  } else {
+    searchResults.classList.add("hidden");
+  }
+};
+
+/* =====================
+   BASIC SEARCH (UI ONLY FOR NOW)
+===================== */
+searchInput.oninput = () => {
+  const value = searchInput.value.trim();
+
+  if (!value) {
+    searchResults.classList.add("hidden");
+    return;
+  }
+
+  // temporary placeholder
+  searchResults.classList.remove("hidden");
+  searchResults.innerHTML = `
+    <div style="padding:10px; font-size:14px;">
+      Searching for "<b>${value}</b>"...
+    </div>
+  `;
+};
