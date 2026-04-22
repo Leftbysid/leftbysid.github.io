@@ -55,7 +55,6 @@ const nextBtn = document.getElementById("nextTrack");
 const prevBtn = document.getElementById("prevTrack");
 const titleEl = document.getElementById("trackTitle");
 
-/* PLAYLIST (EDIT THIS) */
 const playlist = [
   { title: "POLICE STATE", src: "music/police-state.mp3" },
   { title: "MALAI KE MARCHAS", src: "music/malai-ke-marchas.mp3" },
@@ -71,16 +70,13 @@ const playlist = [
 let currentIndex = 0;
 let isPlaying = false;
 
-/* LOAD TRACK */
 function loadTrack(index) {
   const track = playlist[index];
   if (!track) return;
-
   audio.src = track.src;
   titleEl.textContent = track.title;
 }
 
-/* PLAY / PAUSE */
 function togglePlay() {
   if (!audio.src) loadTrack(currentIndex);
 
@@ -95,14 +91,12 @@ function togglePlay() {
   isPlaying = !isPlaying;
 }
 
-/* NEXT */
 function nextTrack() {
   currentIndex = (currentIndex + 1) % playlist.length;
   loadTrack(currentIndex);
   if (isPlaying) audio.play();
 }
 
-/* PREVIOUS */
 function prevTrack() {
   currentIndex =
     (currentIndex - 1 + playlist.length) % playlist.length;
@@ -110,24 +104,22 @@ function prevTrack() {
   if (isPlaying) audio.play();
 }
 
-/* AUTO ADVANCE */
 audio.addEventListener("ended", nextTrack);
 
-/* CONTROLS */
 playBtn.onclick = togglePlay;
 nextBtn.onclick = nextTrack;
 prevBtn.onclick = prevTrack;
 
-/* INIT */
 loadTrack(currentIndex);
 
 /* =====================
-   GLOBAL SEARCH TOGGLE
+   GLOBAL SEARCH
 ===================== */
 const searchToggle = document.getElementById("searchToggle");
 const searchBar = document.getElementById("searchBar");
 const searchInput = document.getElementById("globalSearchInput");
 const searchResults = document.getElementById("searchResults");
+const searchCategory = document.getElementById("searchCategory");
 
 searchToggle.onclick = () => {
   searchBar.classList.toggle("hidden");
@@ -138,22 +130,84 @@ searchToggle.onclick = () => {
   }
 };
 
-/* =====================
-   BASIC SEARCH (UI ONLY FOR NOW)
-===================== */
-searchInput.oninput = () => {
-  const value = searchInput.value.trim();
+/* 🔥 REAL SEARCH */
+searchInput.oninput = async () => {
+  const value = searchInput.value.trim().toLowerCase();
+  const category = searchCategory.value;
 
   if (!value) {
     searchResults.classList.add("hidden");
     return;
   }
 
-  // temporary placeholder
+  searchResults.innerHTML = `<div style="padding:10px;">Searching...</div>`;
   searchResults.classList.remove("hidden");
-  searchResults.innerHTML = `
-    <div style="padding:10px; font-size:14px;">
-      Searching for "<b>${value}</b>"...
-    </div>
-  `;
+
+  let resultsHTML = "";
+
+  const collections = [
+    { name: "Books", col: "books_fiction", page: "fnf.html" },
+    { name: "Books", col: "books_nonfiction", page: "fnf.html" },
+    { name: "Quotes", col: "quotes", page: "quotes.html" },
+    { name: "Series", col: "series", page: "stuffs.html" },
+    { name: "Movies", col: "movies", page: "stuffs.html" },
+    { name: "Documentaries", col: "documentaries", page: "stuffs.html" },
+    { name: "Links", col: "links", page: "links.html" },
+    { name: "Notes", col: "notes", page: "notes.html" }
+  ];
+
+  for (const c of collections) {
+    if (category !== "All" && category !== c.name) continue;
+
+    try {
+      const snap = await getDocs(collection(db, c.col));
+
+      snap.forEach(doc => {
+        const data = doc.data();
+
+        const text = (
+          data.title ||
+          data.name ||
+          data.text ||
+          ""
+        ).toLowerCase();
+
+        const code = (data.code || "").toLowerCase();
+
+        if (text.includes(value) || code === value) {
+          resultsHTML += `
+            <div class="search-item"
+              data-page="${c.page}"
+              data-code="${data.code || ""}">
+              <b>${data.code || ""}</b> — ${
+                data.title ||
+                data.name ||
+                data.text?.slice(0, 50)
+              }
+            </div>
+          `;
+        }
+      });
+
+    } catch (err) {
+      console.error("Search error:", err);
+    }
+  }
+
+  if (!resultsHTML) {
+    resultsHTML = `<div style="padding:10px;">No results</div>`;
+  }
+
+  searchResults.innerHTML = resultsHTML;
+};
+
+/* CLICK RESULT */
+searchResults.onclick = (e) => {
+  const item = e.target.closest(".search-item");
+  if (!item) return;
+
+  const page = item.dataset.page;
+  const code = item.dataset.code;
+
+  window.location.href = `${page}?code=${code}`;
 };
