@@ -308,11 +308,14 @@ cancelDeleteBtn.onclick = () =>
 window.fixSeriesUid = async () => {
   if (!user) return console.log("No user");
 
-  const snap = await getDocs(seriesCol);
+  const snap = await getDocs(
+    query(seriesCol, where("uid", "==", user.uid))
+  );
 
   for (const d of snap.docs) {
     const data = d.data();
 
+    // only fix YOUR docs missing uid
     if (!data.uid) {
       console.log("Fixing:", data.name);
 
@@ -322,7 +325,7 @@ window.fixSeriesUid = async () => {
     }
   }
 
-  console.log("Series UID fix complete ✅");
+  console.log("Safe UID fix complete ✅");
 };
 
 window.backfillSeriesCodes = async () => {
