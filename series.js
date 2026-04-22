@@ -156,10 +156,17 @@ await addDoc(seriesCol, data);
 /* LOAD SERIES */
 function loadSeries() {
   const q = query(seriesCol, where("uid", "==", user.uid));
-  onSnapshot(q, snap => {
-    series = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-    applyFilters();
-  });
+
+  onSnapshot(
+    q,
+    snap => {
+      series = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+      applyFilters();
+    },
+    err => {
+      console.error("Series listener error:", err);
+    }
+  );
 }
 
 /* LOAD GENRES */
