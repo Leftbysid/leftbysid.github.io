@@ -20,6 +20,30 @@ onAuthStateChanged(auth, user => {
 });
 </script>
 
+<!-- 🔍 GLOBAL SEARCH -->
+<div class="global-search">
+
+  <div class="search-toggle" id="searchToggle">🔍</div>
+
+  <div class="search-bar hidden" id="searchBar">
+    <select id="searchCategory">
+      <option>All</option>
+      <option>Books</option>
+      <option>Quotes</option>
+      <option>Series</option>
+      <option>Movies</option>
+      <option>Documentaries</option>
+      <option>Links</option>
+      <option>Notes</option>
+    </select>
+
+    <input type="text" id="globalSearchInput" placeholder="Search anything...">
+  </div>
+
+</div>
+
+<div id="searchResults" class="search-results hidden"></div>
+  
 <!-- MATRIX BACKGROUND -->
 <canvas id="matrix"></canvas>
 
