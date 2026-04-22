@@ -535,3 +535,13 @@ window.reapplyCodes = async () => {
 
   console.log("Reapply complete");
 };
+
+
+const code = new URLSearchParams(location.search).get("code");
+
+if (code) {
+  setTimeout(() => {
+    const el = document.querySelector(`[data-code="${code}"]`);
+    if (el) el.scrollIntoView({ behavior: "smooth", block: "center" });
+  }, 600);
+}
