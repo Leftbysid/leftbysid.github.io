@@ -261,3 +261,24 @@ confirmDeleteBtn.onclick = async () => {
 
 cancelDeleteBtn.onclick = () =>
   confirmBox.classList.add("hidden");
+
+
+window.fixSeriesUid = async () => {
+  if (!user) return console.log("No user");
+
+  const snap = await getDocs(seriesCol);
+
+  for (const d of snap.docs) {
+    const data = d.data();
+
+    if (!data.uid) {
+      console.log("Fixing:", data.name);
+
+      await updateDoc(doc(db, "series", d.id), {
+        uid: user.uid
+      });
+    }
+  }
+
+  console.log("Series UID fix complete ✅");
+};
