@@ -9,7 +9,7 @@ body{
 }
 
 /* ======================
-   PAGE (match books layout)
+   PAGE
 ====================== */
 .page{
   min-height:100vh;
@@ -27,10 +27,32 @@ body{
   text-align:center;
 }
 
+/* ✨ UPDATED TITLE */
 .title{
   margin:0;
   font-size:36px;
   letter-spacing:4px;
+  margin-bottom:6px;
+}
+
+/* ✨ SUBTLE ORNAMENT */
+.title::before{
+  content:"✦";
+  display:block;
+  font-size:10px;
+  margin-bottom:6px;
+  opacity:0.5;
+}
+
+/* ✨ DIVIDER LINE */
+.title::after{
+  content:"";
+  display:block;
+  width:120px;
+  height:1px;
+  margin:14px auto 0;
+  background:linear-gradient(to right, transparent, #000, transparent);
+  opacity:0.4;
 }
 
 .total{
@@ -104,7 +126,7 @@ body{
 }
 
 /* ======================
-   OVERLAY (same layout, clean theme)
+   OVERLAY
 ====================== */
 .overlay{
   position:fixed;
@@ -124,14 +146,9 @@ body{
 .overlay-box{
   width:100%;
   max-width:700px;
-
-  /* CLEAN instead of neon */
   background:#ffffff;
   color:#000;
-
   padding:20px;
-
-  /* subtle depth */
   box-shadow:0 10px 40px rgba(0,0,0,0.2);
 }
 
@@ -166,11 +183,9 @@ body{
 .textarea{
   width:100%;
   box-sizing:border-box;
-
   background:#fff;
   border:1px solid #000;
   color:#000;
-
   padding:12px;
   margin-bottom:10px;
 }
@@ -186,11 +201,9 @@ body{
 .btn{
   width:100%;
   padding:12px;
-
   border:1px solid #000;
   background:#000;
   color:#fff;
-
   cursor:pointer;
   letter-spacing:2px;
   transition:0.3s ease;
@@ -201,7 +214,6 @@ body{
   color:#000;
 }
 
-/* EDIT MODE BUTTON ROW */
 .overlay-actions{
   display:flex;
   gap:10px;
@@ -211,7 +223,6 @@ body{
   width:100%;
 }
 
-/* DELETE BUTTON */
 .btn.danger{
   border-color:#d33;
   color:#d33;
