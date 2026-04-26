@@ -1,100 +1,197 @@
+/* ======================
+   BASE
+====================== */
 body{
   margin:0;
-  background:white;
-  color:black;
-  font-family:serif;
+  background:#ffffff;
+  color:#111;
+  font-family: 'Playfair Display', serif;
 }
 
+/* ======================
+   PAGE
+====================== */
 .page{
-  max-width:900px;
-  margin:auto;
-  padding:40px 20px;
+  max-width:700px;
+  margin:60px auto;
+  padding:20px;
+}
+
+/* ======================
+   HEADER
+====================== */
+.header{
+  text-align:center;
+  margin-bottom:40px;
 }
 
 .title{
-  text-align:center;
-  letter-spacing:4px;
+  font-size:42px;
+  letter-spacing:6px;
+  margin-bottom:10px;
 }
 
 .total{
-  text-align:center;
+  color:#666;
   margin-bottom:20px;
 }
 
+/* ======================
+   CONTROLS
+====================== */
 .controls{
   display:flex;
-  gap:10px;
   justify-content:center;
+  gap:10px;
+  margin-bottom:20px;
 }
 
-.search, .filter-btn{
+.search{
+  width:220px;
   padding:10px;
-  border:1px solid black;
-  background:white;
+  border:1px solid #000;
+  background:#fff;
+  font-family:inherit;
 }
 
+.filter-btn{
+  padding:10px 14px;
+  border:1px solid #000;
+  background:#fff;
+  cursor:pointer;
+  font-family:inherit;
+}
+
+/* ======================
+   ADD BUTTON
+====================== */
 .add-btn{
   display:block;
   margin:20px auto;
   padding:10px 20px;
-  border:1px solid black;
-  background:white;
+  border:1px solid #000;
+  background:#000;
+  color:#fff;
   cursor:pointer;
+  transition:0.3s ease;
 }
 
-/* LIST */
+.add-btn:hover{
+  background:#fff;
+  color:#000;
+}
+
+/* ======================
+   LIST
+====================== */
+.list{
+  margin-top:30px;
+}
+
 .poem-row{
-  padding:14px;
-  border-bottom:1px solid #ccc;
+  padding:16px 10px;
+  border-bottom:1px solid #ddd;
   cursor:pointer;
+  font-size:16px;
+  letter-spacing:1px;
+  transition:0.2s ease;
 }
 
 .poem-row:hover{
   background:#f5f5f5;
 }
 
-/* OVERLAY */
+/* ======================
+   OVERLAY
+====================== */
 .overlay{
   position:fixed;
   inset:0;
-  background:rgba(0,0,0,.3);
+  background:rgba(0,0,0,0.35);
   display:flex;
   align-items:center;
   justify-content:center;
+  padding:20px;
+  z-index:100;
 }
 
-.hidden{display:none;}
+.hidden{
+  display:none;
+}
 
 .overlay-box{
-  background:white;
-  padding:20px;
-  width:600px;
+  background:#fff;
+  padding:24px;
+  width:100%;
+  max-width:600px;
+  box-shadow:0 10px 40px rgba(0,0,0,0.15);
+  border-radius:4px;
 }
 
-.input, .textarea{
+/* ======================
+   INPUTS
+====================== */
+.input,
+.textarea{
   width:100%;
-  margin:8px 0;
-  padding:10px;
-  border:1px solid black;
+  margin:10px 0;
+  padding:12px;
+  border:1px solid #000;
+  font-family:inherit;
+  background:#fff;
 }
 
 .textarea{
-  height:180px;
+  height:200px;
+  resize:vertical;
 }
 
+/* ======================
+   BUTTONS
+====================== */
 .btn{
   width:100%;
-  padding:10px;
-  border:1px solid black;
-  background:white;
+  padding:12px;
+  border:1px solid #000;
+  background:#000;
+  color:#fff;
   cursor:pointer;
+  transition:0.3s ease;
+  font-family:inherit;
 }
 
+.btn:hover{
+  background:#fff;
+  color:#000;
+}
+
+/* ======================
+   POEM VIEW
+====================== */
 .poem-full{
   white-space:pre-wrap;
   margin:20px 0;
+  font-size:18px;
+  line-height:1.8;
 }
 
 .poem-meta{
-  color:#555;
+  color:#666;
+  text-align:right;
+  font-style:italic;
+  margin-top:10px;
+}
+
+/* ======================
+   BACK BUTTON
+====================== */
+.top-actions{
+  margin-bottom:20px;
+}
+
+.action-btn{
+  text-decoration:none;
+  color:#000;
+  border-bottom:1px solid #000;
+  font-size:14px;
 }
