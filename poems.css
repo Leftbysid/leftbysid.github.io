@@ -3,9 +3,17 @@
 ====================== */
 body{
   margin:0;
-  background:#ffffff;
+  background:
+    linear-gradient(#ffffff, #f9f9f9),
+    repeating-linear-gradient(
+      0deg,
+      rgba(0,0,0,0.02),
+      rgba(0,0,0,0.02) 1px,
+      transparent 1px,
+      transparent 4px
+    );
   color:#111;
-  font-family: 'Playfair Display', serif;
+  font-family:'Playfair Display', serif;
 }
 
 /* ======================
