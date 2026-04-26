@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Poems</title>
+
+  <link rel="stylesheet" href="poems.css" />
+</head>
+<body>
+
+<!-- AUTH GUARD -->
+<script type="module">
+import { auth } from "./firebase.js";
+import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-auth.js";
+
+onAuthStateChanged(auth, user => {
+  if (!user) window.location.href = "index.html";
+});
+</script>
+
+<div class="page">
+
+  <!-- TOP RIGHT -->
+  <div class="top-actions">
+    <a href="dashboard.html" class="action-btn">⬅ Back</a>
+  </div>
+
+  <!-- HEADER -->
+  <header class="header">
+    <h1 class="title">POEMS</h1>
+
+    <p class="total" id="totalPoems">Total: 0</p>
+
+    <div class="controls">
+      <input id="searchInput" class="search" type="text" placeholder="Search poems..." />
+      <button id="sortBtn" class="filter-btn">🕒 Recently Added</button>
+    </div>
+
+    <button class="add-btn" id="openAddOverlay">＋ Add Poem</button>
+  </header>
+
+  <!-- LIST -->
+  <main class="list" id="poemsList">
+    <p class="muted">Loading...</p>
+  </main>
+
+</div>
+
+<!-- ADD POEM -->
+<div class="overlay hidden" id="addOverlay">
+  <div class="overlay-box">
+
+    <div class="overlay-head">
+      <h2>ADD POEM</h2>
+      <button class="close-btn" id="closeAddOverlay">✖</button>
+    </div>
+
+    <textarea id="poemContent" class="textarea" placeholder="Write your poem..."></textarea>
+
+    <input id="poemTitle" class="input" placeholder="Title" />
+    <input id="poemAuthor" class="input" placeholder="Author" />
+    <input id="poemLanguage" class="input" placeholder="Language" />
+    <input id="poemYear" class="input" placeholder="Year" />
+
+    <button class="btn" id="addPoemBtn">SAVE POEM</button>
+    <p class="status" id="statusText"></p>
+
+  </div>
+</div>
+
+<!-- VIEW POEM -->
+<div class="overlay hidden" id="poemOverlay">
+  <div class="overlay-box">
+
+    <div class="overlay-head">
+      <h2 id="overlayTitle"></h2>
+      <button class="close-btn" id="closeOverlay">✖</button>
+    </div>
+
+    <p id="overlayContent" class="poem-full"></p>
+
+    <p id="overlayMeta" class="poem-meta"></p>
+
+  </div>
+</div>
+
+<script type="module" src="poems.js"></script>
+</body>
+</html>
