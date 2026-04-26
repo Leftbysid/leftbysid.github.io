@@ -33,6 +33,16 @@ body{
   max-width:900px;
   margin:40px auto 0;
   text-align:center;
+  position:relative; 
+}
+
+.header::after{
+  content:"";
+  display:block;
+  width:60%;
+  height:1px;
+  margin:30px auto 0;
+  background:rgba(0,0,0,0.08);
 }
 
 /* ✨ UPDATED TITLE */
