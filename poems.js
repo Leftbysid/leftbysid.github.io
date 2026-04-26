@@ -164,7 +164,11 @@ openAddOverlay.onclick = ()=> addOverlay.classList.remove("hidden");
 closeAddOverlay.onclick = ()=> addOverlay.classList.add("hidden");
 
 /* CLOSE FOCUS MODE */
-focusOverlay.addEventListener("click", closeFocusMode);
+focusOverlay.addEventListener("click", (e)=>{
+  if(e.target === focusOverlay){
+    closeFocusMode();
+  }
+});
 
 document.addEventListener("keydown", (e)=>{
   if(e.key === "Escape"){
