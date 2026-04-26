@@ -374,7 +374,8 @@ body{
   background:#ffffff;
   z-index:999;
 
-  display:flex;
+  display:none; /* 🔥 important */
+
   align-items:center;
   justify-content:center;
 
@@ -384,7 +385,9 @@ body{
   transition:0.3s ease;
 }
 
+/* when active */
 .focus-overlay.show{
+  display:flex;   /* show it */
   opacity:1;
 }
 
