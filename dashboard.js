@@ -228,8 +228,8 @@ if (poemsBtn) {
       const colors = ['#ffffff', '#a0ffd6', '#caffbf', '#ffd6a5', '#bdb2ff'];
       p.style.background = colors[Math.floor(Math.random() * colors.length)];
 
-      p.style.left = '50%';
-      p.style.top = '50%';
+     p.style.left = Math.random() * 100 + '%';
+     p.style.top = Math.random() * 100 + '%';
 
       const x = (Math.random() - 0.5) * 120 + 'px';
       const y = (Math.random() - 0.5) * 120 + 'px';
