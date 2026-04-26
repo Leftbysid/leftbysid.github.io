@@ -364,3 +364,44 @@ body{
     transform:translateY(0);
   }
 }
+
+/* ======================
+   FOCUS MODE
+====================== */
+.focus-overlay{
+  position:fixed;
+  inset:0;
+  background:#ffffff;
+  z-index:999;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  padding:40px 20px;
+
+  opacity:0;
+  transition:0.3s ease;
+}
+
+.focus-overlay.show{
+  opacity:1;
+}
+
+.focus-content{
+  max-width:700px;
+  text-align:center;
+}
+
+.focus-text{
+  font-family:'Cedarville Cursive', cursive;
+  font-size:26px;
+  line-height:2;
+  white-space:pre-wrap;
+}
+
+.focus-meta{
+  margin-top:30px;
+  color:#666;
+  font-style:italic;
+}
