@@ -360,3 +360,33 @@ body {
 
   transform: translateY(-2px) scale(1.03);
 }
+
+.menu-link.poems-btn {
+  position: relative;
+  overflow: hidden;
+}
+
+/* container */
+.particles {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+/* each particle */
+.particle {
+  position: absolute;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  opacity: 0.8;
+  animation: float 0.8s ease-out forwards;
+}
+
+/* animation */
+@keyframes float {
+  to {
+    transform: translate(var(--x), var(--y)) scale(0.5);
+    opacity: 0;
+  }
+}
