@@ -267,3 +267,100 @@ body{
   border-bottom:1px solid #000;
   font-size:14px;
 }
+
+
+/* ======================
+   LIST IMPROVEMENTS
+====================== */
+.poem-row{
+  padding:22px 14px;
+  border-bottom:1px solid #ddd;
+  cursor:pointer;
+  font-size:17px;
+  letter-spacing:1px;
+
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+
+  transition:0.25s ease;
+}
+
+.poem-row:hover{
+  background:#f5f5f5;
+  transform:translateX(4px);
+}
+
+/* spacing between rows */
+.poem-row + .poem-row{
+  margin-top:8px;
+}
+
+/* ======================
+   META + PREVIEW
+====================== */
+.poem-meta{
+  color:#777;
+  font-size:14px;
+  letter-spacing:1px;
+}
+
+/* preview line */
+.poem-row span{
+  font-style:italic;
+  color:#555;
+}
+
+/* ======================
+   LIST SPACING
+====================== */
+.list{
+  max-width:900px;
+  margin:40px auto 0;
+}
+
+/* ======================
+   READING MODE
+====================== */
+.poem-full{
+  max-width:600px;
+  margin:30px auto;
+}
+
+/* ======================
+   BUTTON SMOOTHNESS
+====================== */
+.add-btn,
+.filter-btn{
+  transition:all 0.25s ease;
+}
+
+/* ======================
+   SEARCH REFINEMENT
+====================== */
+.search{
+  border:1px solid #aaa;
+}
+
+.search:focus{
+  border-color:#000;
+  outline:none;
+}
+
+/* ======================
+   PAGE ANIMATION
+====================== */
+.page{
+  animation:fadeIn 0.4s ease;
+}
+
+@keyframes fadeIn{
+  from{
+    opacity:0;
+    transform:translateY(10px);
+  }
+  to{
+    opacity:1;
+    transform:translateY(0);
+  }
+}
