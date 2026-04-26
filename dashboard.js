@@ -213,3 +213,33 @@ searchResults.onclick = (e) => {
 
   window.location.href = `${page}?code=${code}`;
 };
+
+// === POEMS BUTTON PARTICLES ===
+const poemsBtn = document.querySelector('.poems-btn');
+
+if (poemsBtn) {
+  const particleContainer = poemsBtn.querySelector('.particles');
+
+  poemsBtn.addEventListener('mouseenter', () => {
+    for (let i = 0; i < 20; i++) {
+      const p = document.createElement('span');
+      p.className = 'particle';
+
+      const colors = ['#ffffff', '#a0ffd6', '#caffbf', '#ffd6a5', '#bdb2ff'];
+      p.style.background = colors[Math.floor(Math.random() * colors.length)];
+
+      p.style.left = '50%';
+      p.style.top = '50%';
+
+      const x = (Math.random() - 0.5) * 120 + 'px';
+      const y = (Math.random() - 0.5) * 120 + 'px';
+
+      p.style.setProperty('--x', x);
+      p.style.setProperty('--y', y);
+
+      particleContainer.appendChild(p);
+
+      setTimeout(() => p.remove(), 800);
+    }
+  });
+}
