@@ -231,8 +231,8 @@ if (poemsBtn) {
      p.style.left = Math.random() * 100 + '%';
      p.style.top = Math.random() * 100 + '%';
 
-      const x = (Math.random() - 0.5) * 120 + 'px';
-      const y = (Math.random() - 0.5) * 120 + 'px';
+      const x = (Math.random() - 0.5) * 200 + 'px';
+      const y = (Math.random() - 0.5) * 200 + 'px';
 
       p.style.setProperty('--x', x);
       p.style.setProperty('--y', y);
