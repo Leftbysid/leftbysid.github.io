@@ -38,6 +38,10 @@ const closeOverlay = document.getElementById("closeOverlay");
 const overlayTitle = document.getElementById("overlayTitle");
 const overlayContent = document.getElementById("overlayContent");
 const overlayMeta = document.getElementById("overlayMeta");
+/* FOCUS MODE */
+const focusOverlay = document.getElementById("focusOverlay");
+const focusText = document.getElementById("focusText");
+const focusMeta = document.getElementById("focusMeta");
 
 /* STATE */
 let currentUser = null;
@@ -46,6 +50,33 @@ let sortMode = "recent";
 
 /* HELPERS */
 function safe(v){ return (v ?? "").toString(); }
+
+/* FOCUS MODE FUNCTIONS */
+function openFocusMode(d){
+  const meta = [
+    d.title,
+    d.author,
+    d.language,
+    d.year
+  ].filter(Boolean).join(" — ");
+
+  focusText.textContent = d.content || "";
+  focusMeta.textContent = meta;
+
+  focusOverlay.classList.remove("hidden");
+
+  setTimeout(()=>{
+    focusOverlay.classList.add("show");
+  },10);
+}
+
+function closeFocusMode(){
+  focusOverlay.classList.remove("show");
+
+  setTimeout(()=>{
+    focusOverlay.classList.add("hidden");
+  },300);
+}
 
 /* RENDER */
 function renderPoems(){
@@ -84,11 +115,8 @@ function renderPoems(){
     row.textContent = meta || "Untitled";
 
     row.onclick = ()=>{
-      overlayTitle.textContent = d.title || "Untitled";
-      overlayContent.textContent = d.content || "";
-      overlayMeta.textContent = meta;
-      poemOverlay.classList.remove("hidden");
-    };
+  openFocusMode(d);
+};
 
     poemsList.appendChild(row);
   });
@@ -135,4 +163,11 @@ addPoemBtn.onclick = async ()=>{
 openAddOverlay.onclick = ()=> addOverlay.classList.remove("hidden");
 closeAddOverlay.onclick = ()=> addOverlay.classList.add("hidden");
 
-closeOverlay.onclick = ()=> poemOverlay.classList.add("hidden");
+/* CLOSE FOCUS MODE */
+focusOverlay.addEventListener("click", closeFocusMode);
+
+document.addEventListener("keydown", (e)=>{
+  if(e.key === "Escape"){
+    closeFocusMode();
+  }
+});
