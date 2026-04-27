@@ -165,7 +165,8 @@ function renderPoems(){
 
     actions.appendChild(editBtn);
     actions.appendChild(delBtn);
-
+    
+    row.appendChild(text);
     row.appendChild(actions);
 
     /* CLICK = FOCUS MODE */
