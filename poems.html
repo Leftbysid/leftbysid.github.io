@@ -2,10 +2,13 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Poems</title>
+
+  <!-- Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Cedarville+Cursive&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="poems.css" />
+
+  <link rel="stylesheet" href="poems.css"/>
 </head>
 <body>
 
@@ -47,7 +50,9 @@ onAuthStateChanged(auth, user => {
 
 </div>
 
-<!-- ADD POEM -->
+<!-- =========================
+     ADD POEM
+========================= -->
 <div class="overlay hidden" id="addOverlay">
   <div class="overlay-box">
 
@@ -58,10 +63,10 @@ onAuthStateChanged(auth, user => {
 
     <textarea id="poemContent" class="textarea" placeholder="Write your poem..."></textarea>
 
-    <input id="poemTitle" class="input" placeholder="Title" />
-    <input id="poemAuthor" class="input" placeholder="Author" />
-    <input id="poemLanguage" class="input" placeholder="Language" />
-    <input id="poemYear" class="input" placeholder="Year" />
+    <input id="poemTitle" class="input" placeholder="Title"/>
+    <input id="poemAuthor" class="input" placeholder="Author"/>
+    <input id="poemLanguage" class="input" placeholder="Language"/>
+    <input id="poemYear" class="input" placeholder="Year"/>
 
     <button class="btn" id="addPoemBtn">SAVE POEM</button>
     <p class="status" id="statusText"></p>
@@ -69,28 +74,41 @@ onAuthStateChanged(auth, user => {
   </div>
 </div>
 
-<!-- VIEW POEM -->
+<!-- =========================
+     EDIT / VIEW POEM
+========================= -->
 <div class="overlay hidden" id="poemOverlay">
   <div class="overlay-box">
 
     <div class="overlay-head">
-      <h2 id="overlayTitle"></h2>
+      <input id="overlayTitle" class="input" placeholder="Title"/>
       <button class="close-btn" id="closeOverlay">✖</button>
     </div>
 
-    <p id="overlayContent" class="poem-full"></p>
+    <textarea id="overlayContent" class="textarea"></textarea>
 
     <p id="overlayMeta" class="poem-meta"></p>
 
+    <!-- ACTION BUTTONS -->
+    <div class="overlay-actions">
+      <button id="saveEditBtn" class="btn">SAVE CHANGES</button>
+      <button id="deleteBtn" class="btn danger">DELETE</button>
+    </div>
+
   </div>
 </div>
-<!-- FULL SCREEN POEM VIEW -->
+
+<!-- =========================
+     FULL SCREEN READING MODE
+========================= -->
 <div class="focus-overlay hidden" id="focusOverlay">
   <div class="focus-content">
     <div class="focus-text" id="focusText"></div>
     <div class="focus-meta" id="focusMeta"></div>
   </div>
 </div>
+
 <script type="module" src="poems.js"></script>
+
 </body>
 </html>
