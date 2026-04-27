@@ -75,7 +75,7 @@ onAuthStateChanged(auth, user => {
 </div>
 
 <!-- =========================
-     EDIT / VIEW POEM
+     EDIT POEM (FIXED)
 ========================= -->
 <div class="overlay hidden" id="poemOverlay">
   <div class="overlay-box">
@@ -87,9 +87,13 @@ onAuthStateChanged(auth, user => {
 
     <textarea id="overlayContent" class="textarea"></textarea>
 
+    <!-- ✅ ADDED MISSING FIELDS -->
+    <input id="overlayAuthor" class="input" placeholder="Author"/>
+    <input id="overlayLanguage" class="input" placeholder="Language"/>
+    <input id="overlayYear" class="input" placeholder="Year"/>
+
     <p id="overlayMeta" class="poem-meta"></p>
 
-    <!-- ACTION BUTTONS -->
     <div class="overlay-actions">
       <button id="saveEditBtn" class="btn">SAVE CHANGES</button>
       <button id="deleteBtn" class="btn danger">DELETE</button>
