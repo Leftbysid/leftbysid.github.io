@@ -113,12 +113,41 @@ body{
 }
 
 .poem-row{
-  padding:24px 14px;
-  border-bottom:1px solid rgba(0,255,156,.28);
+  display:flex;
+  align-items:center;
+  justify-content:space-between; /* pushes buttons to right */
   cursor:pointer;
   transition:.2s;
+  padding:20px 14px;
+  border-bottom:1px solid rgba(0,255,156,.28);
 }
 
+/* TEXT */
+.poem-text{
+  flex:1;
+  font-size:16px;
+  letter-spacing:1px;
+}
+
+/* RIGHT SIDE BUTTONS */
+.poem-actions{
+  display:flex;
+  gap:12px;
+  margin-left:20px; /* spacing from text */
+}
+
+.poem-actions button{
+  background:none;
+  border:none;
+  cursor:pointer;
+  font-size:16px;
+  color:#00ff9c;
+  opacity:.85;
+}
+
+.poem-actions button:hover{
+  text-shadow:0 0 12px rgba(0,255,156,.9);
+}
 .poem-row:hover{
   background:rgba(0,255,156,.05);
 }
