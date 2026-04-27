@@ -33,17 +33,18 @@ const poemLanguage = document.getElementById("poemLanguage");
 const poemYear = document.getElementById("poemYear");
 
 const addPoemBtn = document.getElementById("addPoemBtn");
-const statusText = document.getElementById("statusText");
 
-/* EDIT / VIEW OVERLAY */
+/* EDIT OVERLAY */
 const poemOverlay = document.getElementById("poemOverlay");
 const closeOverlay = document.getElementById("closeOverlay");
 
 const overlayTitle = document.getElementById("overlayTitle");
 const overlayContent = document.getElementById("overlayContent");
+const overlayAuthor = document.getElementById("overlayAuthor");
+const overlayLanguage = document.getElementById("overlayLanguage");
+const overlayYear = document.getElementById("overlayYear");
 const overlayMeta = document.getElementById("overlayMeta");
 
-/* REQUIRED BUTTONS (MAKE SURE THEY EXIST IN HTML) */
 const saveEditBtn = document.getElementById("saveEditBtn");
 const deleteBtn = document.getElementById("deleteBtn");
 
@@ -77,17 +78,12 @@ function openFocusMode(d){
 
   focusOverlay.classList.remove("hidden");
 
-  setTimeout(()=>{
-    focusOverlay.classList.add("show");
-  },10);
+  setTimeout(()=> focusOverlay.classList.add("show"),10);
 }
 
 function closeFocusMode(){
   focusOverlay.classList.remove("show");
-
-  setTimeout(()=>{
-    focusOverlay.classList.add("hidden");
-  },300);
+  setTimeout(()=> focusOverlay.classList.add("hidden"),300);
 }
 
 /* =========================
@@ -126,18 +122,21 @@ function renderPoems(){
       d.year
     ].filter(Boolean).join(" — ");
 
-    row.textContent = meta || "Untitled";
+    /* TEXT */
+    const text = document.createElement("div");
+    text.className = "poem-text";
+    text.textContent = meta || "Untitled";
+
+    text.onclick = () => openFocusMode(d);
 
     /* ACTIONS */
     const actions = document.createElement("div");
-    actions.className = "note-actions";
+    actions.className = "poem-actions";
 
     const editBtn = document.createElement("button");
-    editBtn.className = "icon-btn";
     editBtn.textContent = "✏️";
 
     const delBtn = document.createElement("button");
-    delBtn.className = "icon-btn";
     delBtn.textContent = "🗑️";
 
     /* EDIT */
@@ -146,8 +145,12 @@ function renderPoems(){
 
       currentPoemId = p.id;
 
-      overlayTitle.textContent = d.title || "";
-      overlayContent.textContent = d.content || "";
+      overlayTitle.value = d.title || "";
+      overlayContent.value = d.content || "";
+      overlayAuthor.value = d.author || "";
+      overlayLanguage.value = d.language || "";
+      overlayYear.value = d.year || "";
+
       overlayMeta.textContent = meta;
 
       poemOverlay.classList.remove("hidden");
@@ -157,22 +160,16 @@ function renderPoems(){
     delBtn.onclick = async (e)=>{
       e.stopPropagation();
 
-      const ok = confirm("Delete this poem?");
-      if(!ok) return;
-
-      await deleteDoc(doc(db,"poems",p.id));
+      if(confirm("Delete this poem?")){
+        await deleteDoc(doc(db,"poems",p.id));
+      }
     };
 
     actions.appendChild(editBtn);
     actions.appendChild(delBtn);
-    
+
     row.appendChild(text);
     row.appendChild(actions);
-
-    /* CLICK = FOCUS MODE */
-    row.onclick = ()=>{
-      openFocusMode(d);
-    };
 
     poemsList.appendChild(row);
   });
@@ -221,28 +218,21 @@ addPoemBtn.onclick = async ()=>{
 };
 
 /* =========================
-   EDIT SAVE
+   SAVE EDIT
 ========================= */
 saveEditBtn.onclick = async ()=>{
   if(!currentPoemId) return;
 
-  try{
-    await updateDoc(doc(db,"poems",currentPoemId),{
-      content: overlayContent.textContent,
-      title: overlayTitle.textContent,
-      updatedAt: serverTimestamp()
-    });
+  await updateDoc(doc(db,"poems",currentPoemId),{
+    content: safe(overlayContent.value),
+    title: safe(overlayTitle.value),
+    author: safe(overlayAuthor.value),
+    language: safe(overlayLanguage.value),
+    year: safe(overlayYear.value),
+    updatedAt: serverTimestamp()
+  });
 
-    overlayMeta.textContent = "Saved ✅";
-
-    setTimeout(()=>{
-      poemOverlay.classList.add("hidden");
-    },300);
-
-  }catch(err){
-    console.error(err);
-    overlayMeta.textContent = "Save failed ❌";
-  }
+  poemOverlay.classList.add("hidden");
 };
 
 /* =========================
@@ -251,11 +241,10 @@ saveEditBtn.onclick = async ()=>{
 deleteBtn.onclick = async ()=>{
   if(!currentPoemId) return;
 
-  const ok = confirm("Delete this poem?");
-  if(!ok) return;
-
-  await deleteDoc(doc(db,"poems",currentPoemId));
-  poemOverlay.classList.add("hidden");
+  if(confirm("Delete this poem?")){
+    await deleteDoc(doc(db,"poems",currentPoemId));
+    poemOverlay.classList.add("hidden");
+  }
 };
 
 /* =========================
@@ -276,21 +265,19 @@ searchInput.addEventListener("input", renderPoems);
 
 sortBtn.addEventListener("click", ()=>{
   sortMode = sortMode === "recent" ? "old" : "recent";
-  sortBtn.textContent = sortMode === "recent" ? "🕒 Recently Added" : "🕰 Oldest First";
+  sortBtn.textContent = sortMode === "recent"
+    ? "🕒 Recently Added"
+    : "🕰 Oldest First";
   renderPoems();
 });
 
 /* =========================
-   FOCUS MODE CLOSE
+   FOCUS CLOSE
 ========================= */
 focusOverlay.addEventListener("click", (e)=>{
-  if(e.target === focusOverlay){
-    closeFocusMode();
-  }
+  if(e.target === focusOverlay) closeFocusMode();
 });
 
 document.addEventListener("keydown", (e)=>{
-  if(e.key === "Escape"){
-    closeFocusMode();
-  }
+  if(e.key === "Escape") closeFocusMode();
 });
