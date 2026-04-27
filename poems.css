@@ -150,7 +150,7 @@ body{
   border:2px solid rgba(0,255,156,.7);
   background:rgba(0,0,0,.88);
 
-  padding:22px 20px;
+  padding:18px 18px;
 
   box-shadow:0 0 30px rgba(0,255,156,.45);
 }
@@ -160,7 +160,7 @@ body{
   align-items:center;
   justify-content:space-between;
 
-  margin-bottom:18px; /* more breathing space */
+  margin-bottom:12px; /* more breathing space */
 }
 
 .close-btn{
@@ -183,11 +183,12 @@ body{
 
   padding:12px;
 
-  margin:12px 0; /* ✅ uniform spacing */
+  margin:8px 0; /* ✅ uniform spacing */
 }
 
 .textarea{
-  min-height:180px;
+  min-height:140px;   /* 🔥 reduced */
+  max-height:220px;
   resize:vertical;
 
   margin-bottom:16px; /* separates from inputs below */
@@ -202,7 +203,7 @@ body{
   color:#00ff9c;
   cursor:pointer;
   letter-spacing:2px;
-  margin-top:10px; 
+  margin-top:12px; 
 }
 
 .btn:hover{
