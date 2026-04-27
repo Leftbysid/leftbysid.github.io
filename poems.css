@@ -143,17 +143,24 @@ body{
 
 .overlay-box{
   width:100%;
-  max-width:700px;
+  max-width:650px; /* slightly tighter = better balance */
+
+  margin:auto; /* ✅ ensures perfect centering */
+
   border:2px solid rgba(0,255,156,.7);
   background:rgba(0,0,0,.88);
-  padding:18px;
+
+  padding:22px 20px;
+
   box-shadow:0 0 30px rgba(0,255,156,.45);
 }
 
 .overlay-head{
   display:flex;
+  align-items:center;
   justify-content:space-between;
-  margin-bottom:14px;
+
+  margin-bottom:18px; /* more breathing space */
 }
 
 .close-btn{
@@ -168,15 +175,22 @@ body{
 .input,
 .textarea{
   width:100%;
+  box-sizing:border-box;
+
   background:rgba(0,0,0,.78);
   border:2px solid rgba(0,255,156,.55);
   color:#00ff9c;
+
   padding:12px;
-  margin-bottom:10px;
+
+  margin:12px 0; /* ✅ uniform spacing */
 }
 
 .textarea{
-  min-height:170px;
+  min-height:180px;
+  resize:vertical;
+
+  margin-bottom:16px; /* separates from inputs below */
 }
 
 /* BUTTON */
@@ -188,6 +202,7 @@ body{
   color:#00ff9c;
   cursor:pointer;
   letter-spacing:2px;
+  margin-top:10px; 
 }
 
 .btn:hover{
@@ -249,4 +264,9 @@ body{
 @media(max-width:900px){
   .title{ font-size:24px; }
   .search{ width:100%; }
+}
+
+.overlay-box input::placeholder,
+.overlay-box textarea::placeholder{
+  opacity:0.6;
 }
