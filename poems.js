@@ -52,6 +52,7 @@ const deleteBtn = document.getElementById("deleteBtn");
 const focusOverlay = document.getElementById("focusOverlay");
 const focusText = document.getElementById("focusText");
 const focusMeta = document.getElementById("focusMeta");
+const focusTitle = document.getElementById("focusTitle");
 
 /* STATE */
 let currentUser = null;
