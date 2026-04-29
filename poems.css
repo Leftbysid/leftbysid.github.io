@@ -300,3 +300,12 @@ body{
 .overlay-box textarea::placeholder{
   opacity:0.6;
 }
+
+/* TITLE (BOOK STYLE) */
+.focus-title{
+  text-align:center;
+  font-size:28px;
+  margin-bottom:30px;
+  font-family: 'Playfair Display', serif;
+  letter-spacing:2px;
+}
