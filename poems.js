@@ -68,20 +68,21 @@ function safe(v){ return (v ?? "").toString(); }
 ========================= */
 function openFocusMode(d){
   const meta = [
-    d.title,
     d.author,
     d.language,
     d.year
   ].filter(Boolean).join(" — ");
 
+  focusTitle.textContent = d.title || "Untitled";
   focusText.textContent = d.content || "";
   focusMeta.textContent = meta;
 
   focusOverlay.classList.remove("hidden");
 
-  setTimeout(()=> focusOverlay.classList.add("show"),10);
+  setTimeout(()=>{
+    focusOverlay.classList.add("show");
+  },10);
 }
-
 function closeFocusMode(){
   focusOverlay.classList.remove("show");
   setTimeout(()=> focusOverlay.classList.add("hidden"),300);
