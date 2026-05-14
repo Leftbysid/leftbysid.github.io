@@ -151,9 +151,6 @@ const data = {
 if (year) {
   data.year = year;
 }
-
-  code: seriesCode // 🔥 ADD THIS
-};
   
 await addDoc(seriesCol, data);
 
