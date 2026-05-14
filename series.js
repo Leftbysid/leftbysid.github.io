@@ -108,7 +108,7 @@ saveSeriesBtn.onclick = async () => {
 
   
 
-if (year) data.year = year;
+
 
 // ===== GENERATE CODE =====
 const prefix = "S";
@@ -145,6 +145,12 @@ const data = {
   genres,
   seen: false,
   createdAt: serverTimestamp(),
+  code: seriesCode
+};
+
+if (year) {
+  data.year = year;
+}
 
   code: seriesCode // 🔥 ADD THIS
 };
