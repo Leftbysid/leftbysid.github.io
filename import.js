@@ -8,16 +8,12 @@ import {
 import { onAuthStateChanged } from
   "https://www.gstatic.com/firebasejs/12.7.0/firebase-auth.js";
 
-/* ======================
-   DOM
-====================== */
+/* DOM */
 const importBtn = document.getElementById("importBtn");
 const fileInput = document.getElementById("fileInput");
 const statusEl = document.getElementById("status");
 
-/* ======================
-   AUTH STATE (CRITICAL)
-====================== */
+/* AUTH STATE */
 let currentUser = null;
 
 onAuthStateChanged(auth, user => {
