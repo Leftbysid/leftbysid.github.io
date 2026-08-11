@@ -111,19 +111,7 @@ body {
   margin: 10px auto;
 }
 
-/* ===============================
-   LEFT OWNED ICON (OUTSIDE CARD)
-================================ */
-.owned-icon {
-  font-size: 22px;
-  width: 26px;
-  text-align: center;
-  transition: color .2s ease, text-shadow .2s ease;
-}
 
-/* ===============================
-   LEFT OWNED ICON (OUTSIDE CARD)
-================================ */
 
 /* ===============================
    BOOK CARD
@@ -515,7 +503,7 @@ body {
 
 .book-row-wrapper {
   display: flex;
-  flex-direction: column
+  flex-direction: row;
   align-items: center;
   gap: 16px;
   max-width: 1000px;
@@ -700,7 +688,7 @@ body {
 .meta-right {
   width: 60px;
   align-items: flex-end;
-
+}
 .book-meta {
   display: block;
 }
@@ -733,93 +721,28 @@ body {
 
   opacity: 0.9;
 }
-
-/* =========================
-   OWNED ICON STACK
-========================= */
-
 /* =========================
    OWNED FORMAT ICONS
 ========================= */
 
 .owned-icons {
-  width: 55px !important;
-  min-width: 55px !important;
-  height: auto !important;
-
-  display: flex !important;
-  flex-direction: column !important;
-  flex-wrap: nowrap !important;
-
-  align-items: center !important;
-  justify-content: center !important;
-
-  gap: 2px !important;
-
-  flex-shrink: 0 !important;
-}
-
-/* DIGITAL / PHYSICAL / AUDIO BUTTONS */
-.owned-icons .owned-type {
-  display: flex !important;
-
-  width: 32px !important;
-  height: 28px !important;
-
-  margin: 0 !important;
-  padding: 0 !important;
-
-  background: transparent !important;
-  background-color: transparent !important;
-
-  border: 0 !important;
-  outline: none !important;
-  box-shadow: none !important;
-
-  align-items: center !important;
-  justify-content: center !important;
-
-  font-size: 20px !important;
-  line-height: 1 !important;
-
-  cursor: pointer !important;
-
-  appearance: none !important;
-  -webkit-appearance: none !important;
-
-  opacity: 1 !important;
-}
-
-/* HOVER */
-.owned-icons .owned-type:hover {
-  background: transparent !important;
-  transform: scale(1.15);
-
-  filter:
-    drop-shadow(0 0 5px #00ff9c)
-    drop-shadow(0 0 10px #00ff9c);
-}
-
-/* ===============================
-   OWNERSHIP FORMAT ICONS
-=============================== */
-
-.owned-icons {
   width: 45px;
   min-width: 45px;
 
-  display: flex !important;
-  flex-direction: column !important;
-  flex-wrap: nowrap !important;
+  display: flex;
+  flex-direction: column;
+  flex-wrap: nowrap;
 
-  align-items: center !important;
-  justify-content: center !important;
+  align-items: center;
+  justify-content: center;
 
-  gap: 4px !important;
+  gap: 4px;
+
+  flex-shrink: 0;
 }
 
-.owned-type {
-  display: block !important;
+.owned-icons .owned-type {
+  display: flex;
 
   width: 32px;
   height: 28px;
@@ -827,19 +750,23 @@ body {
   margin: 0;
   padding: 0;
 
-  text-align: center;
-  line-height: 28px;
+  align-items: center;
+  justify-content: center;
+
+  background: transparent;
+  border: none;
+  box-shadow: none;
 
   font-size: 20px;
+  line-height: 1;
 
   cursor: pointer;
-
-  background: transparent !important;
-  border: none !important;
-  box-shadow: none !important;
 }
 
-.owned-type:hover {
+.owned-icons .owned-type:hover {
+  background: transparent;
   transform: scale(1.15);
-  filter: drop-shadow(0 0 7px #00ff9c);
+
+  filter:
+    drop-shadow(0 0 7px #00ff9c);
 }
