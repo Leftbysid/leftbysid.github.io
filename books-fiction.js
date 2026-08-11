@@ -247,28 +247,44 @@ function applyView() {
   let list = [...books];
 
   if (searchQuery) {
-  const term = searchQuery.toLowerCase();
+  let term = searchQuery.trim().toLowerCase();
 
-  // 🔥 detect code pattern (F12 / NF12)
-  const isCodeSearch = /^[a-z]+[0-9]+$/i.test(term);
+  // # = GENRE ONLY
+  if (term.startsWith("#")) {
+    const genreTerm = term.slice(1).trim();
 
-  if (isCodeSearch) {
+    list = list.filter(b => {
+      const categories = (b.category || "")
+        .split(",")
+        .map(g => g.trim().toLowerCase())
+        .filter(Boolean);
+
+      return categories.some(g => g.includes(genreTerm));
+    });
+
+  // @ = AUTHOR ONLY
+  } else if (term.startsWith("@")) {
+    const authorTerm = term.slice(1).trim();
+
     list = list.filter(b =>
-      (b.code || "").toLowerCase() === term
+      (b.author || "").toLowerCase().includes(authorTerm)
     );
-  } else {
-    const isAuthorOnly = term.startsWith("@");
-    const cleanTerm = isAuthorOnly ? term.slice(1) : term;
 
+  // NORMAL = TITLE + AUTHOR + CODE
+  } else {
     list = list.filter(b => {
       const title = (b.title || "").toLowerCase();
       const author = (b.author || "").toLowerCase();
+      const code = (b.code || "").toLowerCase();
 
-      return isAuthorOnly
-        ? author.includes(cleanTerm)
-        : title.includes(cleanTerm) || author.includes(cleanTerm);
+      return (
+        title.includes(term) ||
+        author.includes(term) ||
+        code.includes(term)
+      );
     });
   }
+}
 }
   switch (currentFilter) {
     case "owned": list = list.filter(b => b.owned); break;
