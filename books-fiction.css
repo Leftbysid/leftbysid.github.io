@@ -737,80 +737,64 @@ body {
    OWNED ICON STACK
 ========================= */
 
+/* =========================
+   OWNED FORMAT ICONS
+========================= */
+
 .owned-icons {
-  width: 70px;
-  min-width: 70px;
+  width: 55px !important;
+  min-width: 55px !important;
+  height: auto !important;
 
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
+  display: flex !important;
+  flex-direction: column !important;
+  flex-wrap: nowrap !important;
 
-  gap: 3px;
+  align-items: center !important;
+  justify-content: center !important;
+
+  gap: 2px !important;
+
+  flex-shrink: 0 !important;
 }
 
-.owned-type {
-  width: 32px;
-  height: 32px;
+/* DIGITAL / PHYSICAL / AUDIO BUTTONS */
+.owned-icons .owned-type {
+  display: flex !important;
 
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  width: 32px !important;
+  height: 28px !important;
 
-  font-size: 20px;
+  margin: 0 !important;
+  padding: 0 !important;
 
-  opacity: 0.95;
+  background: transparent !important;
+  background-color: transparent !important;
 
-  transition:
-    transform 0.2s ease,
-    filter 0.2s ease;
+  border: 0 !important;
+  outline: none !important;
+  box-shadow: none !important;
+
+  align-items: center !important;
+  justify-content: center !important;
+
+  font-size: 20px !important;
+  line-height: 1 !important;
+
+  cursor: pointer !important;
+
+  appearance: none !important;
+  -webkit-appearance: none !important;
+
+  opacity: 1 !important;
 }
 
-.owned-type:hover {
+/* HOVER */
+.owned-icons .owned-type:hover {
+  background: transparent !important;
   transform: scale(1.15);
 
   filter:
     drop-shadow(0 0 5px #00ff9c)
     drop-shadow(0 0 10px #00ff9c);
-}
-/* =========================
-   OWNERSHIP ICONS
-========================= */
-
-.owned-icons {
-  width: 55px;
-  min-width: 55px;
-
-  display: flex !important;
-  flex-direction: column !important;
-  align-items: center !important;
-  justify-content: center !important;
-
-  gap: 2px !important;
-}
-
-.owned-type {
-  display: flex !important;
-
-  width: 32px !important;
-  height: 30px !important;
-
-  margin: 0 !important;
-  padding: 0 !important;
-
-  align-items: center !important;
-  justify-content: center !important;
-
-  background: none !important;
-  border: none !important;
-
-  font-size: 20px !important;
-  line-height: 1 !important;
-
-  cursor: pointer;
-}
-
-.owned-type:hover {
-  transform: scale(1.15);
-  filter: drop-shadow(0 0 7px #00ff9c);
 }
