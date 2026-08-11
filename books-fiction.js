@@ -285,7 +285,6 @@ function applyView() {
     });
   }
 }
-}
   switch (currentFilter) {
     case "owned": list = list.filter(b => b.owned); break;
     case "not-owned": list = list.filter(b => !b.owned); break;
