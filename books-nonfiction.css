@@ -745,3 +745,53 @@ body {
 
   opacity: 0.9;
 }
+
+/* =========================
+   OWNED FORMAT ICONS
+========================= */
+
+.owned-icons {
+  width: 45px;
+  min-width: 45px;
+
+  display: flex;
+  flex-direction: column;
+  flex-wrap: nowrap;
+
+  align-items: center;
+  justify-content: center;
+
+  gap: 4px;
+
+  flex-shrink: 0;
+}
+
+.owned-icons .owned-type {
+  display: flex;
+
+  width: 32px;
+  height: 28px;
+
+  margin: 0;
+  padding: 0;
+
+  align-items: center;
+  justify-content: center;
+
+  background: transparent;
+  border: none;
+  box-shadow: none;
+
+  font-size: 20px;
+  line-height: 1;
+
+  cursor: pointer;
+}
+
+.owned-icons .owned-type:hover {
+  background: transparent;
+  transform: scale(1.15);
+
+  filter:
+    drop-shadow(0 0 7px #00ff9c);
+}
