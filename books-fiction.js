@@ -350,10 +350,30 @@ html += `
 
     <span class="book-code-left">${b.code || ""}</span>
     <div class="owned-icons">
-  ${b.ownedDigital ? `<span class="owned-type digital" title="Digital Book">💻</span>` : ""}
-  ${b.ownedBook ? `<span class="owned-type physical" title="Physical Book">📘</span>` : ""}
-  ${b.ownedAudio ? `<span class="owned-type audio" title="Audio Book">🎧</span>` : ""}
-    </div>
+  ${b.ownedDigital ? `
+    <button
+      class="owned-type digital"
+      title="Remove Digital"
+      onclick="toggleOwnedType('${b.id}', 'digital')"
+    >💻</button>
+  ` : ""}
+
+  ${b.ownedBook ? `
+    <button
+      class="owned-type physical"
+      title="Remove Physical Book"
+      onclick="toggleOwnedType('${b.id}', 'book')"
+    >📘</button>
+  ` : ""}
+
+  ${b.ownedAudio ? `
+    <button
+      class="owned-type audio"
+      title="Remove Audio Book"
+      onclick="toggleOwnedType('${b.id}', 'audio')"
+    >🎧</button>
+  ` : ""}
+</div>
 
     <div class="book-cover">
       ${
@@ -398,29 +418,7 @@ html += `
       title="Owned"
     >
 
-    ${b.owned ? `
-      <div class="owned-options">
-
-        <button
-          class="${b.ownedDigital ? "active" : ""}"
-          onclick="toggleOwnedType('${b.id}', 'digital', ${b.ownedDigital ? "true" : "false"})"
-          title="Digital Book"
-        >💻</button>
-
-        <button
-          class="${b.ownedBook ? "active" : ""}"
-          onclick="toggleOwnedType('${b.id}', 'book', ${b.ownedBook ? "true" : "false"})"
-          title="Physical Book"
-        >📘</button>
-
-        <button
-          class="${b.ownedAudio ? "active" : ""}"
-          onclick="toggleOwnedType('${b.id}', 'audio', ${b.ownedAudio ? "true" : "false"})"
-          title="Audio Book"
-        >🎧</button>
-
-      </div>
-    ` : ""}
+    
 
   </div>
 
@@ -477,68 +475,51 @@ window.toggleRead = async (id, current) => {
 
 window.toggleOwned = async (id, value) => {
 
-  const updateData = {
-    owned: value
-  };
-
-  // If ownership is turned OFF,
-  // remove all ownership types.
-  if (!value) {
-    updateData.ownedBook = false;
-    updateData.ownedDigital = false;
-    updateData.ownedAudio = false;
-  }
-
   await updateDoc(
     doc(db, COLLECTION_NAME, id),
-    updateData
+    {
+      owned: value,
+      ownedBook: value,
+      ownedDigital: value,
+      ownedAudio: value
+    }
   );
 
   const book = books.find(b => b.id === id);
 
   if (book) {
     book.owned = value;
-
-    if (!value) {
-      book.ownedBook = false;
-      book.ownedDigital = false;
-      book.ownedAudio = false;
-    }
+    book.ownedBook = value;
+    book.ownedDigital = value;
+    book.ownedAudio = value;
   }
 
   applyView();
 };
-window.toggleOwnedType = async (id, type, currentValue) => {
 
-  let field = "";
+window.toggleOwnedType = async (id, type) => {
 
-  if (type === "book") {
-    field = "ownedBook";
-  }
+  const fieldMap = {
+    book: "ownedBook",
+    digital: "ownedDigital",
+    audio: "ownedAudio"
+  };
 
-  if (type === "digital") {
-    field = "ownedDigital";
-  }
-
-  if (type === "audio") {
-    field = "ownedAudio";
-  }
+  const field = fieldMap[type];
 
   if (!field) return;
-
-  const newValue = !currentValue;
 
   await updateDoc(
     doc(db, COLLECTION_NAME, id),
     {
-      [field]: newValue
+      [field]: false
     }
   );
 
   const book = books.find(b => b.id === id);
 
   if (book) {
-    book[field] = newValue;
+    book[field] = false;
   }
 
   applyView();
