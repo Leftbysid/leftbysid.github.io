@@ -105,6 +105,7 @@ body {
 ================================ */
 .book-row-wrapper {
   display: flex;
+  flex-direction: row;
   align-items: center;
   gap: 14px;
   max-width: 980px;
@@ -712,7 +713,7 @@ body {
 .meta-right {
   width: 60px;
   align-items: flex-end;
-
+}
 .book-meta {
   display: block;
 }
