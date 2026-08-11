@@ -247,42 +247,60 @@ function applyView() {
   let list = [...books];
 
   if (searchQuery) {
-  let term = searchQuery.trim().toLowerCase();
+  const term = searchQuery.toLowerCase().trim();
 
-  // # = GENRE ONLY
-  if (term.startsWith("#")) {
-    const genreTerm = term.slice(1).trim();
+  // 🔥 detect code pattern (F12 / NF12)
+  const isCodeSearch = /^[a-z]+[0-9]+$/i.test(term);
 
-    list = list.filter(b => {
-      const categories = (b.category || "")
-        .split(",")
-        .map(g => g.trim().toLowerCase())
-        .filter(Boolean);
-
-      return categories.some(g => g.includes(genreTerm));
-    });
-
-  // @ = AUTHOR ONLY
-  } else if (term.startsWith("@")) {
-    const authorTerm = term.slice(1).trim();
-
+  if (isCodeSearch) {
     list = list.filter(b =>
-      (b.author || "").toLowerCase().includes(authorTerm)
+      (b.code || "").toLowerCase() === term
     );
 
-  // NORMAL = TITLE + AUTHOR + CODE
   } else {
-    list = list.filter(b => {
-      const title = (b.title || "").toLowerCase();
-      const author = (b.author || "").toLowerCase();
-      const code = (b.code || "").toLowerCase();
 
-      return (
-        title.includes(term) ||
-        author.includes(term) ||
-        code.includes(term)
-      );
-    });
+    // 🔥 MULTIPLE GENRE SEARCH
+    // Example: #history #politics
+    const genreTerms = term
+      .split(/\s+/)
+      .filter(t => t.startsWith("#"))
+      .map(t => t.slice(1).trim())
+      .filter(Boolean);
+
+    if (genreTerms.length > 0) {
+
+      list = list.filter(b => {
+        const genres = (b.category || "")
+          .split(",")
+          .map(g => g.trim().toLowerCase())
+          .filter(Boolean);
+
+        // Book must contain EVERY requested genre
+        return genreTerms.every(searchGenre =>
+          genres.some(bookGenre =>
+            bookGenre.includes(searchGenre)
+          )
+        );
+      });
+
+    } else {
+
+      // 🔥 AUTHOR SEARCH
+      const isAuthorOnly = term.startsWith("@");
+      const cleanTerm = isAuthorOnly
+        ? term.slice(1)
+        : term;
+
+      list = list.filter(b => {
+        const title = (b.title || "").toLowerCase();
+        const author = (b.author || "").toLowerCase();
+
+        return isAuthorOnly
+          ? author.includes(cleanTerm)
+          : title.includes(cleanTerm) ||
+            author.includes(cleanTerm);
+      });
+    }
   }
 }
   switch (currentFilter) {
