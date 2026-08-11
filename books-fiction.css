@@ -124,20 +124,7 @@ body {
 /* ===============================
    LEFT OWNED ICON (OUTSIDE CARD)
 ================================ */
-.owned-icon {
-  width: 30px;
-  text-align: center;
-  opacity: 0;
-  transform: scale(0.6);
-  transition: all .2s ease;
-}
 
-.owned-icon.owned {
-  opacity: 1;
-  transform: scale(1);
-  color: #4cc9ff;
-  text-shadow: 0 0 10px rgba(76,201,255,.8);
-}
 /* ===============================
    BOOK CARD
 ================================ */
