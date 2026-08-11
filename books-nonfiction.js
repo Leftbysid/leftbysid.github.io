@@ -232,6 +232,9 @@ await addDoc(collection(db, COLLECTION_NAME), {
   image: imageUrl,
   read: false,
   owned: false,
+  ownedBook: false,
+  ownedDigital: false,
+  ownedAudio: false,
   createdAt: Date.now(),
 
   code: bookCode // 🔥 THIS WAS MISSING
@@ -378,7 +381,33 @@ function renderBooks(list) {
 html += `
   <div class="book-row-wrapper">
     <span class="book-code-left">${b.code || ""}</span>
-    <span class="owned-icon ${b.owned ? "owned" : ""}">📕</span>
+    <div class="owned-icons">
+
+  ${b.ownedDigital ? `
+    <span
+      class="owned-type digital"
+      title="Remove Digital Book"
+      onclick="toggleOwnedType('${b.id}', 'digital')"
+    >💻</span>
+  ` : ""}
+
+  ${b.ownedBook ? `
+    <span
+      class="owned-type physical"
+      title="Remove Physical Book"
+      onclick="toggleOwnedType('${b.id}', 'book')"
+    >📕</span>
+  ` : ""}
+
+  ${b.ownedAudio ? `
+    <span
+      class="owned-type audio"
+      title="Remove Audio Book"
+      onclick="toggleOwnedType('${b.id}', 'audio')"
+    >🎧</span>
+  ` : ""}
+
+</div>
 
     <div class="book-cover">
       ${
@@ -449,16 +478,50 @@ window.toggleRead = async (id, current) => {
 };
 
 window.toggleOwned = async (id, value) => {
+
   await updateDoc(doc(db, COLLECTION_NAME, id), {
-    owned: value
+    owned: value,
+    ownedBook: value,
+    ownedDigital: value,
+    ownedAudio: value
   });
 
   const book = books.find(b => b.id === id);
-  if (book) book.owned = value;
+
+  if (book) {
+    book.owned = value;
+    book.ownedBook = value;
+    book.ownedDigital = value;
+    book.ownedAudio = value;
+  }
 
   applyView();
 };
 
+window.toggleOwnedType = async (id, type) => {
+
+  const fieldMap = {
+    book: "ownedBook",
+    digital: "ownedDigital",
+    audio: "ownedAudio"
+  };
+
+  const field = fieldMap[type];
+
+  if (!field) return;
+
+  await updateDoc(doc(db, COLLECTION_NAME, id), {
+    [field]: false
+  });
+
+  const book = books.find(b => b.id === id);
+
+  if (book) {
+    book[field] = false;
+  }
+
+  applyView();
+};
 window.editBook = id => {
   const b = books.find(x => x.id === id);
   editingId = id;
