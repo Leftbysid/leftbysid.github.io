@@ -798,3 +798,47 @@ body {
     drop-shadow(0 0 5px #00ff9c)
     drop-shadow(0 0 10px #00ff9c);
 }
+
+/* ===============================
+   OWNERSHIP FORMAT ICONS
+=============================== */
+
+.owned-icons {
+  width: 45px;
+  min-width: 45px;
+
+  display: flex !important;
+  flex-direction: column !important;
+  flex-wrap: nowrap !important;
+
+  align-items: center !important;
+  justify-content: center !important;
+
+  gap: 4px !important;
+}
+
+.owned-type {
+  display: block !important;
+
+  width: 32px;
+  height: 28px;
+
+  margin: 0;
+  padding: 0;
+
+  text-align: center;
+  line-height: 28px;
+
+  font-size: 20px;
+
+  cursor: pointer;
+
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+.owned-type:hover {
+  transform: scale(1.15);
+  filter: drop-shadow(0 0 7px #00ff9c);
+}
