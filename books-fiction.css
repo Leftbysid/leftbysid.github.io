@@ -786,3 +786,44 @@ body {
     drop-shadow(0 0 5px #00ff9c)
     drop-shadow(0 0 10px #00ff9c);
 }
+/* =========================
+   OWNERSHIP ICONS
+========================= */
+
+.owned-icons {
+  width: 55px;
+  min-width: 55px;
+
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+
+  gap: 2px !important;
+}
+
+.owned-type {
+  display: flex !important;
+
+  width: 32px !important;
+  height: 30px !important;
+
+  margin: 0 !important;
+  padding: 0 !important;
+
+  align-items: center !important;
+  justify-content: center !important;
+
+  background: none !important;
+  border: none !important;
+
+  font-size: 20px !important;
+  line-height: 1 !important;
+
+  cursor: pointer;
+}
+
+.owned-type:hover {
+  transform: scale(1.15);
+  filter: drop-shadow(0 0 7px #00ff9c);
+}
