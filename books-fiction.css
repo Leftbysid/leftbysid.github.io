@@ -770,3 +770,35 @@ body {
   filter:
     drop-shadow(0 0 7px #00ff9c);
 }
+
+/* ===============================
+   CLICKABLE BOOK COVER
+=============================== */
+
+.clickable-cover {
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+}
+
+.clickable-cover:hover {
+  box-shadow:
+    0 0 12px rgba(0,255,156,.6),
+    inset 0 0 12px rgba(0,255,156,.25);
+}
+
+.clickable-cover img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.clickable-cover .no-cover {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
