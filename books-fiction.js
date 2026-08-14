@@ -207,6 +207,7 @@ await addDoc(collection(db, COLLECTION_NAME), {
   image: imageUrl,
   read: false,
   owned: false,
+  rating: 0, 
   createdAt: Date.now(),
 
   code: bookCode // 🔥 THIS WAS MISSING
@@ -458,9 +459,24 @@ html += `
         </div>
       </div>
 
-      <span class="status-badge ${b.read ? "read" : "unread"}">
-        ${b.read ? "READ" : "UNREAD"}
-      </span>
+      <select
+  class="book-rating ${b.rating > 0 ? "rated" : "unrated"}"
+  onchange="changeRating('${b.id}', this.value)"
+  title="Change rating"
+>
+  <option value="0" ${!b.rating ? "selected" : ""}>UNRATED</option>
+  ${Array.from({ length: 10 }, (_, i) => i + 1)
+    .map(n => `
+      <option value="${n}" ${Number(b.rating) === n ? "selected" : ""}>
+        ${n}/10
+      </option>
+    `)
+    .join("")}
+</select>
+
+<span class="status-badge ${b.read ? "read" : "unread"}">
+  ${b.read ? "READ" : "UNREAD"}
+</span>
 
     </div>
 
@@ -553,6 +569,34 @@ window.toggleOwned = async (id, value) => {
   }
 
   applyView();
+};
+
+/* ===============================
+   ⭐ BOOK RATING
+=============================== */
+
+window.changeRating = async (id, value) => {
+  const rating = Number(value);
+
+  if (rating < 0 || rating > 10) return;
+
+  try {
+    await updateDoc(doc(db, COLLECTION_NAME, id), {
+      rating: rating
+    });
+
+    const book = books.find(b => b.id === id);
+
+    if (book) {
+      book.rating = rating;
+    }
+
+    applyView();
+
+  } catch (err) {
+    console.error("Rating update failed:", err);
+    alert("Failed to update rating.");
+  }
 };
 
 window.toggleOwnedType = async (id, type) => {
