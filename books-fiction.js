@@ -468,7 +468,7 @@ html += `
   ${Array.from({ length: 9 }, (_, i) => i + 1)
     .map(n => `
       <option value="${n}" ${Number(b.rating) === n ? "selected" : ""}>
-        ${n}/10
+        ${n}/9
       </option>
     `)
     .join("")}
