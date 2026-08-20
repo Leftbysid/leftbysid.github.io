@@ -465,7 +465,7 @@ html += `
   title="Change rating"
 >
   <option value="0" ${!b.rating ? "selected" : ""}>UNRATED</option>
-  ${Array.from({ length: 10 }, (_, i) => i + 1)
+  ${Array.from({ length: 9 }, (_, i) => i + 1)
     .map(n => `
       <option value="${n}" ${Number(b.rating) === n ? "selected" : ""}>
         ${n}/10
@@ -578,7 +578,7 @@ window.toggleOwned = async (id, value) => {
 window.changeRating = async (id, value) => {
   const rating = Number(value);
 
-  if (rating < 0 || rating > 10) return;
+  if (rating < 0 || rating > 9) return;
 
   try {
     await updateDoc(doc(db, COLLECTION_NAME, id), {
