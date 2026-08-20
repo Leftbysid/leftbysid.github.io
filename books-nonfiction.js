@@ -367,6 +367,61 @@ function applyView() {
 /* ===============================
    RENDER (SAME UI AS FICTION)
 ================================ */
+
+/* ===============================
+   CLICKABLE BOOK COVER
+=============================== */
+
+window.changeBookCover = async (id) => {
+  const input = document.createElement("input");
+
+  input.type = "file";
+  input.accept = "image/*";
+  input.style.display = "none";
+
+  document.body.appendChild(input);
+
+  input.onchange = async () => {
+    const file = input.files[0];
+
+    if (!file) {
+      input.remove();
+      return;
+    }
+
+    try {
+      // Upload selected image to Cloudinary
+      const imageUrl = await uploadImage(file);
+
+      // Save image URL to Firestore
+      await updateDoc(
+        doc(db, COLLECTION_NAME, id),
+        {
+          image: imageUrl
+        }
+      );
+
+      // Update local data immediately
+      const book = books.find(b => b.id === id);
+
+      if (book) {
+        book.image = imageUrl;
+      }
+
+      // Refresh the displayed books
+      applyView();
+
+    } catch (err) {
+      console.error("Cover upload error:", err);
+      alert("Failed to change book cover.");
+    }
+
+    input.remove();
+  };
+
+  input.click();
+};
+
 function renderBooks(list) {
   let html = "";
 
@@ -409,13 +464,17 @@ html += `
 
 </div>
 
-    <div class="book-cover">
-      ${
-        b.image
-          ? `<img src="${b.image}" loading="lazy">`
-          : `<div class="no-cover">💀</div>`
-      }
-    </div>
+    <div
+  class="book-cover clickable-cover"
+  onclick="changeBookCover('${b.id}')"
+  title="Click to change cover"
+>
+  ${
+    b.image
+      ? `<img src="${b.image}" loading="lazy" alt="Book cover">`
+      : `<div class="no-cover">💀</div>`
+  }
+</div>
 
     <div class="book-row">
 
