@@ -827,3 +827,54 @@ body {
   align-items: center;
   justify-content: center;
 }
+
+/* ===============================
+   ⭐ BOOK RATING
+=============================== */
+
+.book-rating {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 12px;
+
+  min-width: 78px;
+  padding: 5px 7px;
+
+  background: black;
+  border: 1px solid #00ff9c;
+  color: #00ff9c;
+
+  outline: none;
+  cursor: pointer;
+  text-align: center;
+
+  box-shadow:
+    0 0 8px rgba(0,255,156,.25);
+
+  transition:
+    box-shadow .2s ease,
+    background .2s ease,
+    color .2s ease;
+}
+
+.book-rating:hover,
+.book-rating:focus {
+  box-shadow:
+    0 0 10px rgba(0,255,156,.7),
+    0 0 20px rgba(0,255,156,.35);
+}
+
+.book-rating.unrated {
+  border-color: #777;
+  color: #777;
+  box-shadow: none;
+}
+
+.book-rating.rated {
+  border-color: #00ff9c;
+  color: #00ff9c;
+}
+
+.book-rating option {
+  background: black;
+  color: #00ff9c;
+}
