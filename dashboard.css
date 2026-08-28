@@ -6,7 +6,10 @@ body {
   background: black;
   color: #00ff9c;
   font-family: 'Share Tech Mono', monospace;
-  overflow: hidden;
+
+  overflow-x: hidden;
+  overflow-y: auto;
+  min-height: 100vh;
 }
 
 /* ======================
