@@ -115,20 +115,10 @@ loadTrack(currentIndex);
 /* =====================
    GLOBAL SEARCH
 ===================== */
-const searchToggle = document.getElementById("searchToggle");
-const searchBar = document.getElementById("searchBar");
+
 const searchInput = document.getElementById("globalSearchInput");
 const searchResults = document.getElementById("searchResults");
 const searchCategory = document.getElementById("searchCategory");
-
-searchToggle.onclick = () => {
-  searchBar.classList.toggle("hidden");
-  if (!searchBar.classList.contains("hidden")) {
-    searchInput.focus();
-  } else {
-    searchResults.classList.add("hidden");
-  }
-};
 
 /* 🔥 REAL SEARCH */
 searchInput.oninput = async () => {
