@@ -21,27 +21,6 @@ onAuthStateChanged(auth, user => {
 });
 </script>
 
-<!-- 🔍 GLOBAL SEARCH -->
-<div class="global-search">
-
-  <div class="search-toggle" id="searchToggle">🔎︎</div>
-
-  <div class="search-bar hidden" id="searchBar">
-    <select id="searchCategory">
-      <option>All</option>
-      <option>Books</option>
-      <option>Quotes</option>
-      <option>Series</option>
-      <option>Movies</option>
-      <option>Documentaries</option>
-      <option>Links</option>
-      <option>Notes</option>
-    </select>
-
-    <input type="text" id="globalSearchInput" placeholder="Search anything...">
-  </div>
-   <div id="searchResults" class="search-results hidden"></div>
-</div>
 
 
   
@@ -67,6 +46,60 @@ onAuthStateChanged(auth, user => {
     <p class="quote-author" id="dashboardAuthor"></p>
   </div>
 
+<div class="container">
+
+  <!-- QUOTE WIDGET -->
+  <div class="quote-widget" id="quoteWidget">
+    <p class="quote-text" id="dashboardQuote">Loading quote...</p>
+    <p class="quote-author" id="dashboardAuthor"></p>
+  </div>
+
+  <!-- GLOBAL SEARCH -->
+  <div class="global-search">
+
+    <div class="search-bar">
+      <select id="searchCategory">
+        <option>All</option>
+        <option>Books</option>
+        <option>Quotes</option>
+        <option>Series</option>
+        <option>Movies</option>
+        <option>Documentaries</option>
+        <option>Links</option>
+        <option>Notes</option>
+      </select>
+
+      <input
+        type="text"
+        id="globalSearchInput"
+        placeholder="Search anything..."
+      >
+    </div>
+
+    <div id="searchResults" class="search-results hidden"></div>
+
+  </div>
+
+  <!-- NAVIGATION -->
+  <div class="menu">
+    <a href="fnf.html" class="menu-link">BOOKS</a>
+    <a href="quotes.html" class="menu-link">QUOTES</a>
+    <a href="links.html" class="menu-link">LINKS</a>
+    <a href="stuffs.html" class="menu-link">STUFF</a>
+
+    <a href="poems.html" class="menu-link poems-btn">
+      POEMS
+      <span class="particles"></span>
+    </a>
+
+    <a href="import.html" class="menu-link">IMPORT</a>
+
+    <a href="#" class="menu-link disconnect full" onclick="logout()">
+      DISCONNECT
+    </a>
+  </div>
+
+</div>  
   <!-- NAVIGATION -->
   <div class="menu">
     <a href="fnf.html" class="menu-link">BOOKS</a>
