@@ -105,17 +105,48 @@ saveSeriesBtn.onclick = async () => {
     return;
   }
 
-  const data = {
-    uid: user.uid,
-    name,
-    genres,
-    seen: false,
-    createdAt: serverTimestamp()
-  };
+  // ===== GENERATE CODE =====
+const prefix = "D";
 
-  if (year) data.year = year;
+let numbers = documentaries
+  .map(d => {
+    if (!d.code) return null;
+    return parseInt(d.code.replace(prefix, ""));
+  })
+  .filter(n => !isNaN(n));
 
-  await addDoc(documentariesCol, data);
+numbers.sort((a, b) => a - b);
+
+let max = numbers.length ? numbers[numbers.length - 1] : 0;
+
+// check for gaps
+const hasGap = numbers.some((num, i) => num !== i + 1);
+
+let nextNumber;
+
+if (max === 0) {
+  nextNumber = 1;
+} else if (hasGap) {
+  nextNumber = max + 1;
+} else {
+  nextNumber = max + 1;
+}
+
+const documentaryCode = prefix + nextNumber;
+
+// ===== SAVE DOCUMENTARY =====
+const data = {
+  uid: user.uid,
+  name,
+  genres,
+  seen: false,
+  createdAt: serverTimestamp(),
+  code: documentaryCode
+};
+
+if (year) data.year = year;
+
+await addDoc(documentariesCol, data);
 
   seriesForm.classList.add("hidden");
   nameInput.value = yearInput.value = genreInput.value = "";
@@ -195,6 +226,7 @@ function render(list) {
     row.innerHTML = `
       <div class="series-text">
         <strong>
+        <span class="series-code">${d.code || ""}</span>
           ${d.name}
           <span class="status ${d.seen ? "seen" : "unseen"}">
             ${d.seen ? "SEEN" : "UNSEEN"}
@@ -255,3 +287,44 @@ confirmDeleteBtn.onclick = async () => {
 
 cancelDeleteBtn.onclick = () =>
   confirmBox.classList.add("hidden");
+
+window.backfillDocumentaryCodes = async () => {
+  if (!user) {
+    console.log("No user");
+    return;
+  }
+
+  const snap = await getDocs(
+    query(documentariesCol, where("uid", "==", user.uid))
+  );
+
+  let docs = snap.docs.map(d => ({
+    id: d.id,
+    ...d.data()
+  }));
+
+  // Oldest first
+  docs.sort((a, b) => {
+    const aTime = a.createdAt?.seconds || 0;
+    const bTime = b.createdAt?.seconds || 0;
+    return aTime - bTime;
+  });
+
+  let counter = 1;
+
+  for (const d of docs) {
+    if (d.code) continue;
+
+    const code = "D" + counter;
+
+    console.log("Assigning:", d.name, "→", code);
+
+    await updateDoc(doc(db, "documentaries", d.id), {
+      code: code
+    });
+
+    counter++;
+  }
+
+  console.log("Documentary backfill complete ✅");
+};
