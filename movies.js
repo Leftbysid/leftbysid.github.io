@@ -107,18 +107,49 @@ saveSeriesBtn.onclick = async () => {
     return;
   }
 
-  const data = {
-    uid: user.uid,
-    name,
-    genres,
-    seen: false,
-    createdAt: serverTimestamp()
-  };
+  // ===== GENERATE CODE =====
+const prefix = "M";
 
-  if (year) data.year = year;
+let numbers = movies
+  .map(m => {
+    if (!m.code) return null;
+    return parseInt(m.code.replace(prefix, ""));
+  })
+  .filter(n => !isNaN(n));
 
-  await addDoc(moviesCol, data);
+numbers.sort((a, b) => a - b);
 
+let max = numbers.length ? numbers[numbers.length - 1] : 0;
+
+// check for gaps
+const hasGap = numbers.some((num, i) => num !== i + 1);
+
+let nextNumber;
+
+if (max === 0) {
+  nextNumber = 1;
+} else if (hasGap) {
+  nextNumber = max + 1;
+} else {
+  nextNumber = max + 1;
+}
+
+const movieCode = prefix + nextNumber;
+
+// ===== SAVE MOVIE =====
+const data = {
+  uid: user.uid,
+  name,
+  genres,
+  seen: false,
+  createdAt: serverTimestamp(),
+  code: movieCode
+};
+
+if (year) data.year = year;
+
+await addDoc(moviesCol, data);
+  
   seriesForm.classList.add("hidden");
   nameInput.value = yearInput.value = genreInput.value = "";
 };
@@ -197,6 +228,7 @@ function render(list) {
     row.innerHTML = `
       <div class="series-text">
         <strong>
+        <span class="series-code">${m.code || ""}</span>
           ${m.name}
           <span class="status ${m.seen ? "seen" : "unseen"}">
             ${m.seen ? "SEEN" : "UNSEEN"}
@@ -257,3 +289,44 @@ confirmDeleteBtn.onclick = async () => {
 
 cancelDeleteBtn.onclick = () =>
   confirmBox.classList.add("hidden");
+
+window.backfillMovieCodes = async () => {
+  if (!user) {
+    console.log("No user");
+    return;
+  }
+
+  const snap = await getDocs(
+    query(moviesCol, where("uid", "==", user.uid))
+  );
+
+  let docs = snap.docs.map(d => ({
+    id: d.id,
+    ...d.data()
+  }));
+
+  // oldest first
+  docs.sort((a, b) => {
+    const aTime = a.createdAt?.seconds || 0;
+    const bTime = b.createdAt?.seconds || 0;
+    return aTime - bTime;
+  });
+
+  let counter = 1;
+
+  for (const m of docs) {
+    if (m.code) continue;
+
+    const code = "M" + counter;
+
+    console.log("Assigning:", m.name, "→", code);
+
+    await updateDoc(doc(db, "movies", m.id), {
+      code: code
+    });
+
+    counter++;
+  }
+
+  console.log("Movie backfill complete ✅");
+};
